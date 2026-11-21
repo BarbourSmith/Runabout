@@ -1891,11 +1891,11 @@
       "ioValues": [
         {
           "name": "Hull Lines",
-          "ioValue": 10
+          "ioValue": "__GEOMETRY_INPUT__"
         },
         {
           "name": "CrownRadius",
-          "ioValue": 10
+          "ioValue": 6000
         }
       ],
       "topLevel": false,
@@ -1918,7 +1918,7 @@
           "y": 0.1538,
           "uniqueID": "id-433",
           "name": "Hull Lines",
-          "type": "number",
+          "type": "geometry",
           "options": []
         },
         {
@@ -1954,7 +1954,868 @@
           "compiledCode": "\"use strict\";\n/**\n * Deck crown volume.\n * The deck of the runabout is crowned with a constant radius: at every\n * station it is a circular arc of radius `crownRadius` passing through the\n * port and starboard sheer points. This samples the sheer wire (the hull-lines\n * wire tagged \"sheer\") and lofts a full circle of that radius at each sample,\n * centred on the boat's centreline below the sheer. Everything inside the\n * result is under the deck; intersect it with the hull interior to give the\n * frames, transom and stem their crowned tops.\n */\nfunction run(hullLines, crownRadius = 6000, samples = 48) {\n    let sheer = undefined;\n    hullLines.onLeafs((leaf) => {\n        if (!sheer && leaf.isWire() && (leaf.tags || []).includes(\"sheer\")) {\n            sheer = leaf.geometry;\n        }\n        return leaf;\n    });\n    if (!sheer)\n        throw new Error(\"No wire tagged 'sheer' in the hull lines\");\n    const R = crownRadius;\n    const n = Math.max(4, Math.round(samples));\n    const wires = [];\n    let lastX = -Infinity;\n    for (let i = 0; i <= n; i++) {\n        const p = sheer.pointAt(i / n);\n        const x = p.x;\n        if (x <= lastX + 1)\n            continue; // stations must advance along the boat\n        lastX = x;\n        const half = Math.min(Math.abs(p.y), R * 0.999);\n        // centre of the crown arc: on the centreline, below the sheer point\n        const zc = p.z - Math.sqrt(R * R - half * half);\n        const circle = replicad.makeCircle(R, [x, 0, zc], [1, 0, 0]);\n        wires.push(replicad.assembleWire([circle]));\n    }\n    console.log(`deck crown: ${wires.length} sections from x=${wires.length ? \"ok\" : \"none\"}`);\n    const solid = replicad.loft(wires, { ruled: false }, false);\n    return new Assembly({ geometry: solid, color: \"#c8b08a\", tags: [\"deck crown volume\"] });\n}\n"
         }
       ],
-      "allConnectors": [],
+      "allConnectors": [
+        {
+          "ap2Name": "hullLines",
+          "ap1ID": "id-433",
+          "ap2ID": "id-439"
+        },
+        {
+          "ap2Name": "crownRadius",
+          "ap1ID": "id-436",
+          "ap2ID": "id-439"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-439",
+          "ap2ID": "id-431"
+        }
+      ],
+      "fileTypeVersion": 1
+    },
+    {
+      "atomType": "Molecule",
+      "x": 0.55,
+      "y": 0.6,
+      "uniqueID": "id-451",
+      "name": "Hull Interior",
+      "ioValues": [
+        {
+          "name": "Extended Hull Lines",
+          "ioValue": "__GEOMETRY_INPUT__"
+        },
+        {
+          "name": "Cutters",
+          "ioValue": "__GEOMETRY_INPUT__"
+        },
+        {
+          "name": "Deck Crown",
+          "ioValue": "__GEOMETRY_INPUT__"
+        }
+      ],
+      "topLevel": false,
+      "allAtoms": [
+        {
+          "atomType": "Output",
+          "x": 0.98,
+          "y": 0.5,
+          "uniqueID": "id-453",
+          "ioValues": [
+            {
+              "name": "number or geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.1538,
+          "uniqueID": "id-455",
+          "name": "Extended Hull Lines",
+          "type": "geometry",
+          "options": []
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.2462,
+          "uniqueID": "id-458",
+          "name": "Cutters",
+          "type": "geometry",
+          "options": []
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.3385,
+          "uniqueID": "id-461",
+          "name": "Deck Crown",
+          "type": "geometry",
+          "options": []
+        },
+        {
+          "atomType": "Molecule",
+          "x": 0.3,
+          "y": 0.35,
+          "uniqueID": "id-464",
+          "name": "Starboard Interior",
+          "ioValues": [
+            {
+              "name": "Extended Hull Lines",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Cutters",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "topLevel": false,
+          "allAtoms": [
+            {
+              "atomType": "Output",
+              "x": 0.98,
+              "y": 0.5,
+              "uniqueID": "id-466",
+              "ioValues": [
+                {
+                  "name": "number or geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.1538,
+              "uniqueID": "id-468",
+              "name": "Extended Hull Lines",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.2462,
+              "uniqueID": "id-471",
+              "name": "Cutters",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "GitHubMolecule",
+              "x": 0.2,
+              "y": 0.3,
+              "uniqueID": "id-479",
+              "name": "crv.OpenWireLoft",
+              "ioValues": [
+                {
+                  "name": "Wires",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "Thickness",
+                  "ioValue": 0
+                }
+              ],
+              "topLevel": false,
+              "allAtoms": [
+                {
+                  "atomType": "Output",
+                  "x": 0.98,
+                  "y": 0.5,
+                  "uniqueID": "id-475",
+                  "ioValues": [
+                    {
+                      "name": "number or geometry",
+                      "ioValue": "__GEOMETRY_INPUT__"
+                    }
+                  ]
+                },
+                {
+                  "atomType": "Code",
+                  "x": 0.4173,
+                  "y": 0.5223,
+                  "uniqueID": "id-476",
+                  "ioValues": [
+                    {
+                      "name": "wires",
+                      "ioValue": "__GEOMETRY_INPUT__"
+                    },
+                    {
+                      "name": "thickness",
+                      "ioValue": 0
+                    }
+                  ],
+                  "interpreterVersion": 1,
+                  "code": "\n/**\n * =========================================================================\n *  ABUNDANCE CODE ATOM — Quick Reference\n * =========================================================================\n *\n *  HOW INPUTS WORK\n *  ---------------\n *  Every parameter of run() becomes an input port on this atom.\n *  Four types are supported:\n *\n *    number   -> numeric input / slider\n *    string   -> text input  (great for hex color codes, labels, etc.)\n *    boolean  -> true/false toggle\n *    Assembly -> geometry -- wire this to the output of another atom\n *\n *  Give a parameter a default value ( = x ) to make it optional.\n *  Mark it with ? (name?: Assembly) to make it optional with no default.\n *  Parameters without a default must be connected before the atom runs.\n *\n *  RETURN VALUE\n *  ------------\n *  Return an Assembly, an Assembly[], or a primitive (number/string/boolean).\n *  Returning an Assembly[] lets downstream atoms (BOM, cut layout...)\n *  see each piece independently.\n *\n *  GEOMETRY API  (replicad is available as a global)\n *  -------------------------------------------------\n *  Create 2-D sketches\n *    replicad.drawCircle(radius)\n *    replicad.drawRectangle(width, height)\n *    replicad.drawRoundedRectangle(width, height, cornerRadius)\n *\n *  Turn a 2-D sketch into a 3-D solid\n *    sketch.sketchOnPlane().extrude(distance)\n *    sketch.sketchOnPlane().revolve()          // rotate 360 deg around Z\n *\n *  Create 3-D primitives directly\n *    replicad.makeBaseBox(width, depth, height)\n *    replicad.makeSphere(radius)\n *    replicad.makeCylinder(radius, height)\n *\n *  Boolean operations\n *    solidA.fuse(solidB)                       // union\n *    solidA.cut(solidB)                        // difference (cut a hole)\n *    solidA.intersect(solidB)                  // intersection\n *\n *  Post-processing\n *    solid.fillet(radius)                      // round ALL edges\n *    solid.fillet(r, e => e.inPlane(\"XY\", z))  // round only top-face edges\n *    solid.chamfer(distance)                   // bevel ALL edges\n *    solid.translate(x, y, z)                  // move the solid\n *    solid.rotate(angle, [0, 0, 1])            // rotate around Z axis\n *\n *  ASSEMBLY CLASS\n *  --------------\n *  Wrap any replicad solid in an Assembly to attach display metadata:\n *    new Assembly({ geometry, color, tags, bom })\n *      geometry -> replicad solid / drawing returned by the API above\n *      color    -> hex string shown in the 3-D viewport  (\"#A3CE5B\")\n *      tags     -> string[] used for filtering in cut layout / BOM\n *      bom      -> string[] lines added to the Bill of Materials panel\n *\n *  AI PROMPT TIP\n *  -------------\n *  Copy the code in this editor into ChatGPT / Claude and say something like:\n *    \"Modify this Abundance Code Atom to create a gear with 12 teeth\"\n *    \"Change this to make a hexagonal nut instead of a round plate\"\n *  The comments above give the AI all the context it needs to produce\n *  valid, working Abundance TypeScript code.\n * =========================================================================\n */\n\n/**\n * A rectangular mounting plate with a circular hole in the centre.\n * All parameters have defaults so the atom produces geometry immediately\n * after creation — no connections required to get started.\n */\n\n/**\n * This code atom implements a simple linear layout funtion which repeats\n * shape count times in the positive X direction with offset space\n * between each. Works for either 2D or 3D shapes. Negative offset\n * and negative counts invert the direction.\n * \n * Notice that defaults are set for both count and offset.\n */\nfunction run(wires: Assembly, thickness: number = 1) {\n  const TOLERANCE = 0.0001\n  const wireList: replicad.Wire[] = []\n  wires.onLeafs((leaf) => {\n    if (leaf.isWire()) {\n      if (leaf.geometry.isClosed) {\n        throw new Error(\"Only open wires allowed for this loft operation\")\n      }\n      wireList.push(leaf.geometry)\n    }\n    return leaf;\n  })\n\n  const result = [];\n  for (let i = 0; i < wireList.length - 1; i++) {\n    const surf = replicad.loft(wireList.slice(i, i + 2), {}, true)\n    if (thickness != 0) {\n      const offset = replicad.makeOffset(surf.faces[0], thickness);\n      const w1 = replicad.assembleWire(surf.edges)\n      const w2 = replicad.assembleWire(offset.edges)\n      const boundary = replicad.loft([w2, w1], {}, true)\n\n      const validFaces = [...surf.faces, ...offset.faces, ...boundary.faces].filter((f) => { return replicad.measureArea(f) > TOLERANCE })\n\n      result.push(new Assembly({\n        geometry: replicad.makeSolid(validFaces)}))\n    } else {\n      result.push(...surf.faces.filter((f) => { return replicad.measureArea(f) > TOLERANCE }))\n    }\n  }\n  return result;\n}\n",
+                  "compiledCode": "\"use strict\";\n/**\n * =========================================================================\n *  ABUNDANCE CODE ATOM — Quick Reference\n * =========================================================================\n *\n *  HOW INPUTS WORK\n *  ---------------\n *  Every parameter of run() becomes an input port on this atom.\n *  Four types are supported:\n *\n *    number   -> numeric input / slider\n *    string   -> text input  (great for hex color codes, labels, etc.)\n *    boolean  -> true/false toggle\n *    Assembly -> geometry -- wire this to the output of another atom\n *\n *  Give a parameter a default value ( = x ) to make it optional.\n *  Mark it with ? (name?: Assembly) to make it optional with no default.\n *  Parameters without a default must be connected before the atom runs.\n *\n *  RETURN VALUE\n *  ------------\n *  Return an Assembly, an Assembly[], or a primitive (number/string/boolean).\n *  Returning an Assembly[] lets downstream atoms (BOM, cut layout...)\n *  see each piece independently.\n *\n *  GEOMETRY API  (replicad is available as a global)\n *  -------------------------------------------------\n *  Create 2-D sketches\n *    replicad.drawCircle(radius)\n *    replicad.drawRectangle(width, height)\n *    replicad.drawRoundedRectangle(width, height, cornerRadius)\n *\n *  Turn a 2-D sketch into a 3-D solid\n *    sketch.sketchOnPlane().extrude(distance)\n *    sketch.sketchOnPlane().revolve()          // rotate 360 deg around Z\n *\n *  Create 3-D primitives directly\n *    replicad.makeBaseBox(width, depth, height)\n *    replicad.makeSphere(radius)\n *    replicad.makeCylinder(radius, height)\n *\n *  Boolean operations\n *    solidA.fuse(solidB)                       // union\n *    solidA.cut(solidB)                        // difference (cut a hole)\n *    solidA.intersect(solidB)                  // intersection\n *\n *  Post-processing\n *    solid.fillet(radius)                      // round ALL edges\n *    solid.fillet(r, e => e.inPlane(\"XY\", z))  // round only top-face edges\n *    solid.chamfer(distance)                   // bevel ALL edges\n *    solid.translate(x, y, z)                  // move the solid\n *    solid.rotate(angle, [0, 0, 1])            // rotate around Z axis\n *\n *  ASSEMBLY CLASS\n *  --------------\n *  Wrap any replicad solid in an Assembly to attach display metadata:\n *    new Assembly({ geometry, color, tags, bom })\n *      geometry -> replicad solid / drawing returned by the API above\n *      color    -> hex string shown in the 3-D viewport  (\"#A3CE5B\")\n *      tags     -> string[] used for filtering in cut layout / BOM\n *      bom      -> string[] lines added to the Bill of Materials panel\n *\n *  AI PROMPT TIP\n *  -------------\n *  Copy the code in this editor into ChatGPT / Claude and say something like:\n *    \"Modify this Abundance Code Atom to create a gear with 12 teeth\"\n *    \"Change this to make a hexagonal nut instead of a round plate\"\n *  The comments above give the AI all the context it needs to produce\n *  valid, working Abundance TypeScript code.\n * =========================================================================\n */\n/**\n * A rectangular mounting plate with a circular hole in the centre.\n * All parameters have defaults so the atom produces geometry immediately\n * after creation — no connections required to get started.\n */\n/**\n * This code atom implements a simple linear layout funtion which repeats\n * shape count times in the positive X direction with offset space\n * between each. Works for either 2D or 3D shapes. Negative offset\n * and negative counts invert the direction.\n *\n * Notice that defaults are set for both count and offset.\n */\nfunction run(wires, thickness = 1) {\n    const TOLERANCE = 0.0001;\n    const wireList = [];\n    wires.onLeafs((leaf) => {\n        if (leaf.isWire()) {\n            if (leaf.geometry.isClosed) {\n                throw new Error(\"Only open wires allowed for this loft operation\");\n            }\n            wireList.push(leaf.geometry);\n        }\n        return leaf;\n    });\n    const result = [];\n    for (let i = 0; i < wireList.length - 1; i++) {\n        const surf = replicad.loft(wireList.slice(i, i + 2), {}, true);\n        if (thickness != 0) {\n            const offset = replicad.makeOffset(surf.faces[0], thickness);\n            const w1 = replicad.assembleWire(surf.edges);\n            const w2 = replicad.assembleWire(offset.edges);\n            const boundary = replicad.loft([w2, w1], {}, true);\n            const validFaces = [...surf.faces, ...offset.faces, ...boundary.faces].filter((f) => { return replicad.measureArea(f) > TOLERANCE; });\n            result.push(new Assembly({\n                geometry: replicad.makeSolid(validFaces)\n            }));\n        }\n        else {\n            result.push(...surf.faces.filter((f) => { return replicad.measureArea(f) > TOLERANCE; }));\n        }\n    }\n    return result;\n}\n"
+                },
+                {
+                  "atomType": "Input",
+                  "x": 0.0254,
+                  "y": 0.1538,
+                  "uniqueID": "id-477",
+                  "name": "Wires",
+                  "type": "geometry",
+                  "options": []
+                },
+                {
+                  "atomType": "Input",
+                  "x": 0.0254,
+                  "y": 0.2462,
+                  "uniqueID": "id-478",
+                  "name": "Thickness",
+                  "type": "number",
+                  "options": []
+                }
+              ],
+              "allConnectors": [
+                {
+                  "ap2Name": "number or geometry",
+                  "ap1ID": "id-476",
+                  "ap2ID": "id-475"
+                },
+                {
+                  "ap2Name": "wires",
+                  "ap1ID": "id-477",
+                  "ap2ID": "id-476"
+                },
+                {
+                  "ap2Name": "thickness",
+                  "ap1ID": "id-478",
+                  "ap2ID": "id-476"
+                }
+              ],
+              "parentRepo": {
+                "owner": "tristan-huber",
+                "repoName": "crv.OpenWireLoft",
+                "privateRepo": false
+              },
+              "unitsKey": "Unitless",
+              "fileTypeVersion": 1,
+              "scaleToProjectUnits": true,
+              "lastReloadedFromGithubAt": 1795304440435
+            },
+            {
+              "atomType": "GitHubMolecule",
+              "x": 0.35,
+              "y": 0.4,
+              "uniqueID": "id-496",
+              "name": "util.FaceDifference",
+              "ioValues": [
+                {
+                  "name": "faces",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "cuttingSolid",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ],
+              "topLevel": false,
+              "allAtoms": [
+                {
+                  "atomType": "Output",
+                  "x": 0.98,
+                  "y": 0.5,
+                  "uniqueID": "id-492",
+                  "ioValues": [
+                    {
+                      "name": "number or geometry",
+                      "ioValue": "__GEOMETRY_INPUT__"
+                    }
+                  ]
+                },
+                {
+                  "atomType": "Code",
+                  "x": 0.3079,
+                  "y": 0.5771,
+                  "uniqueID": "id-493",
+                  "ioValues": [
+                    {
+                      "name": "faces",
+                      "ioValue": "__GEOMETRY_INPUT__"
+                    },
+                    {
+                      "name": "cuttingSolid",
+                      "ioValue": "__GEOMETRY_INPUT__"
+                    }
+                  ],
+                  "interpreterVersion": 1,
+                  "code": "function run(faces: Assembly, cuttingSolid: Assembly) {\n  const cutters: replicad.Shape3D[] = []\n  cuttingSolid.onLeafs((leaf) => {\n    if (leaf.is3D() && replicad.isShape3D(leaf.geometry)) {\n      cutters.push(leaf.geometry)\n    } else {\n      throw Error(\"cuttingSolid must be a 3d shape. was: \" + leaf)\n    }\n    return leaf;\n  })\n\n  return faces.onLeafs((leaf) => {\n    if (leaf.geometry instanceof replicad.Face) {\n      const norm = leaf.geometry.normalAt([0.5, 0.5]).normalize().multiply(-1)\n      let solid = replicad.basicFaceExtrusion(leaf.geometry, norm)\n      for (const cutter of cutters) {\n        solid = solid.cut(cutter)\n      }\n\n      // select trimmed face\n      for (const candidateResult of solid.faces) {\n        const point = candidateResult.pointOnSurface(0.5, 0.5)\n        const found = new replicad.FaceFinder().containsPoint(point).find(leaf.geometry)\n        console.log(found)\n        if (found.length > 0) {\n          // A central point of the candidate face is on the input face. This should only happen for one candidate\n          leaf.geometry = candidateResult\n          return leaf;\n        }\n      }\n      console.warn(\"Didn't find a face in the result which corresponds to our input face\")\n      return undefined\n    } else {\n      throw new Error(\"Faces to trim were not of type face \" + leaf)\n    }\n  })\n}",
+                  "compiledCode": "\"use strict\";\nfunction run(faces, cuttingSolid) {\n    const cutters = [];\n    cuttingSolid.onLeafs((leaf) => {\n        if (leaf.is3D() && replicad.isShape3D(leaf.geometry)) {\n            cutters.push(leaf.geometry);\n        }\n        else {\n            throw Error(\"cuttingSolid must be a 3d shape. was: \" + leaf);\n        }\n        return leaf;\n    });\n    return faces.onLeafs((leaf) => {\n        if (leaf.geometry instanceof replicad.Face) {\n            const norm = leaf.geometry.normalAt([0.5, 0.5]).normalize().multiply(-1);\n            let solid = replicad.basicFaceExtrusion(leaf.geometry, norm);\n            for (const cutter of cutters) {\n                solid = solid.cut(cutter);\n            }\n            // select trimmed face\n            for (const candidateResult of solid.faces) {\n                const point = candidateResult.pointOnSurface(0.5, 0.5);\n                const found = new replicad.FaceFinder().containsPoint(point).find(leaf.geometry);\n                console.log(found);\n                if (found.length > 0) {\n                    // A central point of the candidate face is on the input face. This should only happen for one candidate\n                    leaf.geometry = candidateResult;\n                    return leaf;\n                }\n            }\n            console.warn(\"Didn't find a face in the result which corresponds to our input face\");\n            return undefined;\n        }\n        else {\n            throw new Error(\"Faces to trim were not of type face \" + leaf);\n        }\n    });\n}\n"
+                },
+                {
+                  "atomType": "Input",
+                  "x": 0.0254,
+                  "y": 0.1538,
+                  "uniqueID": "id-494",
+                  "name": "faces",
+                  "type": "geometry",
+                  "options": []
+                },
+                {
+                  "atomType": "Input",
+                  "x": 0.0254,
+                  "y": 0.2462,
+                  "uniqueID": "id-495",
+                  "name": "cuttingSolid",
+                  "type": "geometry",
+                  "options": []
+                }
+              ],
+              "allConnectors": [
+                {
+                  "ap2Name": "number or geometry",
+                  "ap1ID": "id-493",
+                  "ap2ID": "id-492"
+                },
+                {
+                  "ap2Name": "faces",
+                  "ap1ID": "id-494",
+                  "ap2ID": "id-493"
+                },
+                {
+                  "ap2Name": "cuttingSolid",
+                  "ap1ID": "id-495",
+                  "ap2ID": "id-493"
+                }
+              ],
+              "parentRepo": {
+                "owner": "tristan-huber",
+                "repoName": "util.FaceDifference",
+                "privateRepo": false
+              },
+              "unitsKey": "Unitless",
+              "fileTypeVersion": 1,
+              "scaleToProjectUnits": true,
+              "lastReloadedFromGithubAt": 1795304441122
+            },
+            {
+              "atomType": "GitHubMolecule",
+              "x": 0.5,
+              "y": 0.4,
+              "uniqueID": "id-513",
+              "name": "extrudeFaceDirected",
+              "ioValues": [
+                {
+                  "name": "face",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "extrusionVec",
+                  "ioValue": [
+                    0,
+                    -2000,
+                    0
+                  ]
+                }
+              ],
+              "topLevel": false,
+              "allAtoms": [
+                {
+                  "atomType": "Output",
+                  "x": 0.98,
+                  "y": 0.5,
+                  "uniqueID": "id-509",
+                  "ioValues": [
+                    {
+                      "name": "number or geometry",
+                      "ioValue": "__GEOMETRY_INPUT__"
+                    }
+                  ]
+                },
+                {
+                  "atomType": "Code",
+                  "x": 0.4517,
+                  "y": 0.4833,
+                  "uniqueID": "id-510",
+                  "ioValues": [
+                    {
+                      "name": "faces",
+                      "ioValue": "__GEOMETRY_INPUT__"
+                    },
+                    {
+                      "name": "direction",
+                      "ioValue": [
+                        0,
+                        -2000,
+                        0
+                      ]
+                    }
+                  ],
+                  "interpreterVersion": 1,
+                  "code": "function run(faces: Assembly, direction: number[]) {\n  return faces.onLeafs((leaf) => {\n    leaf.geometry = replicad.basicFaceExtrusion(leaf.geometry, new replicad.Vector(direction))\n    return leaf;\n  })\n}",
+                  "compiledCode": "\"use strict\";\nfunction run(faces, direction) {\n    return faces.onLeafs((leaf) => {\n        leaf.geometry = replicad.basicFaceExtrusion(leaf.geometry, new replicad.Vector(direction));\n        return leaf;\n    });\n}\n"
+                },
+                {
+                  "atomType": "Input",
+                  "x": 0.0254,
+                  "y": 0.1538,
+                  "uniqueID": "id-511",
+                  "name": "face",
+                  "type": "geometry",
+                  "options": []
+                },
+                {
+                  "atomType": "Input",
+                  "x": 0.0254,
+                  "y": 0.2462,
+                  "uniqueID": "id-512",
+                  "name": "extrusionVec",
+                  "type": "point3d",
+                  "options": [],
+                  "pointValue": null
+                }
+              ],
+              "allConnectors": [
+                {
+                  "ap2Name": "number or geometry",
+                  "ap1ID": "id-510",
+                  "ap2ID": "id-509"
+                },
+                {
+                  "ap2Name": "faces",
+                  "ap1ID": "id-511",
+                  "ap2ID": "id-510"
+                },
+                {
+                  "ap2Name": "direction",
+                  "ap1ID": "id-512",
+                  "ap2ID": "id-510"
+                }
+              ],
+              "parentRepo": {
+                "owner": "tristan-huber",
+                "repoName": "extrudeFaceDirected",
+                "privateRepo": false
+              },
+              "unitsKey": "Unitless",
+              "fileTypeVersion": 1,
+              "scaleToProjectUnits": true,
+              "lastReloadedFromGithubAt": 1795304441874
+            },
+            {
+              "atomType": "Fusion",
+              "x": 0.65,
+              "y": 0.4,
+              "uniqueID": "id-525",
+              "ioValues": [
+                {
+                  "name": "Shape 1",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ],
+              "unionType": "Fusion"
+            },
+            {
+              "atomType": "Difference",
+              "x": 0.8,
+              "y": 0.45,
+              "uniqueID": "id-530",
+              "ioValues": [
+                {
+                  "name": "retain",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "remove",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            }
+          ],
+          "allConnectors": [
+            {
+              "ap2Name": "Wires",
+              "ap1ID": "id-468",
+              "ap2ID": "id-479"
+            },
+            {
+              "ap2Name": "cuttingSolid",
+              "ap1ID": "id-471",
+              "ap2ID": "id-496"
+            },
+            {
+              "ap2Name": "remove",
+              "ap1ID": "id-471",
+              "ap2ID": "id-530"
+            },
+            {
+              "ap2Name": "faces",
+              "ap1ID": "id-479",
+              "ap2ID": "id-496"
+            },
+            {
+              "ap2Name": "face",
+              "ap1ID": "id-496",
+              "ap2ID": "id-513"
+            },
+            {
+              "ap2Name": "Shape 1",
+              "ap1ID": "id-513",
+              "ap2ID": "id-525"
+            },
+            {
+              "ap2Name": "retain",
+              "ap1ID": "id-525",
+              "ap2ID": "id-530"
+            },
+            {
+              "ap2Name": "number or geometry",
+              "ap1ID": "id-530",
+              "ap2ID": "id-466"
+            }
+          ],
+          "fileTypeVersion": 1
+        },
+        {
+          "atomType": "Intersection",
+          "x": 0.5,
+          "y": 0.45,
+          "uniqueID": "id-608",
+          "ioValues": [
+            {
+              "name": "geometry1",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "geometry2",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "GitHubMolecule",
+          "x": 0.65,
+          "y": 0.6,
+          "uniqueID": "id-625",
+          "name": "Mirror",
+          "ioValues": [
+            {
+              "name": "Shape",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Pivot",
+              "ioValue": 90
+            },
+            {
+              "name": "Plane",
+              "ioValue": "X",
+              "currentEquation": "X"
+            }
+          ],
+          "topLevel": false,
+          "allAtoms": [
+            {
+              "atomType": "Output",
+              "x": 0.98,
+              "y": 0.5,
+              "uniqueID": "id-613",
+              "ioValues": [
+                {
+                  "name": "number or geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.1538,
+              "uniqueID": "id-614",
+              "name": "Shape",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "Code",
+              "x": 0.5916,
+              "y": 0.5807,
+              "uniqueID": "id-615",
+              "ioValues": [
+                {
+                  "name": "shape",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "pivot",
+                  "ioValue": 90
+                },
+                {
+                  "name": "plane",
+                  "ioValue": "X",
+                  "currentEquation": "X"
+                }
+              ],
+              "interpreterVersion": 0,
+              "code": "\n      const Inputs = [\n       {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n        {inputName: \"pivot\", type: \"number\", defaultValue: 90},\n        {inputName: \"plane\", type: \"string\", defaultValue: \"X\"}\n        \n        ]\n      //This defines the molecules inputs and creates variables with the same names which can be referenced in the code\n\n      //Gets the shape from the library - no need to clone or access geometry directly\n      let importedShape = library[shape]\n\n      const newPlane = new replicad.Plane().pivot(pivot, plane)\n      console.log(importedShape)\n      let mirroredShape = importedShape.geometry[0].mirror(newPlane,(0,0,0))\n\n\n      //Wrap the raw replicad geometry in our assembly format\n      let shape2 = {\n          geometry: [mirroredShape],\n          dimension: \"3D\",\n          tags: [\"createdShape\"],\n          color: '#A3CE5B',\n          plane: newPlane,\n          bom: []\n      }\n    \n      return shape2\n\n      /**\n      Built-in Functions Available:\n      - Move(geometry, x, y, z) - Move a shape in 3D space\n      - Rotate(geometry, x, y, z) - Rotate a shape around X, Y, Z axes (degrees)\n      - Scale(geometry, factor) - Scale a shape by a factor\n      - Assembly([shapes]) - Combine multiple shapes into an assembly\n      - Intersect(shape1, shape2) - Boolean intersection of two shapes\n      - GetBounds(geometry) - Get the bounding box of a shape\n      - Fillet(geometry, radius) - Round edges with specified radius\n      - Chamfer(geometry, size) - Bevel edges with specified size\n\n      To Use the Code Atom, enter your inputs to the input list as an object array:\n      const Inputs = [\n        {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n        {inputName: \"dist\", type: \"number\", defaultValue: 5},\n        {inputName: \"height\", type: \"number\", defaultValue: 10}\n      ]\n\n      Access imported geometry using library[inputName] - the built-in functions handle \n      the complexity of accessing geometry arrays and maintaining metadata automatically.\n\n      Simple Example - Move a shape:\n         const Inputs = [\n          {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n          {inputName: \"x\", type: \"number\", defaultValue: 5}\n        ]\n        let movedShape = await Move(library[shape], x, 0, 0)\n        return movedShape\n      */\n      "
+            },
+            {
+              "atomType": "Rectangle",
+              "x": 0.1558,
+              "y": 0.6584,
+              "uniqueID": "id-616",
+              "ioValues": [
+                {
+                  "name": "x length",
+                  "ioValue": 10
+                },
+                {
+                  "name": "y length",
+                  "ioValue": 10
+                }
+              ]
+            },
+            {
+              "atomType": "Extrude",
+              "x": 0.272,
+              "y": 0.7981,
+              "uniqueID": "id-617",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "height",
+                  "ioValue": 1
+                }
+              ]
+            },
+            {
+              "atomType": "Move",
+              "x": 0.4027,
+              "y": 0.7112,
+              "uniqueID": "id-618",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "xDist",
+                  "ioValue": 0
+                },
+                {
+                  "name": "yDist",
+                  "ioValue": 10
+                },
+                {
+                  "name": "zDist",
+                  "ioValue": 0
+                }
+              ]
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.2462,
+              "uniqueID": "id-619",
+              "name": "Pivot",
+              "type": "number",
+              "options": []
+            },
+            {
+              "atomType": "Assembly",
+              "x": 0.6893,
+              "y": 0.7919,
+              "uniqueID": "id-620",
+              "ioValues": [
+                {
+                  "name": "makeDisjoint",
+                  "ioValue": true
+                },
+                {
+                  "name": "Shape 1",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "Shape 3",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "Shape4",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Readme",
+              "x": 0.8063,
+              "y": 0.7236,
+              "uniqueID": "id-621",
+              "name": "README",
+              "ioValues": [
+                {
+                  "name": "value",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ],
+              "readMeText": "Mirror a given shape",
+              "global": true
+            },
+            {
+              "atomType": "Rotate",
+              "x": 0.4964,
+              "y": 0.7733,
+              "uniqueID": "id-622",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "x-axis degrees",
+                  "ioValue": 0
+                },
+                {
+                  "name": "y-axis degrees",
+                  "ioValue": 30
+                },
+                {
+                  "name": "z-axis degrees",
+                  "ioValue": 0
+                }
+              ]
+            },
+            {
+              "atomType": "Code",
+              "x": 0.4972,
+              "y": 0.3292,
+              "uniqueID": "id-623",
+              "ioValues": [
+                {
+                  "name": "shape",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "pivot",
+                  "ioValue": 90
+                },
+                {
+                  "name": "plane",
+                  "ioValue": "X",
+                  "currentEquation": "X"
+                }
+              ],
+              "interpreterVersion": 0,
+              "code": "\n      const Inputs = [\n       {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n        {inputName: \"pivot\", type: \"number\", defaultValue: 90},\n        {inputName: \"plane\", type: \"string\", defaultValue: \"X\"}\n        \n        ]\n      //This defines the molecules inputs and creates variables with the same names which can be referenced in the code\n\n      //Gets the shape from the library - no need to clone or access geometry directly\n      let importedShape = library[shape]\n\n      const newPlane = new replicad.Plane().pivot(pivot, plane)\n      console.log(importedShape)\n      let mirroredShape = importedShape.geometry[0].mirror(newPlane,(0,0,0))\n\n\n      //Wrap the raw replicad geometry in our assembly format\n      let shape2 = {\n          geometry: [mirroredShape],\n          dimension: \"3D\",\n          tags: [\"createdShape\"],\n          color: '#A3CE5B',\n          plane: newPlane,\n          bom: []\n      }\n    \n      return shape2\n\n      /**\n      Built-in Functions Available:\n      - Move(geometry, x, y, z) - Move a shape in 3D space\n      - Rotate(geometry, x, y, z) - Rotate a shape around X, Y, Z axes (degrees)\n      - Scale(geometry, factor) - Scale a shape by a factor\n      - Assembly([shapes]) - Combine multiple shapes into an assembly\n      - Intersect(shape1, shape2) - Boolean intersection of two shapes\n      - GetBounds(geometry) - Get the bounding box of a shape\n      - Fillet(geometry, radius) - Round edges with specified radius\n      - Chamfer(geometry, size) - Bevel edges with specified size\n\n      To Use the Code Atom, enter your inputs to the input list as an object array:\n      const Inputs = [\n        {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n        {inputName: \"dist\", type: \"number\", defaultValue: 5},\n        {inputName: \"height\", type: \"number\", defaultValue: 10}\n      ]\n\n      Access imported geometry using library[inputName] - the built-in functions handle \n      the complexity of accessing geometry arrays and maintaining metadata automatically.\n\n      Simple Example - Move a shape:\n         const Inputs = [\n          {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n          {inputName: \"x\", type: \"number\", defaultValue: 5}\n        ]\n        let movedShape = await Move(library[shape], x, 0, 0)\n        return movedShape\n      */\n      "
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.3385,
+              "uniqueID": "id-624",
+              "name": "Plane",
+              "type": "string",
+              "options": []
+            }
+          ],
+          "allConnectors": [
+            {
+              "ap2Name": "shape",
+              "ap1ID": "id-614",
+              "ap2ID": "id-623"
+            },
+            {
+              "ap2Name": "Shape 1",
+              "ap1ID": "id-615",
+              "ap2ID": "id-620"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-616",
+              "ap2ID": "id-617"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-617",
+              "ap2ID": "id-618"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-618",
+              "ap2ID": "id-622"
+            },
+            {
+              "ap2Name": "pivot",
+              "ap1ID": "id-619",
+              "ap2ID": "id-623"
+            },
+            {
+              "ap2Name": "shape",
+              "ap1ID": "id-622",
+              "ap2ID": "id-615"
+            },
+            {
+              "ap2Name": "Shape 3",
+              "ap1ID": "id-622",
+              "ap2ID": "id-620"
+            },
+            {
+              "ap2Name": "number or geometry",
+              "ap1ID": "id-623",
+              "ap2ID": "id-613"
+            },
+            {
+              "ap2Name": "plane",
+              "ap1ID": "id-624",
+              "ap2ID": "id-623"
+            }
+          ],
+          "parentRepo": {
+            "owner": "alzatin",
+            "repoName": "Mirror",
+            "privateRepo": false
+          },
+          "unitsKey": "Unitless",
+          "fileTypeVersion": 1,
+          "scaleToProjectUnits": true,
+          "lastReloadedFromGithubAt": 1795304469651
+        },
+        {
+          "atomType": "Fusion",
+          "x": 0.82,
+          "y": 0.45,
+          "uniqueID": "id-666",
+          "ioValues": [
+            {
+              "name": "Shape 1",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Shape2",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "unionType": "Fusion"
+        }
+      ],
+      "allConnectors": [
+        {
+          "ap2Name": "Extended Hull Lines",
+          "ap1ID": "id-455",
+          "ap2ID": "id-464"
+        },
+        {
+          "ap2Name": "Cutters",
+          "ap1ID": "id-458",
+          "ap2ID": "id-464"
+        },
+        {
+          "ap2Name": "geometry2",
+          "ap1ID": "id-461",
+          "ap2ID": "id-608"
+        },
+        {
+          "ap2Name": "geometry1",
+          "ap1ID": "id-464",
+          "ap2ID": "id-608"
+        },
+        {
+          "ap2Name": "Shape",
+          "ap1ID": "id-608",
+          "ap2ID": "id-625"
+        },
+        {
+          "ap2Name": "Shape 1",
+          "ap1ID": "id-608",
+          "ap2ID": "id-666"
+        },
+        {
+          "ap2Name": "Shape2",
+          "ap1ID": "id-625",
+          "ap2ID": "id-666"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-666",
+          "ap2ID": "id-453"
+        }
+      ],
       "fileTypeVersion": 1
     }
   ],
@@ -1975,9 +2836,19 @@
       "ap2ID": "id-296"
     },
     {
+      "ap2Name": "Hull Lines",
+      "ap1ID": "id-125",
+      "ap2ID": "id-429"
+    },
+    {
       "ap2Name": "Cutters",
       "ap1ID": "id-240",
       "ap2ID": "id-296"
+    },
+    {
+      "ap2Name": "Cutters",
+      "ap1ID": "id-240",
+      "ap2ID": "id-451"
     },
     {
       "ap2Name": "Shape 1",
@@ -1985,9 +2856,19 @@
       "ap2ID": "id-340"
     },
     {
+      "ap2Name": "Extended Hull Lines",
+      "ap1ID": "id-346",
+      "ap2ID": "id-451"
+    },
+    {
       "ap2Name": "Shape2",
       "ap1ID": "id-4",
       "ap2ID": "id-340"
+    },
+    {
+      "ap2Name": "Deck Crown",
+      "ap1ID": "id-429",
+      "ap2ID": "id-451"
     }
   ],
   "unitsKey": "MM",

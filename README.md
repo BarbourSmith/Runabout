@@ -4,6 +4,11 @@
 
 ![](/project.png)
 
+## Inputs
+
+- **Hull JSON** (string)
+
+
 
 
  

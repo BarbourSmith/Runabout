@@ -9416,8 +9416,8 @@
     },
     {
       "atomType": "Assembly",
-      "x": 0.8499,
-      "y": 0.431,
+      "x": 0.8485,
+      "y": 0.4254,
       "uniqueID": "id-8036",
       "ioValues": [
         {
@@ -11526,8 +11526,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.1971,
-      "y": 0.462,
+      "x": 0.1812,
+      "y": 0.4254,
       "uniqueID": "id-8443",
       "name": "1 Hull",
       "topLevel": false,

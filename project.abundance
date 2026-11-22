@@ -148,13 +148,11 @@
             },
             {
               "name": "xDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
@@ -424,8 +422,7 @@
                     },
                     {
                       "name": "xDist",
-                      "ioValue": 0,
-                      "currentEquation": "0"
+                      "ioValue": 0
                     },
                     {
                       "name": "yDist",
@@ -434,8 +431,7 @@
                     },
                     {
                       "name": "zDist",
-                      "ioValue": 0,
-                      "currentEquation": "0"
+                      "ioValue": 0
                     }
                   ]
                 },
@@ -451,8 +447,7 @@
                     },
                     {
                       "name": "xDist",
-                      "ioValue": 0,
-                      "currentEquation": "0"
+                      "ioValue": 0
                     },
                     {
                       "name": "yDist",
@@ -461,8 +456,7 @@
                     },
                     {
                       "name": "zDist",
-                      "ioValue": 0,
-                      "currentEquation": "0"
+                      "ioValue": 0
                     }
                   ]
                 },
@@ -478,13 +472,11 @@
                     },
                     {
                       "name": "xDist",
-                      "ioValue": 0,
-                      "currentEquation": "0"
+                      "ioValue": 0
                     },
                     {
                       "name": "yDist",
-                      "ioValue": 0,
-                      "currentEquation": "0"
+                      "ioValue": 0
                     },
                     {
                       "name": "zDist",
@@ -505,13 +497,11 @@
                     },
                     {
                       "name": "xDist",
-                      "ioValue": 0,
-                      "currentEquation": "0"
+                      "ioValue": 0
                     },
                     {
                       "name": "yDist",
-                      "ioValue": 0,
-                      "currentEquation": "0"
+                      "ioValue": 0
                     },
                     {
                       "name": "zDist",
@@ -811,8 +801,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.6951,
-      "y": 0.7296,
+      "x": 0.6911,
+      "y": 0.7127,
       "uniqueID": "id-1191",
       "name": "Transom",
       "ioValues": [
@@ -933,8 +923,7 @@
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
@@ -984,13 +973,11 @@
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             }
           ]
         },
@@ -1112,7 +1099,7 @@
     {
       "atomType": "Input",
       "x": 0.0254,
-      "y": 0.3127,
+      "y": 0.1538,
       "uniqueID": "id-122",
       "name": "Hull JSON",
       "type": "string",
@@ -1319,8 +1306,7 @@
                 },
                 {
                   "name": "yDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "zDist",
@@ -2257,8 +2243,7 @@
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
@@ -2411,8 +2396,7 @@
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
@@ -2453,8 +2437,7 @@
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
@@ -2585,8 +2568,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.8029,
-      "y": 0.3915,
+      "x": 0.7487,
+      "y": 0.4197,
       "uniqueID": "id-1404",
       "name": "Longitudinals",
       "ioValues": [
@@ -2913,6 +2896,14 @@
               "uniqueID": "id-1614",
               "ioValues": [
                 {
+                  "name": "surface",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "inset",
+                  "ioValue": 6
+                },
+                {
                   "name": "thickness",
                   "ioValue": -26,
                   "currentEquation": "-Offset"
@@ -2921,15 +2912,6 @@
                   "name": "color",
                   "ioValue": "#b5835a",
                   "currentEquation": "#b5835a"
-                },
-                {
-                  "name": "surface",
-                  "ioValue": "__GEOMETRY_INPUT__"
-                },
-                {
-                  "name": "inset",
-                  "ioValue": 6,
-                  "currentEquation": "6"
                 }
               ],
               "interpreterVersion": 1,
@@ -3250,6 +3232,14 @@
               "uniqueID": "id-1624",
               "ioValues": [
                 {
+                  "name": "surface",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "inset",
+                  "ioValue": 6
+                },
+                {
                   "name": "thickness",
                   "ioValue": -34,
                   "currentEquation": "-Offset"
@@ -3258,15 +3248,6 @@
                   "name": "color",
                   "ioValue": "#b5835a",
                   "currentEquation": "#b5835a"
-                },
-                {
-                  "name": "surface",
-                  "ioValue": "__GEOMETRY_INPUT__"
-                },
-                {
-                  "name": "inset",
-                  "ioValue": 6,
-                  "currentEquation": "6"
                 }
               ],
               "interpreterVersion": 1,
@@ -3586,6 +3567,14 @@
               "uniqueID": "id-1634",
               "ioValues": [
                 {
+                  "name": "surface",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "inset",
+                  "ioValue": 9
+                },
+                {
                   "name": "thickness",
                   "ioValue": -29,
                   "currentEquation": "-Offset"
@@ -3594,15 +3583,6 @@
                   "name": "color",
                   "ioValue": "#b5835a",
                   "currentEquation": "#b5835a"
-                },
-                {
-                  "name": "surface",
-                  "ioValue": "__GEOMETRY_INPUT__"
-                },
-                {
-                  "name": "inset",
-                  "ioValue": 9,
-                  "currentEquation": "9"
                 }
               ],
               "interpreterVersion": 1,
@@ -3922,6 +3902,14 @@
               "uniqueID": "id-1644",
               "ioValues": [
                 {
+                  "name": "surface",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "inset",
+                  "ioValue": 9
+                },
+                {
                   "name": "thickness",
                   "ioValue": -29,
                   "currentEquation": "-Offset"
@@ -3930,15 +3918,6 @@
                   "name": "color",
                   "ioValue": "#b5835a",
                   "currentEquation": "#b5835a"
-                },
-                {
-                  "name": "surface",
-                  "ioValue": "__GEOMETRY_INPUT__"
-                },
-                {
-                  "name": "inset",
-                  "ioValue": 9,
-                  "currentEquation": "9"
                 }
               ],
               "interpreterVersion": 1,
@@ -5556,13 +5535,11 @@
             },
             {
               "name": "xDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
@@ -6050,8 +6027,7 @@
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
@@ -6737,8 +6713,7 @@
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
@@ -8120,13 +8095,11 @@
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             }
           ]
         },
@@ -8643,8 +8616,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.6435,
-      "y": 0.2282,
+      "x": 0.6541,
+      "y": 0.2254,
       "uniqueID": "id-2977",
       "name": "Deck",
       "ioValues": [
@@ -8686,7 +8659,7 @@
         {
           "atomType": "Input",
           "x": 0.0254,
-          "y": 0.3385,
+          "y": 0.1538,
           "uniqueID": "id-2987",
           "name": "Cockpit Opening",
           "type": "geometry",
@@ -8695,7 +8668,7 @@
         {
           "atomType": "Input",
           "x": 0.0254,
-          "y": 0.4308,
+          "y": 0.2462,
           "uniqueID": "id-2990",
           "name": "Thickness",
           "type": "number",
@@ -8746,7 +8719,7 @@
             {
               "atomType": "Input",
               "x": 0.0254,
-              "y": 0.3385,
+              "y": 0.1538,
               "uniqueID": "id-3003",
               "name": "Cockpit Opening",
               "type": "geometry",
@@ -8755,7 +8728,7 @@
             {
               "atomType": "Input",
               "x": 0.0254,
-              "y": 0.4308,
+              "y": 0.2462,
               "uniqueID": "id-3006",
               "name": "Thickness",
               "type": "number",
@@ -8805,13 +8778,11 @@
                 },
                 {
                   "name": "xDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "yDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "zDist",
@@ -8838,7 +8809,7 @@
             {
               "atomType": "Input",
               "x": 0.0254,
-              "y": 0.5231,
+              "y": 0.3385,
               "uniqueID": "id-3140",
               "name": "Hull Lines",
               "type": "geometry",
@@ -8883,7 +8854,7 @@
             {
               "atomType": "Input",
               "x": 0.0254,
-              "y": 0.6154,
+              "y": 0.4308,
               "uniqueID": "id-3904",
               "name": "Deck Plan",
               "type": "geometry",
@@ -8892,7 +8863,7 @@
             {
               "atomType": "Input",
               "x": 0.0254,
-              "y": 0.7077,
+              "y": 0.5231,
               "uniqueID": "id-3907",
               "name": "Cutters",
               "type": "geometry",
@@ -9549,7 +9520,7 @@
         {
           "atomType": "Input",
           "x": 0.0254,
-          "y": 0.5231,
+          "y": 0.3385,
           "uniqueID": "id-3158",
           "name": "Hull Lines",
           "type": "geometry",
@@ -9558,7 +9529,7 @@
         {
           "atomType": "Input",
           "x": 0.0254,
-          "y": 0.6154,
+          "y": 0.4308,
           "uniqueID": "id-3898",
           "name": "Deck Plan",
           "type": "geometry",
@@ -9567,7 +9538,7 @@
         {
           "atomType": "Input",
           "x": 0.0254,
-          "y": 0.7077,
+          "y": 0.5231,
           "uniqueID": "id-3901",
           "name": "Cutters",
           "type": "geometry",
@@ -9878,13 +9849,11 @@
             },
             {
               "name": "xDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
@@ -10315,13 +10284,11 @@
                 },
                 {
                   "name": "xDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "yDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "zDist",
@@ -10487,8 +10454,7 @@
                 },
                 {
                   "name": "yDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "zDist",
@@ -10682,16 +10648,16 @@
               "uniqueID": "id-3408",
               "ioValues": [
                 {
-                  "name": "width",
-                  "ioValue": 40
-                },
-                {
                   "name": "hullLines",
                   "ioValue": "__GEOMETRY_INPUT__"
                 },
                 {
                   "name": "fraction",
                   "ioValue": 0.29
+                },
+                {
+                  "name": "width",
+                  "ioValue": 40
                 },
                 {
                   "name": "stopY",
@@ -10734,13 +10700,11 @@
                 },
                 {
                   "name": "xDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "yDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "zDist",
@@ -10929,16 +10893,16 @@
               "uniqueID": "id-3421",
               "ioValues": [
                 {
-                  "name": "width",
-                  "ioValue": 40
-                },
-                {
                   "name": "hullLines",
                   "ioValue": "__GEOMETRY_INPUT__"
                 },
                 {
                   "name": "fraction",
                   "ioValue": 0.53
+                },
+                {
+                  "name": "width",
+                  "ioValue": 40
                 },
                 {
                   "name": "stopY",
@@ -10981,13 +10945,11 @@
                 },
                 {
                   "name": "xDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "yDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "zDist",
@@ -11176,16 +11138,16 @@
               "uniqueID": "id-3434",
               "ioValues": [
                 {
-                  "name": "width",
-                  "ioValue": 40
-                },
-                {
                   "name": "hullLines",
                   "ioValue": "__GEOMETRY_INPUT__"
                 },
                 {
                   "name": "fraction",
                   "ioValue": 0.79
+                },
+                {
+                  "name": "width",
+                  "ioValue": 40
                 },
                 {
                   "name": "stopY",
@@ -11228,13 +11190,11 @@
                 },
                 {
                   "name": "xDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "yDist",
-                  "ioValue": 0,
-                  "currentEquation": "0"
+                  "ioValue": 0
                 },
                 {
                   "name": "zDist",
@@ -12416,8 +12376,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.8948,
-      "y": 0.6507,
+      "x": 0.8955,
+      "y": 0.6563,
       "uniqueID": "id-3719",
       "name": "Cockpit Beam Cut",
       "ioValues": [
@@ -12503,13 +12463,11 @@
             },
             {
               "name": "xDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "yDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "zDist",
@@ -12566,8 +12524,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.8538,
-      "y": 0.0986,
+      "x": 0.8598,
+      "y": 0.0873,
       "uniqueID": "id-3749",
       "name": "Deck Flat Patterns",
       "ioValues": [
@@ -13032,7 +12990,7 @@
     {
       "atomType": "Input",
       "x": 0.0254,
-      "y": 0.569,
+      "y": 0.2462,
       "uniqueID": "id-3895",
       "name": "FrameStations",
       "type": "array",
@@ -14064,20 +14022,20 @@
       "name": "Flat Patterns",
       "ioValues": [
         {
-          "name": "Side Surface",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "Bottom Surface",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
           "name": "SideThickness",
           "ioValue": 6
         },
         {
           "name": "BottomThickness",
           "ioValue": 9
+        },
+        {
+          "name": "Side Surface",
+          "ioValue": "__GEOMETRY_INPUT__"
+        },
+        {
+          "name": "Bottom Surface",
+          "ioValue": "__GEOMETRY_INPUT__"
         }
       ],
       "topLevel": false,
@@ -14085,7 +14043,7 @@
         {
           "atomType": "Input",
           "x": 0.0254,
-          "y": 0.3385,
+          "y": 0.1538,
           "uniqueID": "id-2000",
           "name": "SideThickness",
           "type": "number",
@@ -14094,7 +14052,7 @@
         {
           "atomType": "Input",
           "x": 0.0254,
-          "y": 0.4308,
+          "y": 0.2462,
           "uniqueID": "id-2003",
           "name": "BottomThickness",
           "type": "number",
@@ -14178,8 +14136,7 @@
             },
             {
               "name": "xDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             },
             {
               "name": "yDist",
@@ -14187,8 +14144,7 @@
             },
             {
               "name": "zDist",
-              "ioValue": 0,
-              "currentEquation": "0"
+              "ioValue": 0
             }
           ]
         },
@@ -14287,7 +14243,7 @@
         {
           "atomType": "Input",
           "x": 0.0254,
-          "y": 0.1538,
+          "y": 0.3385,
           "uniqueID": "id-786",
           "name": "Side Surface",
           "type": "geometry",
@@ -14296,7 +14252,7 @@
         {
           "atomType": "Input",
           "x": 0.0254,
-          "y": 0.2462,
+          "y": 0.4308,
           "uniqueID": "id-789",
           "name": "Bottom Surface",
           "type": "geometry",
@@ -15238,13 +15194,13 @@
               "uniqueID": "id-932",
               "ioValues": [
                 {
+                  "name": "surface",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
                   "name": "thickness",
                   "ioValue": -6,
                   "currentEquation": "-Thickness"
-                },
-                {
-                  "name": "surface",
-                  "ioValue": "__GEOMETRY_INPUT__"
                 },
                 {
                   "name": "color",
@@ -15326,6 +15282,10 @@
               "uniqueID": "id-943",
               "ioValues": [
                 {
+                  "name": "surface",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
                   "name": "thickness",
                   "ioValue": -9,
                   "currentEquation": "-Thickness"
@@ -15334,10 +15294,6 @@
                   "name": "color",
                   "ioValue": "#c9a47a",
                   "currentEquation": "#c9a47a"
-                },
-                {
-                  "name": "surface",
-                  "ioValue": "__GEOMETRY_INPUT__"
                 }
               ],
               "interpreterVersion": 1,

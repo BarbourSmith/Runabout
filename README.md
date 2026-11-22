@@ -43,5 +43,7 @@ A 4.33 m (14 ft 2 in) barrel-back plywood runabout, modelled from the hull refer
 ## Assumed (not in the references)
 Plywood thicknesses (6 / 9 / 18 mm, 9 mm deck), frame stations, member sizes, the deck framing, the cockpit and coaming sizes and where the stem starts are estimates from the photos; all are inputs. Hardware is not modelled.
 
+__GEOMETRY_INPUT__
+
 
 

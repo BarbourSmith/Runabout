@@ -7341,6 +7341,23 @@
               "ioValue": "__GEOMETRY_INPUT__"
             }
           ]
+        },
+        {
+          "atomType": "Fusion",
+          "x": 0.7,
+          "y": 0.85,
+          "uniqueID": "id-3940",
+          "ioValues": [
+            {
+              "name": "Shape 1",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "simplify",
+              "ioValue": false
+            }
+          ],
+          "unionType": "Fusion"
         }
       ],
       "allConnectors": [
@@ -7405,13 +7422,18 @@
           "ap2ID": "id-3826"
         },
         {
-          "ap2Name": "remove",
+          "ap2Name": "Shape 1",
           "ap1ID": "id-3891",
+          "ap2ID": "id-3940"
+        },
+        {
+          "ap2Name": "remove",
+          "ap1ID": "id-3940",
           "ap2ID": "id-2790"
         },
         {
           "ap2Name": "remove",
-          "ap1ID": "id-3891",
+          "ap1ID": "id-3940",
           "ap2ID": "id-2794"
         }
       ],
@@ -7575,63 +7597,53 @@
           "placements": [
             [
               {
-                "id": 1,
-                "rotate": 90,
-                "translate": {
-                  "x": 822.1800537109375,
-                  "y": 299.9599914550781
-                }
-              },
-              {
-                "id": 0,
+                "id": 3,
                 "rotate": 270,
                 "translate": {
-                  "x": 715.489990234375,
-                  "y": 859.5999755859375
-                }
-              },
-              {
-                "id": 5,
-                "rotate": 180,
-                "translate": {
-                  "x": 1718.760009765625,
-                  "y": 1199.4600830078125
-                }
-              }
-            ],
-            [
-              {
-                "id": 7,
-                "rotate": 270,
-                "translate": {
-                  "x": 560.9000244140625,
-                  "y": 142.1999969482422
-                }
-              },
-              {
-                "id": 4,
-                "rotate": 270,
-                "translate": {
-                  "x": 662.5700073242188,
-                  "y": 591.7999877929688
+                  "x": 826.469970703125,
+                  "y": 336.82000732421875
                 }
               },
               {
                 "id": 6,
-                "rotate": 90,
+                "rotate": 180,
                 "translate": {
-                  "x": 560.9500122070312,
-                  "y": 1041.3399658203125
+                  "x": 1786.6300048828125,
+                  "y": 560.8699951171875
+                }
+              },
+              {
+                "id": 5,
+                "rotate": 270,
+                "translate": {
+                  "x": 644.5,
+                  "y": 884.280029296875
                 }
               }
             ],
             [
               {
-                "id": 3,
-                "rotate": 270,
+                "id": 4,
+                "rotate": 90,
                 "translate": {
-                  "x": 827.0999755859375,
-                  "y": 337.0400085449219
+                  "x": 663.56005859375,
+                  "y": 307.25
+                }
+              },
+              {
+                "id": 1,
+                "rotate": 90,
+                "translate": {
+                  "x": 1503.1500244140625,
+                  "y": 907.0400390625
+                }
+              },
+              {
+                "id": 7,
+                "rotate": 150,
+                "translate": {
+                  "x": 256.5595703125,
+                  "y": 732.6319580078125
                 }
               }
             ],
@@ -7640,8 +7652,16 @@
                 "id": 2,
                 "rotate": 90,
                 "translate": {
-                  "x": 864.8199462890625,
-                  "y": 327.3500061035156
+                  "x": 864.6499633789062,
+                  "y": 327.3699951171875
+                }
+              },
+              {
+                "id": 0,
+                "rotate": 270,
+                "translate": {
+                  "x": 715.489990234375,
+                  "y": 914.3299560546875
                 }
               }
             ]
@@ -7772,7 +7792,7 @@
           "ioValue": "__GEOMETRY_INPUT__"
         }
       ],
-      "readMeText": "# Zephyr runabout\n\nA 4.33 m (14 ft 2 in) barrel-back plywood runabout, modelled from the hull reference `Zephyr runabout.stl` and the build photos in **Refrences** (the STL is in metres; Refrences scales it x1000 to mm).\n\n## Hull lines: a camber hull definition\n- **Hull JSON** (project input) is a camber v1 hull in mm, fitted to the STL: 24 stations from 420 mm aft of the transom to the stem head, one template per station (one-hot blend weights) with 14 points each: deck edge, a point 5 mm above the sheer, sheer clamp edge, two side points, chine log edge, chine, chine log edge, outer and inner batten edges, keel hog edge, and a point past the centreline. The flat camber deck plane is 720 mm above the keel and `sheerTrim` brings it down to the real sheer.\n- **Hull Lines** runs tristan-huber/CamberToWires and moves the wires into the boat frame (x = 0 at the transom bottom, z = 0 at the keel). **Hull Cutters** trims at the centreline and the 12.0 deg raked transom. Strips come from crv.OpenWireLoft + util.FaceDifference, as in tristan-huber/CamberInterpreter.\n- Fit to the STL: mean 0.7 mm, 95 % within 2.2 mm, worst 5.2 mm (on the barrel-back curve at the transom corner).\n- CamberToWires scales its wires so their X extent equals `HullLengthInches`. It is set to the raw wire extent (Hull Lines 4713.971, Extended Hull Lines 4713.971, Inner Hull Lines 4710.283) so the scale is exactly 1. **If you edit the JSON, copy the new value from the `Width` atom inside each CamberToWires into its `HullLengthInches`.**\n\n## Parts\n- **Planking**: Side Panel 6 mm and Bottom Panel 9 mm per side (port copies mirrored). **Flat Patterns** unrolls them with tristan-huber/crv.MeshUnroll: side 4575 x 724 mm, bottom 4176 x 864 mm (scarf two 8 ft sheets for each).\n- **Frames**: 5 ring frames in 18 mm plywood at `Stations` = 700, 1400, 2100, 2800, 3500 mm from the transom bottom, 90 mm band, with the crowned deck beam on top (6 m crown radius, matching the 22 mm crown of the STL transom).\n- **Transom** 18 mm, **Stem** two 18 mm laminations from x = 3300 mm to the stem head, **Keel Hog** 64 x 25 mm to x = 3300 mm.\n- **Longitudinals**: sheer clamps, chine logs and two bottom battens per side. Each is a strip of the camber hull between two hull lines, given depth inward, so it follows the twist of the planking.\n- Frames, transom, stem and keel hog are cut from **Inner Hull Interior Starboard**, the volume inside the planking and a 9 mm deck (built from **Inner Hull Lines**, the camber sections offset inward by the planking).\n- **CNC Parts**: frames and transom notched by the keel hog and longitudinals. **Cut Layout 18mm** nests them, with the transom and stem, on 4 sheets of 2440 x 1220.\n\n## Assumed (not in the references)\nPlywood thicknesses (6 / 9 / 18 mm, 9 mm deck), frame stations, member sizes and where the stem starts are estimates from the photos; all are inputs. The deck, cockpit, deck battens and hardware are not modelled yet.",
+      "readMeText": "# Zephyr runabout\n\nA 4.33 m (14 ft 2 in) barrel-back plywood runabout, modelled from the hull reference `Zephyr runabout.stl` and the build photos in **Refrences** (the STL is in metres; Refrences scales it x1000 to mm).\n\n## Hull lines: a camber hull definition\n- **Hull JSON** (project input) is a camber v1 hull in mm, fitted to the STL: 24 stations from 420 mm aft of the transom to the stem head, one template per station (one-hot blend weights) with 14 points each: deck edge, a point 5 mm above the sheer, sheer clamp edge, two side points, chine log edge, chine, chine log edge, outer and inner batten edges, keel hog edge, and a point past the centreline. The flat camber deck plane is 720 mm above the keel and `sheerTrim` brings it down to the real sheer.\n- **Hull Lines** runs tristan-huber/CamberToWires and moves the wires into the boat frame (x = 0 at the transom bottom, z = 0 at the keel). **Hull Cutters** trims at the centreline and the 12.0 deg raked transom. Strips come from crv.OpenWireLoft + util.FaceDifference, as in tristan-huber/CamberInterpreter.\n- Fit to the STL: mean 0.7 mm, 95 % within 2.2 mm, worst 5.2 mm (on the barrel-back curve at the transom corner).\n- CamberToWires scales its wires so their X extent equals `HullLengthInches`. It is set to the raw wire extent (Hull Lines 4713.971, Inner Hull Lines 4710.283) so the scale is exactly 1. **If you edit the JSON, copy the new value from the `Width` atom inside each CamberToWires into its `HullLengthInches`.**\n\n## Parts\n- **Planking**: Side Panel 6 mm and Bottom Panel 9 mm per side (port copies mirrored). **Flat Patterns** unrolls them with tristan-huber/crv.MeshUnroll: side 4575 x 724 mm, bottom 4176 x 864 mm (scarf two 8 ft sheets for each).\n- **Frames**: 5 ring frames in 18 mm plywood at **FrameStations** (project input) = 700, 1400, 2100, 2800, 3500 mm from the transom bottom, 90 mm band, with the crowned deck beam on top (6 m crown radius, matching the 22 mm crown of the STL transom).\n- **Transom** 18 mm, **Stem** two 18 mm laminations from x = 3300 mm to the stem head, **Keel Hog** 64 mm wide and 34 mm deep to x = 3300 mm.\n- **Longitudinals**: sheer clamps, chine logs and two bottom battens per side. Each is a strip of the camber hull between two hull lines, given depth inward, so it follows the twist of the planking.\n- Frames, transom, stem and keel hog are cut from **Inner Hull Interior Starboard**, the volume inside the planking and a 9 mm deck (built from **Inner Hull Lines**, the camber sections offset inward by the planking).\n- **Deck**: **Deck Plan** is the sheer line seen from above. The 9 mm deck is a skin with a 6 m crown radius, cut to the deck plan, trimmed at the transom by Hull Cutters and split into two halves on the centreline. **Cockpit Opening** (x = 720 to 2780 mm, 200 mm side decks, 150 mm corner radius) is cut out of it and **Coaming** (12 mm, 80 mm above the deck) lines it. **Deck Flat Patterns** unrolls the two deck halves.\n- **Deck Framing**: a 90 mm king plank and three 40 x 20 mm deck battens per side under the deck. **Cockpit Beam Cut** removes the frame beams above z = 470 mm inside the cockpit in the assembled boat.\n- **CNC Parts**: frames and transom notched by the keel hog, longitudinals and deck framing. **Cut Layout 18mm** nests them, with the stem, on 3 sheets of 2440 x 1220 (the frames are laid out whole, before the cockpit beam cut).\n\n## Keeping the compute time down\n- Notches: **Notch Zones** (inside CNC Parts) clips the keel hog, longitudinals and deck framing to 60 mm boxes around each frame station and a 400 mm box at the transom, and the clipped pieces are fused into one cutter. Each frame and the transom then takes one boolean cut instead of 16 cuts against full-length members (this step went from about an hour to a few minutes).\n- There is one hull volume, the inner one. The deck is cut from the deck plan and Hull Cutters rather than from a second, outer hull volume.\n- The crowned lofts (Deck Crown Volume, deck skin, coaming, deck framing layer) use 24 sections along the sheer.\n- Each stem lamination subtracts a shifted copy of its own blank, not the whole hull volume.\n- The slowest steps left are building the inner hull volume and intersecting it with the frames, transom, stem, keel hog and longitudinals. A change to the Hull JSON or thicknesses recomputes all of these.\n\n## Assumed (not in the references)\nPlywood thicknesses (6 / 9 / 18 mm, 9 mm deck), frame stations, member sizes, the deck framing, the cockpit and coaming sizes and where the stem starts are estimates from the photos; all are inputs. Hardware is not modelled.",
       "global": true
     },
     {

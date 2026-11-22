@@ -26,7 +26,7 @@
     {
       "atomType": "Input",
       "x": 0.0254,
-      "y": 0.4873,
+      "y": 0.1538,
       "uniqueID": "id-122",
       "name": "Hull JSON",
       "type": "string",
@@ -46,8 +46,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.7328,
-      "y": 0.1944,
+      "x": 0.7381,
+      "y": 0.1859,
       "uniqueID": "id-2809",
       "name": "6 Cut Layout",
       "ioValues": [
@@ -3465,7 +3465,7 @@
                 {
                   "atomType": "Input",
                   "x": 0.0254,
-                  "y": 0.3385,
+                  "y": 0.2462,
                   "uniqueID": "id-6579",
                   "name": "DeckThickness",
                   "type": "number",
@@ -3474,7 +3474,7 @@
                 {
                   "atomType": "Input",
                   "x": 0.0254,
-                  "y": 0.4308,
+                  "y": 0.3385,
                   "uniqueID": "id-6580",
                   "name": "Depth",
                   "type": "number",
@@ -9381,8 +9381,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.75,
-      "y": 0.7,
+      "x": 0.7606,
+      "y": 0.6817,
       "uniqueID": "id-8048",
       "name": "5 Flat Patterns",
       "ioValues": [

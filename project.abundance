@@ -26,7 +26,7 @@
     {
       "atomType": "Input",
       "x": 0.0254,
-      "y": 0.1538,
+      "y": 0.4873,
       "uniqueID": "id-122",
       "name": "Hull JSON",
       "type": "string",

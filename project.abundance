@@ -7305,6 +7305,517 @@
     {
       "atomType": "Molecule",
       "x": 0.38,
+      "y": 0.66,
+      "uniqueID": "id-2875",
+      "name": "Deck Plan",
+      "ioValues": [
+        {
+          "name": "Hull Lines",
+          "ioValue": "__GEOMETRY_INPUT__"
+        }
+      ],
+      "topLevel": false,
+      "allAtoms": [
+        {
+          "atomType": "Output",
+          "x": 0.98,
+          "y": 0.5,
+          "uniqueID": "id-2877",
+          "ioValues": [
+            {
+              "name": "number or geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.1538,
+          "uniqueID": "id-2879",
+          "name": "Hull Lines",
+          "type": "geometry",
+          "options": []
+        },
+        {
+          "atomType": "Code",
+          "x": 0.45,
+          "y": 0.5,
+          "uniqueID": "id-2882",
+          "ioValues": [
+            {
+              "name": "hullLines",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "samples",
+              "ioValue": 160
+            }
+          ],
+          "interpreterVersion": 1,
+          "code": "/**\n * Deck plan: the outline of the deck seen from above.\n * Samples the starboard sheer line (the hull-lines wire tagged \"sheer\"),\n * mirrors it to port and closes it into one 2D outline. The sheer line runs\n * a little aft of the transom, so the outline does too; the hull volume trims\n * anything built from it at the transom.\n */\nfunction run(hullLines: Assembly, samples: number = 160): Assembly {\n  let sheer: any = undefined;\n  hullLines.onLeafs((leaf) => {\n    if (!sheer && leaf.isWire() && (leaf.tags || []).includes(\"sheer\")) sheer = leaf.geometry;\n    return leaf;\n  });\n  if (!sheer) throw new Error(\"No wire tagged 'sheer' in the hull lines\");\n  const n = Math.max(8, Math.round(samples));\n  const pts: number[][] = [];\n  let lastX = -Infinity;\n  for (let i = 0; i <= n; i++) {\n    const p = sheer.pointAt(i / n);\n    if (p.x <= lastX + 0.5) continue;\n    lastX = p.x;\n    pts.push([p.x, Math.max(0, p.y)]);\n  }\n  // the bow end meets the centreline\n  pts[pts.length - 1][1] = 0;\n  let pen = replicad.draw([pts[0][0], pts[0][1]]);\n  for (let i = 1; i < pts.length; i++) pen = pen.lineTo([pts[i][0], pts[i][1]]);\n  for (let i = pts.length - 2; i >= 0; i--) pen = pen.lineTo([pts[i][0], -pts[i][1]]);\n  return new Assembly({ geometry: pen.close(), tags: [\"deck plan\"] });\n}\n",
+          "compiledCode": "\"use strict\";\n/**\n * Deck plan: the outline of the deck seen from above.\n * Samples the starboard sheer line (the hull-lines wire tagged \"sheer\"),\n * mirrors it to port and closes it into one 2D outline. The sheer line runs\n * a little aft of the transom, so the outline does too; the hull volume trims\n * anything built from it at the transom.\n */\nfunction run(hullLines, samples = 160) {\n    let sheer = undefined;\n    hullLines.onLeafs((leaf) => {\n        if (!sheer && leaf.isWire() && (leaf.tags || []).includes(\"sheer\"))\n            sheer = leaf.geometry;\n        return leaf;\n    });\n    if (!sheer)\n        throw new Error(\"No wire tagged 'sheer' in the hull lines\");\n    const n = Math.max(8, Math.round(samples));\n    const pts = [];\n    let lastX = -Infinity;\n    for (let i = 0; i <= n; i++) {\n        const p = sheer.pointAt(i / n);\n        if (p.x <= lastX + 0.5)\n            continue;\n        lastX = p.x;\n        pts.push([p.x, Math.max(0, p.y)]);\n    }\n    // the bow end meets the centreline\n    pts[pts.length - 1][1] = 0;\n    let pen = replicad.draw([pts[0][0], pts[0][1]]);\n    for (let i = 1; i < pts.length; i++)\n        pen = pen.lineTo([pts[i][0], pts[i][1]]);\n    for (let i = pts.length - 2; i >= 0; i--)\n        pen = pen.lineTo([pts[i][0], -pts[i][1]]);\n    return new Assembly({ geometry: pen.close(), tags: [\"deck plan\"] });\n}\n"
+        }
+      ],
+      "allConnectors": [
+        {
+          "ap2Name": "hullLines",
+          "ap1ID": "id-2879",
+          "ap2ID": "id-2882"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-2882",
+          "ap2ID": "id-2877"
+        }
+      ],
+      "fileTypeVersion": 1
+    },
+    {
+      "atomType": "Molecule",
+      "x": 0.45,
+      "y": 0.66,
+      "uniqueID": "id-2893",
+      "name": "Cockpit Opening",
+      "ioValues": [
+        {
+          "name": "Deck Plan",
+          "ioValue": 10
+        },
+        {
+          "name": "AftX",
+          "ioValue": 10
+        },
+        {
+          "name": "ForeX",
+          "ioValue": 10
+        },
+        {
+          "name": "SideDeck",
+          "ioValue": 10
+        },
+        {
+          "name": "CornerRadius",
+          "ioValue": 10
+        }
+      ],
+      "topLevel": false,
+      "allAtoms": [
+        {
+          "atomType": "Output",
+          "x": 0.98,
+          "y": 0.5,
+          "uniqueID": "id-2895",
+          "ioValues": [
+            {
+              "name": "number or geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.1538,
+          "uniqueID": "id-2897",
+          "name": "Deck Plan",
+          "type": "geometry",
+          "options": []
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.2462,
+          "uniqueID": "id-2900",
+          "name": "AftX",
+          "type": "number",
+          "options": []
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.3385,
+          "uniqueID": "id-2903",
+          "name": "ForeX",
+          "type": "number",
+          "options": []
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.4308,
+          "uniqueID": "id-2906",
+          "name": "SideDeck",
+          "type": "number",
+          "options": []
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.5231,
+          "uniqueID": "id-2909",
+          "name": "CornerRadius",
+          "type": "number",
+          "options": []
+        },
+        {
+          "atomType": "GitHubMolecule",
+          "x": 0.2,
+          "y": 0.2,
+          "uniqueID": "id-2917",
+          "name": "Offset_2D",
+          "ioValues": [
+            {
+              "name": "2D_Shape",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Offset",
+              "ioValue": 10
+            }
+          ],
+          "topLevel": false,
+          "allAtoms": [
+            {
+              "atomType": "Output",
+              "x": 1,
+              "y": 0.5,
+              "uniqueID": "id-2913",
+              "ioValues": [
+                {
+                  "name": "number or geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.1538,
+              "uniqueID": "id-2914",
+              "name": "2D_Shape",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.2462,
+              "uniqueID": "id-2915",
+              "name": "Offset",
+              "options": []
+            },
+            {
+              "atomType": "Code",
+              "x": 0.5,
+              "y": 0.4,
+              "uniqueID": "id-2916",
+              "ioValues": [
+                {
+                  "name": "shape",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "distance",
+                  "ioValue": 10
+                }
+              ],
+              "interpreterVersion": 1,
+              "code": "function run(shape: Assembly, distance: number = 1): Assembly {\n  const total = shape.leafCount();\n  let done = 0;\n  progress(`offsetting ${total} parts`);\n  return shape.onLeafs((leaf) => {\n    progress(`offsetting part ${done + 1}/${total}`);\n    leaf.geometry = leaf.geometry.offset(distance);\n    done++;\n    return leaf;\n  }) as Assembly;\n}",
+              "compiledCode": "\"use strict\";\nfunction run(shape, distance = 1) {\n    const total = shape.leafCount();\n    let done = 0;\n    progress(`offsetting ${total} parts`);\n    return shape.onLeafs((leaf) => {\n        progress(`offsetting part ${done + 1}/${total}`);\n        leaf.geometry = leaf.geometry.offset(distance);\n        done++;\n        return leaf;\n    });\n}\n"
+            }
+          ],
+          "allConnectors": [
+            {
+              "ap2Name": "shape",
+              "ap1ID": "id-2914",
+              "ap2ID": "id-2916"
+            },
+            {
+              "ap2Name": "distance",
+              "ap1ID": "id-2915",
+              "ap2ID": "id-2916"
+            },
+            {
+              "ap2Name": "number or geometry",
+              "ap1ID": "id-2916",
+              "ap2ID": "id-2913"
+            }
+          ],
+          "parentRepo": {
+            "owner": "BarbourSmith",
+            "repoName": "Offset_2D",
+            "privateRepo": false,
+            "dateModified": "739888"
+          },
+          "unitsKey": "MM",
+          "fileTypeVersion": 1,
+          "scaleToProjectUnits": true,
+          "lastReloadedFromGithubAt": 1795315495184
+        },
+        {
+          "atomType": "Rectangle",
+          "x": 0.2,
+          "y": 0.5,
+          "uniqueID": "id-2929",
+          "ioValues": [
+            {
+              "name": "x length",
+              "ioValue": 0,
+              "currentEquation": "ForeX - AftX"
+            },
+            {
+              "name": "y length",
+              "ioValue": 3000
+            }
+          ]
+        },
+        {
+          "atomType": "Move",
+          "x": 0.32,
+          "y": 0.5,
+          "uniqueID": "id-2933",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "xDist",
+              "ioValue": 10,
+              "currentEquation": "(AftX + ForeX) / 2"
+            },
+            {
+              "name": "yDist",
+              "ioValue": 0,
+              "currentEquation": "0"
+            },
+            {
+              "name": "zDist",
+              "ioValue": 0,
+              "currentEquation": "0"
+            }
+          ]
+        },
+        {
+          "atomType": "Intersection",
+          "x": 0.45,
+          "y": 0.35,
+          "uniqueID": "id-2939",
+          "ioValues": [
+            {
+              "name": "geometry1",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "geometry2",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "GitHubMolecule",
+          "x": 0.6,
+          "y": 0.35,
+          "uniqueID": "id-2948",
+          "name": "Offset_2D",
+          "ioValues": [
+            {
+              "name": "2D_Shape",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Offset",
+              "ioValue": 10
+            }
+          ],
+          "topLevel": false,
+          "allAtoms": [
+            {
+              "atomType": "Output",
+              "x": 1,
+              "y": 0.5,
+              "uniqueID": "id-2944",
+              "ioValues": [
+                {
+                  "name": "number or geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.1538,
+              "uniqueID": "id-2945",
+              "name": "2D_Shape",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.2462,
+              "uniqueID": "id-2946",
+              "name": "Offset",
+              "options": []
+            },
+            {
+              "atomType": "Code",
+              "x": 0.5,
+              "y": 0.4,
+              "uniqueID": "id-2947",
+              "ioValues": [
+                {
+                  "name": "shape",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "distance",
+                  "ioValue": 10
+                }
+              ],
+              "interpreterVersion": 1,
+              "code": "function run(shape: Assembly, distance: number = 1): Assembly {\n  const total = shape.leafCount();\n  let done = 0;\n  progress(`offsetting ${total} parts`);\n  return shape.onLeafs((leaf) => {\n    progress(`offsetting part ${done + 1}/${total}`);\n    leaf.geometry = leaf.geometry.offset(distance);\n    done++;\n    return leaf;\n  }) as Assembly;\n}",
+              "compiledCode": "\"use strict\";\nfunction run(shape, distance = 1) {\n    const total = shape.leafCount();\n    let done = 0;\n    progress(`offsetting ${total} parts`);\n    return shape.onLeafs((leaf) => {\n        progress(`offsetting part ${done + 1}/${total}`);\n        leaf.geometry = leaf.geometry.offset(distance);\n        done++;\n        return leaf;\n    });\n}\n"
+            }
+          ],
+          "allConnectors": [
+            {
+              "ap2Name": "shape",
+              "ap1ID": "id-2945",
+              "ap2ID": "id-2947"
+            },
+            {
+              "ap2Name": "distance",
+              "ap1ID": "id-2946",
+              "ap2ID": "id-2947"
+            },
+            {
+              "ap2Name": "number or geometry",
+              "ap1ID": "id-2947",
+              "ap2ID": "id-2944"
+            }
+          ],
+          "parentRepo": {
+            "owner": "BarbourSmith",
+            "repoName": "Offset_2D",
+            "privateRepo": false,
+            "dateModified": "739888"
+          },
+          "unitsKey": "MM",
+          "fileTypeVersion": 1,
+          "scaleToProjectUnits": true,
+          "lastReloadedFromGithubAt": 1795315495257
+        },
+        {
+          "atomType": "GitHubMolecule",
+          "x": 0.75,
+          "y": 0.35,
+          "uniqueID": "id-2965",
+          "name": "Offset_2D",
+          "ioValues": [
+            {
+              "name": "2D_Shape",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Offset",
+              "ioValue": 10
+            }
+          ],
+          "topLevel": false,
+          "allAtoms": [
+            {
+              "atomType": "Output",
+              "x": 1,
+              "y": 0.5,
+              "uniqueID": "id-2961",
+              "ioValues": [
+                {
+                  "name": "number or geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.1538,
+              "uniqueID": "id-2962",
+              "name": "2D_Shape",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.2462,
+              "uniqueID": "id-2963",
+              "name": "Offset",
+              "options": []
+            },
+            {
+              "atomType": "Code",
+              "x": 0.5,
+              "y": 0.4,
+              "uniqueID": "id-2964",
+              "ioValues": [
+                {
+                  "name": "shape",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "distance",
+                  "ioValue": 10
+                }
+              ],
+              "interpreterVersion": 1,
+              "code": "function run(shape: Assembly, distance: number = 1): Assembly {\n  const total = shape.leafCount();\n  let done = 0;\n  progress(`offsetting ${total} parts`);\n  return shape.onLeafs((leaf) => {\n    progress(`offsetting part ${done + 1}/${total}`);\n    leaf.geometry = leaf.geometry.offset(distance);\n    done++;\n    return leaf;\n  }) as Assembly;\n}",
+              "compiledCode": "\"use strict\";\nfunction run(shape, distance = 1) {\n    const total = shape.leafCount();\n    let done = 0;\n    progress(`offsetting ${total} parts`);\n    return shape.onLeafs((leaf) => {\n        progress(`offsetting part ${done + 1}/${total}`);\n        leaf.geometry = leaf.geometry.offset(distance);\n        done++;\n        return leaf;\n    });\n}\n"
+            }
+          ],
+          "allConnectors": [
+            {
+              "ap2Name": "shape",
+              "ap1ID": "id-2962",
+              "ap2ID": "id-2964"
+            },
+            {
+              "ap2Name": "distance",
+              "ap1ID": "id-2963",
+              "ap2ID": "id-2964"
+            },
+            {
+              "ap2Name": "number or geometry",
+              "ap1ID": "id-2964",
+              "ap2ID": "id-2961"
+            }
+          ],
+          "parentRepo": {
+            "owner": "BarbourSmith",
+            "repoName": "Offset_2D",
+            "privateRepo": false,
+            "dateModified": "739888"
+          },
+          "unitsKey": "MM",
+          "fileTypeVersion": 1,
+          "scaleToProjectUnits": true,
+          "lastReloadedFromGithubAt": 1795315495310
+        }
+      ],
+      "allConnectors": [
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-2929",
+          "ap2ID": "id-2933"
+        }
+      ],
+      "fileTypeVersion": 1
+    },
+    {
+      "atomType": "Molecule",
+      "x": 0.38,
       "y": 0.3,
       "uniqueID": "id-296",
       "name": "Hull Strips",
@@ -12234,6 +12745,11 @@
       "ap2Name": "Hull Lines",
       "ap1ID": "id-125",
       "ap2ID": "id-1404"
+    },
+    {
+      "ap2Name": "Hull Lines",
+      "ap1ID": "id-125",
+      "ap2ID": "id-2875"
     },
     {
       "ap2Name": "Hull Lines",

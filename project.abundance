@@ -8,8 +8,8 @@
   "allAtoms": [
     {
       "atomType": "Molecule",
-      "x": 0.72,
-      "y": 0.45,
+      "x": 0.6951,
+      "y": 0.5549,
       "uniqueID": "id-1069",
       "name": "Frames",
       "ioValues": [
@@ -794,8 +794,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.72,
-      "y": 0.6,
+      "x": 0.6951,
+      "y": 0.7296,
       "uniqueID": "id-1191",
       "name": "Transom",
       "ioValues": [
@@ -1095,7 +1095,7 @@
     {
       "atomType": "Input",
       "x": 0.0254,
-      "y": 0.1538,
+      "y": 0.3127,
       "uniqueID": "id-122",
       "name": "Hull JSON",
       "type": "string",
@@ -1103,8 +1103,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.72,
-      "y": 0.72,
+      "x": 0.6845,
+      "y": 0.9042,
       "uniqueID": "id-1240",
       "name": "Stem",
       "ioValues": [
@@ -2246,8 +2246,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.85,
-      "y": 0.72,
+      "x": 0.8168,
+      "y": 0.5183,
       "uniqueID": "id-1357",
       "name": "Keel Hog",
       "ioValues": [
@@ -2543,8 +2543,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.85,
-      "y": 0.3,
+      "x": 0.8029,
+      "y": 0.3915,
       "uniqueID": "id-1404",
       "name": "Longitudinals",
       "ioValues": [
@@ -6199,8 +6199,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.2,
-      "y": 0.8,
+      "x": 0.2011,
+      "y": 0.7972,
       "uniqueID": "id-2454",
       "name": "Inner Hull Lines",
       "ioValues": [
@@ -6732,8 +6732,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.93,
-      "y": 0.85,
+      "x": 0.8294,
+      "y": 0.7972,
       "uniqueID": "id-2765",
       "name": "CNC Parts",
       "ioValues": [
@@ -6851,8 +6851,8 @@
         },
         {
           "atomType": "Difference",
-          "x": 0.5,
-          "y": 0.15,
+          "x": 0.4921,
+          "y": 0.231,
           "uniqueID": "id-2790",
           "ioValues": [
             {
@@ -6867,8 +6867,8 @@
         },
         {
           "atomType": "Difference",
-          "x": 0.5,
-          "y": 0.4,
+          "x": 0.4782,
+          "y": 0.6761,
           "uniqueID": "id-2794",
           "ioValues": [
             {
@@ -7027,8 +7027,8 @@
           ],
           "orientations": [
             {
-              "downwardFaceIndex": 100,
-              "faceCount": 122,
+              "downwardFaceIndex": 140,
+              "faceCount": 162,
               "faceNormal": [
                 -1,
                 0,
@@ -7036,8 +7036,8 @@
               ]
             },
             {
-              "downwardFaceIndex": 94,
-              "faceCount": 116,
+              "downwardFaceIndex": 102,
+              "faceCount": 124,
               "faceNormal": [
                 -1,
                 0,
@@ -7046,7 +7046,7 @@
             },
             {
               "downwardFaceIndex": 5,
-              "faceCount": 99,
+              "faceCount": 111,
               "faceNormal": [
                 1,
                 0,
@@ -7054,8 +7054,8 @@
               ]
             },
             {
-              "downwardFaceIndex": 117,
-              "faceCount": 120,
+              "downwardFaceIndex": 147,
+              "faceCount": 150,
               "faceNormal": [
                 1,
                 0,
@@ -7064,7 +7064,7 @@
             },
             {
               "downwardFaceIndex": 5,
-              "faceCount": 118,
+              "faceCount": 158,
               "faceNormal": [
                 1,
                 0,
@@ -7073,7 +7073,7 @@
             },
             {
               "downwardFaceIndex": 0,
-              "faceCount": 64,
+              "faceCount": 102,
               "faceNormal": [
                 -0.9780858690388813,
                 0,
@@ -7323,8 +7323,8 @@
     },
     {
       "atomType": "Readme",
-      "x": 0.05,
-      "y": 0.05,
+      "x": 0.0331,
+      "y": 0.8028,
       "uniqueID": "id-2872",
       "name": "README",
       "ioValues": [
@@ -8145,8 +8145,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.72,
-      "y": 0.25,
+      "x": 0.6429,
+      "y": 0.2479,
       "uniqueID": "id-2977",
       "name": "Deck",
       "ioValues": [
@@ -9027,8 +9027,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.72,
-      "y": 0.33,
+      "x": 0.668,
+      "y": 0.3972,
       "uniqueID": "id-3161",
       "name": "Coaming",
       "ioValues": [
@@ -12284,8 +12284,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.93,
-      "y": 0.75,
+      "x": 0.8948,
+      "y": 0.6507,
       "uniqueID": "id-3719",
       "name": "Cockpit Beam Cut",
       "ioValues": [
@@ -12434,8 +12434,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.85,
-      "y": 0.12,
+      "x": 0.8532,
+      "y": 0.1127,
       "uniqueID": "id-3749",
       "name": "Deck Flat Patterns",
       "ioValues": [
@@ -14756,8 +14756,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.72,
-      "y": 0.12,
+      "x": 0.7024,
+      "y": 0.1183,
       "uniqueID": "id-782",
       "name": "Flat Patterns",
       "ioValues": [

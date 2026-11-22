@@ -46,8 +46,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.9306,
-      "y": 0.907,
+      "x": 0.7328,
+      "y": 0.1944,
       "uniqueID": "id-2809",
       "name": "6 Cut Layout",
       "ioValues": [
@@ -349,8 +349,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.55,
-      "y": 0.4,
+      "x": 0.5503,
+      "y": 0.3746,
       "uniqueID": "id-6438",
       "name": "3 Framing",
       "ioValues": [
@@ -9357,8 +9357,8 @@
     },
     {
       "atomType": "Assembly",
-      "x": 0.85,
-      "y": 0.45,
+      "x": 0.8499,
+      "y": 0.431,
       "uniqueID": "id-8036",
       "ioValues": [
         {
@@ -11464,8 +11464,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.25,
-      "y": 0.5,
+      "x": 0.1971,
+      "y": 0.462,
       "uniqueID": "id-8443",
       "name": "1 Hull",
       "ioValues": [

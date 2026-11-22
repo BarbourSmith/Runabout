@@ -7,6 +7,7 @@
 ## Inputs
 
 - **Hull JSON** (string)
+- **FrameStations** (array)
 
 
 

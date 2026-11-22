@@ -18,9 +18,10 @@ A 4.33 m (14 ft 2 in) barrel-back plywood runabout, modelled from the hull refer
 
 ## Hull lines: a camber hull definition
 - **Hull JSON** (project input) is a camber v1 hull in mm, fitted to the STL: 24 stations from 420 mm aft of the transom to the stem head, one template per station (one-hot blend weights) with 14 points each: deck edge, a point 5 mm above the sheer, sheer clamp edge, two side points, chine log edge, chine, chine log edge, outer and inner batten edges, keel hog edge, and a point past the centreline. The flat camber deck plane is 720 mm above the keel and `sheerTrim` brings it down to the real sheer.
+- **Keep Hull JSON under 10,000 characters.** Abundance does not save longer text inputs, so a longer hull would be lost on reload. The JSON here is a compact copy of the fit: running totals rounded to 0.1 mm (no point moves more than 0.05 mm), `k` left out where it is 0, and only the fields CamberToWires reads (`sheerPlan`, `sheerTrim`, `templates`).
 - **Hull Lines** runs tristan-huber/CamberToWires and moves the wires into the boat frame (x = 0 at the transom bottom, z = 0 at the keel). **Hull Cutters** trims at the centreline and the 12.0 deg raked transom. Strips come from crv.OpenWireLoft + util.FaceDifference, as in tristan-huber/CamberInterpreter.
 - Fit to the STL: mean 0.7 mm, 95 % within 2.2 mm, worst 5.2 mm (on the barrel-back curve at the transom corner).
-- CamberToWires scales its wires so their X extent equals `HullLengthInches`. It is set to the raw wire extent (Hull Lines 4713.971, Inner Hull Lines 4710.283) so the scale is exactly 1. **If you edit the JSON, copy the new value from the `Width` atom inside each CamberToWires into its `HullLengthInches`.**
+- CamberToWires scales its wires so their X extent equals `HullLengthInches`. It is set to the raw wire extent (Hull Lines 4713.955, Inner Hull Lines 4710.300) so the scale is exactly 1. **If you edit the JSON, copy the new value from the `Width` atom inside each CamberToWires into its `HullLengthInches`.**
 
 ## Parts
 - **Planking**: Side Panel 6 mm and Bottom Panel 9 mm per side (port copies mirrored). **Flat Patterns** unrolls them with tristan-huber/crv.MeshUnroll: side 4575 x 724 mm, bottom 4176 x 864 mm (scarf two 8 ft sheets for each).

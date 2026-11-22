@@ -19,10 +19,62 @@
         2800,
         3500
       ]
+    },
+    {
+      "name": "SidePlywood",
+      "ioValue": 6
+    },
+    {
+      "name": "BottomPlywood",
+      "ioValue": 9
+    },
+    {
+      "name": "DeckPlywood",
+      "ioValue": 9
+    },
+    {
+      "name": "FramePlywood",
+      "ioValue": 18
     }
   ],
   "topLevel": true,
   "allAtoms": [
+    {
+      "atomType": "Input",
+      "x": 0.0254,
+      "y": 0.3385,
+      "uniqueID": "id-10573",
+      "name": "SidePlywood",
+      "type": "number",
+      "options": []
+    },
+    {
+      "atomType": "Input",
+      "x": 0.0254,
+      "y": 0.4308,
+      "uniqueID": "id-10576",
+      "name": "BottomPlywood",
+      "type": "number",
+      "options": []
+    },
+    {
+      "atomType": "Input",
+      "x": 0.0254,
+      "y": 0.5231,
+      "uniqueID": "id-10579",
+      "name": "DeckPlywood",
+      "type": "number",
+      "options": []
+    },
+    {
+      "atomType": "Input",
+      "x": 0.0254,
+      "y": 0.6154,
+      "uniqueID": "id-10582",
+      "name": "FramePlywood",
+      "type": "number",
+      "options": []
+    },
     {
       "atomType": "Input",
       "x": 0.0254,
@@ -449,15 +501,18 @@
                 },
                 {
                   "name": "sideThickness",
-                  "ioValue": 6
+                  "ioValue": 6,
+                  "currentEquation": "SidePlywood"
                 },
                 {
                   "name": "bottomThickness",
-                  "ioValue": 9
+                  "ioValue": 9,
+                  "currentEquation": "BottomPlywood"
                 },
                 {
                   "name": "deckThickness",
-                  "ioValue": 9
+                  "ioValue": 9,
+                  "currentEquation": "DeckPlywood"
                 },
                 {
                   "name": "crownRadius",
@@ -484,7 +539,8 @@
                 },
                 {
                   "name": "height",
-                  "ioValue": 18
+                  "ioValue": 18,
+                  "currentEquation": "FramePlywood"
                 }
               ]
             },
@@ -524,7 +580,8 @@
                 },
                 {
                   "name": "xDist",
-                  "ioValue": -9
+                  "ioValue": -9,
+                  "currentEquation": "-FramePlywood/2"
                 },
                 {
                   "name": "yDist",
@@ -679,7 +736,7 @@
               "x": 0.7,
               "y": 0.3,
               "uniqueID": "id-6454",
-              "name": "plywood 18mm",
+              "name": "frame plywood",
               "ioValues": [
                 {
                   "name": "geometry",
@@ -687,7 +744,7 @@
                 }
               ],
               "tags": [
-                "plywood 18mm"
+                "frame plywood"
               ]
             },
             {
@@ -828,15 +885,18 @@
                 },
                 {
                   "name": "sideThickness",
-                  "ioValue": 6
+                  "ioValue": 6,
+                  "currentEquation": "SidePlywood"
                 },
                 {
                   "name": "bottomThickness",
-                  "ioValue": 9
+                  "ioValue": 9,
+                  "currentEquation": "BottomPlywood"
                 },
                 {
                   "name": "deckThickness",
-                  "ioValue": 9
+                  "ioValue": 9,
+                  "currentEquation": "DeckPlywood"
                 },
                 {
                   "name": "crownRadius",
@@ -859,7 +919,8 @@
                 },
                 {
                   "name": "height",
-                  "ioValue": 18
+                  "ioValue": 18,
+                  "currentEquation": "FramePlywood"
                 }
               ]
             },
@@ -940,7 +1001,7 @@
               "x": 0.7,
               "y": 0.4,
               "uniqueID": "id-6465",
-              "name": "plywood 18mm",
+              "name": "frame plywood",
               "ioValues": [
                 {
                   "name": "geometry",
@@ -948,7 +1009,7 @@
                 }
               ],
               "tags": [
-                "plywood 18mm"
+                "frame plywood"
               ]
             },
             {
@@ -1060,7 +1121,8 @@
                 },
                 {
                   "name": "halfWidth",
-                  "ioValue": 18
+                  "ioValue": 18,
+                  "currentEquation": "FramePlywood"
                 },
                 {
                   "name": "step",
@@ -1068,15 +1130,18 @@
                 },
                 {
                   "name": "sideThickness",
-                  "ioValue": 6
+                  "ioValue": 6,
+                  "currentEquation": "SidePlywood"
                 },
                 {
                   "name": "bottomThickness",
-                  "ioValue": 9
+                  "ioValue": 9,
+                  "currentEquation": "BottomPlywood"
                 },
                 {
                   "name": "deckThickness",
-                  "ioValue": 9
+                  "ioValue": 9,
+                  "currentEquation": "DeckPlywood"
                 },
                 {
                   "name": "crownRadius",
@@ -1139,7 +1204,8 @@
                 },
                 {
                   "name": "height",
-                  "ioValue": 18
+                  "ioValue": 18,
+                  "currentEquation": "FramePlywood"
                 }
               ]
             },
@@ -1183,7 +1249,8 @@
                 },
                 {
                   "name": "yDist",
-                  "ioValue": 18
+                  "ioValue": 18,
+                  "currentEquation": "FramePlywood"
                 },
                 {
                   "name": "zDist",
@@ -1220,7 +1287,7 @@
               "x": 0.7288,
               "y": 0.4169,
               "uniqueID": "id-6477",
-              "name": "plywood 18mm",
+              "name": "frame plywood",
               "ioValues": [
                 {
                   "name": "geometry",
@@ -1228,7 +1295,7 @@
                 }
               ],
               "tags": [
-                "plywood 18mm"
+                "frame plywood"
               ]
             },
             {
@@ -1380,11 +1447,13 @@
                 },
                 {
                   "name": "sideThickness",
-                  "ioValue": 6
+                  "ioValue": 6,
+                  "currentEquation": "SidePlywood"
                 },
                 {
                   "name": "bottomThickness",
-                  "ioValue": 9
+                  "ioValue": 9,
+                  "currentEquation": "BottomPlywood"
                 }
               ],
               "interpreterVersion": 1,
@@ -1567,8 +1636,8 @@
               "name": "Sheer Clamp",
               "ioValues": [
                 {
-                  "name": "Offset",
-                  "ioValue": 26
+                  "name": "Depth",
+                  "ioValue": 20
                 },
                 {
                   "name": "Hull",
@@ -1594,7 +1663,7 @@
                   "x": 0.0254,
                   "y": 0.1538,
                   "uniqueID": "id-6493",
-                  "name": "Offset",
+                  "name": "Depth",
                   "type": "number",
                   "options": []
                 },
@@ -1619,23 +1688,29 @@
                       "ioValue": []
                     },
                     {
-                      "name": "inset",
-                      "ioValue": 6
-                    },
-                    {
-                      "name": "thickness",
-                      "ioValue": -26,
-                      "currentEquation": "-Offset"
-                    },
-                    {
                       "name": "color",
                       "ioValue": "#b5835a",
                       "currentEquation": "#b5835a"
+                    },
+                    {
+                      "name": "sideInset",
+                      "ioValue": 6,
+                      "currentEquation": "SidePlywood"
+                    },
+                    {
+                      "name": "bottomInset",
+                      "ioValue": 9,
+                      "currentEquation": "BottomPlywood"
+                    },
+                    {
+                      "name": "depth",
+                      "ioValue": 20,
+                      "currentEquation": "Depth"
                     }
                   ],
                   "interpreterVersion": 1,
-                  "code": "/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is offset inward by\n * `inset` (the planking, giving the face that bears on it) and by `thickness`\n * (planking plus the member's depth, its back face) and closed into a solid\n * with ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull: Assembly, sideStrips: number[] = [0], bottomStrips: number[] = [], inset: number = 6, thickness: number = -26, color: string = \"#b5835a\"): Assembly {\n  const faces = [\n    ...pick(hull, \"side surface\", sideStrips, (c) => c[2]),\n    ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]),\n  ];\n  if (faces.length === 0) throw new Error(\"No strips chosen for the member\");\n  const solids: any[] = [];\n  for (const face of faces) {\n    const inner = (replicad.makeOffset(face, -Math.abs(inset)) as any).faces[0];\n    const back = (replicad.makeOffset(face, thickness) as any).faces[0];\n    const w1 = replicad.assembleWire(inner.edges);\n    const w2 = replicad.assembleWire(back.edges);\n    const walls: any = replicad.loft([w2, w1], {}, true);\n    const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n    solids.push(replicad.makeSolid([shell]));\n  }\n  const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n  return new Assembly({ geometry: member, color });\n}\n\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull: any, tag: string, which: number[], key: (c: number[]) => number): any[] {\n  const faces: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) faces.push(node.geometry);\n  };\n  walk(hull, false);\n  const centre = (f: any) => {\n    const s = [0, 0, 0];\n    let n = 0;\n    for (const e of f.edges) { const p = e.pointAt(0.5); s[0] += p.x; s[1] += p.y; s[2] += p.z; n++; }\n    return s.map((v) => v / n);\n  };\n  const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n  return (which || []).map((i: number) => {\n    if (!sorted[Number(i)]) throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n    return sorted[Number(i)].f;\n  });\n}\n",
-                  "compiledCode": "\"use strict\";\n/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is offset inward by\n * `inset` (the planking, giving the face that bears on it) and by `thickness`\n * (planking plus the member's depth, its back face) and closed into a solid\n * with ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull, sideStrips = [0], bottomStrips = [], inset = 6, thickness = -26, color = \"#b5835a\") {\n    const faces = [\n        ...pick(hull, \"side surface\", sideStrips, (c) => c[2]),\n        ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]),\n    ];\n    if (faces.length === 0)\n        throw new Error(\"No strips chosen for the member\");\n    const solids = [];\n    for (const face of faces) {\n        const inner = replicad.makeOffset(face, -Math.abs(inset)).faces[0];\n        const back = replicad.makeOffset(face, thickness).faces[0];\n        const w1 = replicad.assembleWire(inner.edges);\n        const w2 = replicad.assembleWire(back.edges);\n        const walls = replicad.loft([w2, w1], {}, true);\n        const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n        solids.push(replicad.makeSolid([shell]));\n    }\n    const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n    return new Assembly({ geometry: member, color });\n}\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull, tag, which, key) {\n    const faces = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            faces.push(node.geometry);\n    };\n    walk(hull, false);\n    const centre = (f) => {\n        const s = [0, 0, 0];\n        let n = 0;\n        for (const e of f.edges) {\n            const p = e.pointAt(0.5);\n            s[0] += p.x;\n            s[1] += p.y;\n            s[2] += p.z;\n            n++;\n        }\n        return s.map((v) => v / n);\n    };\n    const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n    return (which || []).map((i) => {\n        if (!sorted[Number(i)])\n            throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n        return sorted[Number(i)].f;\n    });\n}\n"
+                  "code": "/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is moved inward by\n * its planking thickness (sideInset for side strips, bottomInset for bottom\n * strips), giving the face that bears on the planking, and by that plus\n * `depth`, giving the member's back face. The two are closed into a solid with\n * ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull: Assembly, sideStrips: number[] = [4], bottomStrips: number[] = [0], sideInset: number = 6, bottomInset: number = 9, depth: number = 20, color: string = \"#b5835a\"): Assembly {\n  const strips = [\n    ...pick(hull, \"side surface\", sideStrips, (c) => c[2]).map((face) => ({ face, inset: Math.abs(Number(sideInset)) })),\n    ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]).map((face) => ({ face, inset: Math.abs(Number(bottomInset)) })),\n  ];\n  if (strips.length === 0) throw new Error(\"No strips chosen for the member\");\n  const solids: any[] = [];\n  for (const { face, inset } of strips) {\n    const inner = (replicad.makeOffset(face, -inset) as any).faces[0];\n    const back = (replicad.makeOffset(face, -(inset + Math.abs(Number(depth)))) as any).faces[0];\n    const w1 = replicad.assembleWire(inner.edges);\n    const w2 = replicad.assembleWire(back.edges);\n    const walls: any = replicad.loft([w2, w1], {}, true);\n    const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n    solids.push(replicad.makeSolid([shell]));\n  }\n  const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n  return new Assembly({ geometry: member, color });\n}\n\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull: any, tag: string, which: number[], key: (c: number[]) => number): any[] {\n  const faces: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) faces.push(node.geometry);\n  };\n  walk(hull, false);\n  const centre = (f: any) => {\n    const s = [0, 0, 0];\n    let n = 0;\n    for (const e of f.edges) { const p = e.pointAt(0.5); s[0] += p.x; s[1] += p.y; s[2] += p.z; n++; }\n    return s.map((v) => v / n);\n  };\n  const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n  return (which || []).map((i: number) => {\n    if (!sorted[Number(i)]) throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n    return sorted[Number(i)].f;\n  });\n}\n",
+                  "compiledCode": "\"use strict\";\n/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is moved inward by\n * its planking thickness (sideInset for side strips, bottomInset for bottom\n * strips), giving the face that bears on the planking, and by that plus\n * `depth`, giving the member's back face. The two are closed into a solid with\n * ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull, sideStrips = [4], bottomStrips = [0], sideInset = 6, bottomInset = 9, depth = 20, color = \"#b5835a\") {\n    const strips = [\n        ...pick(hull, \"side surface\", sideStrips, (c) => c[2]).map((face) => ({ face, inset: Math.abs(Number(sideInset)) })),\n        ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]).map((face) => ({ face, inset: Math.abs(Number(bottomInset)) })),\n    ];\n    if (strips.length === 0)\n        throw new Error(\"No strips chosen for the member\");\n    const solids = [];\n    for (const { face, inset } of strips) {\n        const inner = replicad.makeOffset(face, -inset).faces[0];\n        const back = replicad.makeOffset(face, -(inset + Math.abs(Number(depth)))).faces[0];\n        const w1 = replicad.assembleWire(inner.edges);\n        const w2 = replicad.assembleWire(back.edges);\n        const walls = replicad.loft([w2, w1], {}, true);\n        const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n        solids.push(replicad.makeSolid([shell]));\n    }\n    const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n    return new Assembly({ geometry: member, color });\n}\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull, tag, which, key) {\n    const faces = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            faces.push(node.geometry);\n    };\n    walk(hull, false);\n    const centre = (f) => {\n        const s = [0, 0, 0];\n        let n = 0;\n        for (const e of f.edges) {\n            const p = e.pointAt(0.5);\n            s[0] += p.x;\n            s[1] += p.y;\n            s[2] += p.z;\n            n++;\n        }\n        return s.map((v) => v / n);\n    };\n    const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n    return (which || []).map((i) => {\n        if (!sorted[Number(i)])\n            throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n        return sorted[Number(i)].f;\n    });\n}\n"
                 },
                 {
                   "atomType": "Input",
@@ -1669,8 +1744,8 @@
               "name": "Chine Log",
               "ioValues": [
                 {
-                  "name": "Offset",
-                  "ioValue": 34
+                  "name": "Depth",
+                  "ioValue": 28
                 },
                 {
                   "name": "Hull",
@@ -1696,7 +1771,7 @@
                   "x": 0.0254,
                   "y": 0.1538,
                   "uniqueID": "id-6498",
-                  "name": "Offset",
+                  "name": "Depth",
                   "type": "number",
                   "options": []
                 },
@@ -1723,23 +1798,29 @@
                       ]
                     },
                     {
-                      "name": "inset",
-                      "ioValue": 6
-                    },
-                    {
-                      "name": "thickness",
-                      "ioValue": -34,
-                      "currentEquation": "-Offset"
-                    },
-                    {
                       "name": "color",
                       "ioValue": "#b5835a",
                       "currentEquation": "#b5835a"
+                    },
+                    {
+                      "name": "sideInset",
+                      "ioValue": 6,
+                      "currentEquation": "SidePlywood"
+                    },
+                    {
+                      "name": "bottomInset",
+                      "ioValue": 9,
+                      "currentEquation": "BottomPlywood"
+                    },
+                    {
+                      "name": "depth",
+                      "ioValue": 28,
+                      "currentEquation": "Depth"
                     }
                   ],
                   "interpreterVersion": 1,
-                  "code": "/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is offset inward by\n * `inset` (the planking, giving the face that bears on it) and by `thickness`\n * (planking plus the member's depth, its back face) and closed into a solid\n * with ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull: Assembly, sideStrips: number[] = [4], bottomStrips: number[] = [0], inset: number = 6, thickness: number = -34, color: string = \"#b5835a\"): Assembly {\n  const faces = [\n    ...pick(hull, \"side surface\", sideStrips, (c) => c[2]),\n    ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]),\n  ];\n  if (faces.length === 0) throw new Error(\"No strips chosen for the member\");\n  const solids: any[] = [];\n  for (const face of faces) {\n    const inner = (replicad.makeOffset(face, -Math.abs(inset)) as any).faces[0];\n    const back = (replicad.makeOffset(face, thickness) as any).faces[0];\n    const w1 = replicad.assembleWire(inner.edges);\n    const w2 = replicad.assembleWire(back.edges);\n    const walls: any = replicad.loft([w2, w1], {}, true);\n    const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n    solids.push(replicad.makeSolid([shell]));\n  }\n  const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n  return new Assembly({ geometry: member, color });\n}\n\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull: any, tag: string, which: number[], key: (c: number[]) => number): any[] {\n  const faces: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) faces.push(node.geometry);\n  };\n  walk(hull, false);\n  const centre = (f: any) => {\n    const s = [0, 0, 0];\n    let n = 0;\n    for (const e of f.edges) { const p = e.pointAt(0.5); s[0] += p.x; s[1] += p.y; s[2] += p.z; n++; }\n    return s.map((v) => v / n);\n  };\n  const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n  return (which || []).map((i: number) => {\n    if (!sorted[Number(i)]) throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n    return sorted[Number(i)].f;\n  });\n}\n",
-                  "compiledCode": "\"use strict\";\n/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is offset inward by\n * `inset` (the planking, giving the face that bears on it) and by `thickness`\n * (planking plus the member's depth, its back face) and closed into a solid\n * with ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull, sideStrips = [4], bottomStrips = [0], inset = 6, thickness = -34, color = \"#b5835a\") {\n    const faces = [\n        ...pick(hull, \"side surface\", sideStrips, (c) => c[2]),\n        ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]),\n    ];\n    if (faces.length === 0)\n        throw new Error(\"No strips chosen for the member\");\n    const solids = [];\n    for (const face of faces) {\n        const inner = replicad.makeOffset(face, -Math.abs(inset)).faces[0];\n        const back = replicad.makeOffset(face, thickness).faces[0];\n        const w1 = replicad.assembleWire(inner.edges);\n        const w2 = replicad.assembleWire(back.edges);\n        const walls = replicad.loft([w2, w1], {}, true);\n        const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n        solids.push(replicad.makeSolid([shell]));\n    }\n    const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n    return new Assembly({ geometry: member, color });\n}\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull, tag, which, key) {\n    const faces = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            faces.push(node.geometry);\n    };\n    walk(hull, false);\n    const centre = (f) => {\n        const s = [0, 0, 0];\n        let n = 0;\n        for (const e of f.edges) {\n            const p = e.pointAt(0.5);\n            s[0] += p.x;\n            s[1] += p.y;\n            s[2] += p.z;\n            n++;\n        }\n        return s.map((v) => v / n);\n    };\n    const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n    return (which || []).map((i) => {\n        if (!sorted[Number(i)])\n            throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n        return sorted[Number(i)].f;\n    });\n}\n"
+                  "code": "/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is moved inward by\n * its planking thickness (sideInset for side strips, bottomInset for bottom\n * strips), giving the face that bears on the planking, and by that plus\n * `depth`, giving the member's back face. The two are closed into a solid with\n * ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull: Assembly, sideStrips: number[] = [4], bottomStrips: number[] = [0], sideInset: number = 6, bottomInset: number = 9, depth: number = 20, color: string = \"#b5835a\"): Assembly {\n  const strips = [\n    ...pick(hull, \"side surface\", sideStrips, (c) => c[2]).map((face) => ({ face, inset: Math.abs(Number(sideInset)) })),\n    ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]).map((face) => ({ face, inset: Math.abs(Number(bottomInset)) })),\n  ];\n  if (strips.length === 0) throw new Error(\"No strips chosen for the member\");\n  const solids: any[] = [];\n  for (const { face, inset } of strips) {\n    const inner = (replicad.makeOffset(face, -inset) as any).faces[0];\n    const back = (replicad.makeOffset(face, -(inset + Math.abs(Number(depth)))) as any).faces[0];\n    const w1 = replicad.assembleWire(inner.edges);\n    const w2 = replicad.assembleWire(back.edges);\n    const walls: any = replicad.loft([w2, w1], {}, true);\n    const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n    solids.push(replicad.makeSolid([shell]));\n  }\n  const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n  return new Assembly({ geometry: member, color });\n}\n\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull: any, tag: string, which: number[], key: (c: number[]) => number): any[] {\n  const faces: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) faces.push(node.geometry);\n  };\n  walk(hull, false);\n  const centre = (f: any) => {\n    const s = [0, 0, 0];\n    let n = 0;\n    for (const e of f.edges) { const p = e.pointAt(0.5); s[0] += p.x; s[1] += p.y; s[2] += p.z; n++; }\n    return s.map((v) => v / n);\n  };\n  const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n  return (which || []).map((i: number) => {\n    if (!sorted[Number(i)]) throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n    return sorted[Number(i)].f;\n  });\n}\n",
+                  "compiledCode": "\"use strict\";\n/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is moved inward by\n * its planking thickness (sideInset for side strips, bottomInset for bottom\n * strips), giving the face that bears on the planking, and by that plus\n * `depth`, giving the member's back face. The two are closed into a solid with\n * ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull, sideStrips = [4], bottomStrips = [0], sideInset = 6, bottomInset = 9, depth = 20, color = \"#b5835a\") {\n    const strips = [\n        ...pick(hull, \"side surface\", sideStrips, (c) => c[2]).map((face) => ({ face, inset: Math.abs(Number(sideInset)) })),\n        ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]).map((face) => ({ face, inset: Math.abs(Number(bottomInset)) })),\n    ];\n    if (strips.length === 0)\n        throw new Error(\"No strips chosen for the member\");\n    const solids = [];\n    for (const { face, inset } of strips) {\n        const inner = replicad.makeOffset(face, -inset).faces[0];\n        const back = replicad.makeOffset(face, -(inset + Math.abs(Number(depth)))).faces[0];\n        const w1 = replicad.assembleWire(inner.edges);\n        const w2 = replicad.assembleWire(back.edges);\n        const walls = replicad.loft([w2, w1], {}, true);\n        const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n        solids.push(replicad.makeSolid([shell]));\n    }\n    const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n    return new Assembly({ geometry: member, color });\n}\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull, tag, which, key) {\n    const faces = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            faces.push(node.geometry);\n    };\n    walk(hull, false);\n    const centre = (f) => {\n        const s = [0, 0, 0];\n        let n = 0;\n        for (const e of f.edges) {\n            const p = e.pointAt(0.5);\n            s[0] += p.x;\n            s[1] += p.y;\n            s[2] += p.z;\n            n++;\n        }\n        return s.map((v) => v / n);\n    };\n    const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n    return (which || []).map((i) => {\n        if (!sorted[Number(i)])\n            throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n        return sorted[Number(i)].f;\n    });\n}\n"
                 },
                 {
                   "atomType": "Input",
@@ -1773,8 +1854,8 @@
               "name": "Outer Bottom Batten",
               "ioValues": [
                 {
-                  "name": "Offset",
-                  "ioValue": 29
+                  "name": "Depth",
+                  "ioValue": 20
                 },
                 {
                   "name": "Hull",
@@ -1800,7 +1881,7 @@
                   "x": 0.0254,
                   "y": 0.1538,
                   "uniqueID": "id-6503",
-                  "name": "Offset",
+                  "name": "Depth",
                   "type": "number",
                   "options": []
                 },
@@ -1825,23 +1906,29 @@
                       ]
                     },
                     {
-                      "name": "inset",
-                      "ioValue": 9
-                    },
-                    {
-                      "name": "thickness",
-                      "ioValue": -29,
-                      "currentEquation": "-Offset"
-                    },
-                    {
                       "name": "color",
                       "ioValue": "#b5835a",
                       "currentEquation": "#b5835a"
+                    },
+                    {
+                      "name": "sideInset",
+                      "ioValue": 6,
+                      "currentEquation": "SidePlywood"
+                    },
+                    {
+                      "name": "bottomInset",
+                      "ioValue": 9,
+                      "currentEquation": "BottomPlywood"
+                    },
+                    {
+                      "name": "depth",
+                      "ioValue": 20,
+                      "currentEquation": "Depth"
                     }
                   ],
                   "interpreterVersion": 1,
-                  "code": "/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is offset inward by\n * `inset` (the planking, giving the face that bears on it) and by `thickness`\n * (planking plus the member's depth, its back face) and closed into a solid\n * with ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull: Assembly, sideStrips: number[] = [], bottomStrips: number[] = [2], inset: number = 9, thickness: number = -29, color: string = \"#b5835a\"): Assembly {\n  const faces = [\n    ...pick(hull, \"side surface\", sideStrips, (c) => c[2]),\n    ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]),\n  ];\n  if (faces.length === 0) throw new Error(\"No strips chosen for the member\");\n  const solids: any[] = [];\n  for (const face of faces) {\n    const inner = (replicad.makeOffset(face, -Math.abs(inset)) as any).faces[0];\n    const back = (replicad.makeOffset(face, thickness) as any).faces[0];\n    const w1 = replicad.assembleWire(inner.edges);\n    const w2 = replicad.assembleWire(back.edges);\n    const walls: any = replicad.loft([w2, w1], {}, true);\n    const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n    solids.push(replicad.makeSolid([shell]));\n  }\n  const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n  return new Assembly({ geometry: member, color });\n}\n\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull: any, tag: string, which: number[], key: (c: number[]) => number): any[] {\n  const faces: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) faces.push(node.geometry);\n  };\n  walk(hull, false);\n  const centre = (f: any) => {\n    const s = [0, 0, 0];\n    let n = 0;\n    for (const e of f.edges) { const p = e.pointAt(0.5); s[0] += p.x; s[1] += p.y; s[2] += p.z; n++; }\n    return s.map((v) => v / n);\n  };\n  const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n  return (which || []).map((i: number) => {\n    if (!sorted[Number(i)]) throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n    return sorted[Number(i)].f;\n  });\n}\n",
-                  "compiledCode": "\"use strict\";\n/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is offset inward by\n * `inset` (the planking, giving the face that bears on it) and by `thickness`\n * (planking plus the member's depth, its back face) and closed into a solid\n * with ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull, sideStrips = [], bottomStrips = [2], inset = 9, thickness = -29, color = \"#b5835a\") {\n    const faces = [\n        ...pick(hull, \"side surface\", sideStrips, (c) => c[2]),\n        ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]),\n    ];\n    if (faces.length === 0)\n        throw new Error(\"No strips chosen for the member\");\n    const solids = [];\n    for (const face of faces) {\n        const inner = replicad.makeOffset(face, -Math.abs(inset)).faces[0];\n        const back = replicad.makeOffset(face, thickness).faces[0];\n        const w1 = replicad.assembleWire(inner.edges);\n        const w2 = replicad.assembleWire(back.edges);\n        const walls = replicad.loft([w2, w1], {}, true);\n        const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n        solids.push(replicad.makeSolid([shell]));\n    }\n    const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n    return new Assembly({ geometry: member, color });\n}\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull, tag, which, key) {\n    const faces = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            faces.push(node.geometry);\n    };\n    walk(hull, false);\n    const centre = (f) => {\n        const s = [0, 0, 0];\n        let n = 0;\n        for (const e of f.edges) {\n            const p = e.pointAt(0.5);\n            s[0] += p.x;\n            s[1] += p.y;\n            s[2] += p.z;\n            n++;\n        }\n        return s.map((v) => v / n);\n    };\n    const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n    return (which || []).map((i) => {\n        if (!sorted[Number(i)])\n            throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n        return sorted[Number(i)].f;\n    });\n}\n"
+                  "code": "/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is moved inward by\n * its planking thickness (sideInset for side strips, bottomInset for bottom\n * strips), giving the face that bears on the planking, and by that plus\n * `depth`, giving the member's back face. The two are closed into a solid with\n * ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull: Assembly, sideStrips: number[] = [4], bottomStrips: number[] = [0], sideInset: number = 6, bottomInset: number = 9, depth: number = 20, color: string = \"#b5835a\"): Assembly {\n  const strips = [\n    ...pick(hull, \"side surface\", sideStrips, (c) => c[2]).map((face) => ({ face, inset: Math.abs(Number(sideInset)) })),\n    ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]).map((face) => ({ face, inset: Math.abs(Number(bottomInset)) })),\n  ];\n  if (strips.length === 0) throw new Error(\"No strips chosen for the member\");\n  const solids: any[] = [];\n  for (const { face, inset } of strips) {\n    const inner = (replicad.makeOffset(face, -inset) as any).faces[0];\n    const back = (replicad.makeOffset(face, -(inset + Math.abs(Number(depth)))) as any).faces[0];\n    const w1 = replicad.assembleWire(inner.edges);\n    const w2 = replicad.assembleWire(back.edges);\n    const walls: any = replicad.loft([w2, w1], {}, true);\n    const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n    solids.push(replicad.makeSolid([shell]));\n  }\n  const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n  return new Assembly({ geometry: member, color });\n}\n\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull: any, tag: string, which: number[], key: (c: number[]) => number): any[] {\n  const faces: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) faces.push(node.geometry);\n  };\n  walk(hull, false);\n  const centre = (f: any) => {\n    const s = [0, 0, 0];\n    let n = 0;\n    for (const e of f.edges) { const p = e.pointAt(0.5); s[0] += p.x; s[1] += p.y; s[2] += p.z; n++; }\n    return s.map((v) => v / n);\n  };\n  const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n  return (which || []).map((i: number) => {\n    if (!sorted[Number(i)]) throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n    return sorted[Number(i)].f;\n  });\n}\n",
+                  "compiledCode": "\"use strict\";\n/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is moved inward by\n * its planking thickness (sideInset for side strips, bottomInset for bottom\n * strips), giving the face that bears on the planking, and by that plus\n * `depth`, giving the member's back face. The two are closed into a solid with\n * ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull, sideStrips = [4], bottomStrips = [0], sideInset = 6, bottomInset = 9, depth = 20, color = \"#b5835a\") {\n    const strips = [\n        ...pick(hull, \"side surface\", sideStrips, (c) => c[2]).map((face) => ({ face, inset: Math.abs(Number(sideInset)) })),\n        ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]).map((face) => ({ face, inset: Math.abs(Number(bottomInset)) })),\n    ];\n    if (strips.length === 0)\n        throw new Error(\"No strips chosen for the member\");\n    const solids = [];\n    for (const { face, inset } of strips) {\n        const inner = replicad.makeOffset(face, -inset).faces[0];\n        const back = replicad.makeOffset(face, -(inset + Math.abs(Number(depth)))).faces[0];\n        const w1 = replicad.assembleWire(inner.edges);\n        const w2 = replicad.assembleWire(back.edges);\n        const walls = replicad.loft([w2, w1], {}, true);\n        const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n        solids.push(replicad.makeSolid([shell]));\n    }\n    const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n    return new Assembly({ geometry: member, color });\n}\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull, tag, which, key) {\n    const faces = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            faces.push(node.geometry);\n    };\n    walk(hull, false);\n    const centre = (f) => {\n        const s = [0, 0, 0];\n        let n = 0;\n        for (const e of f.edges) {\n            const p = e.pointAt(0.5);\n            s[0] += p.x;\n            s[1] += p.y;\n            s[2] += p.z;\n            n++;\n        }\n        return s.map((v) => v / n);\n    };\n    const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n    return (which || []).map((i) => {\n        if (!sorted[Number(i)])\n            throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n        return sorted[Number(i)].f;\n    });\n}\n"
                 },
                 {
                   "atomType": "Input",
@@ -1875,8 +1962,8 @@
               "name": "Inner Bottom Batten",
               "ioValues": [
                 {
-                  "name": "Offset",
-                  "ioValue": 29
+                  "name": "Depth",
+                  "ioValue": 20
                 },
                 {
                   "name": "Hull",
@@ -1902,7 +1989,7 @@
                   "x": 0.0254,
                   "y": 0.1538,
                   "uniqueID": "id-6508",
-                  "name": "Offset",
+                  "name": "Depth",
                   "type": "number",
                   "options": []
                 },
@@ -1927,23 +2014,29 @@
                       ]
                     },
                     {
-                      "name": "inset",
-                      "ioValue": 9
-                    },
-                    {
-                      "name": "thickness",
-                      "ioValue": -29,
-                      "currentEquation": "-Offset"
-                    },
-                    {
                       "name": "color",
                       "ioValue": "#b5835a",
                       "currentEquation": "#b5835a"
+                    },
+                    {
+                      "name": "sideInset",
+                      "ioValue": 6,
+                      "currentEquation": "SidePlywood"
+                    },
+                    {
+                      "name": "bottomInset",
+                      "ioValue": 9,
+                      "currentEquation": "BottomPlywood"
+                    },
+                    {
+                      "name": "depth",
+                      "ioValue": 20,
+                      "currentEquation": "Depth"
                     }
                   ],
                   "interpreterVersion": 1,
-                  "code": "/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is offset inward by\n * `inset` (the planking, giving the face that bears on it) and by `thickness`\n * (planking plus the member's depth, its back face) and closed into a solid\n * with ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull: Assembly, sideStrips: number[] = [], bottomStrips: number[] = [4], inset: number = 9, thickness: number = -29, color: string = \"#b5835a\"): Assembly {\n  const faces = [\n    ...pick(hull, \"side surface\", sideStrips, (c) => c[2]),\n    ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]),\n  ];\n  if (faces.length === 0) throw new Error(\"No strips chosen for the member\");\n  const solids: any[] = [];\n  for (const face of faces) {\n    const inner = (replicad.makeOffset(face, -Math.abs(inset)) as any).faces[0];\n    const back = (replicad.makeOffset(face, thickness) as any).faces[0];\n    const w1 = replicad.assembleWire(inner.edges);\n    const w2 = replicad.assembleWire(back.edges);\n    const walls: any = replicad.loft([w2, w1], {}, true);\n    const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n    solids.push(replicad.makeSolid([shell]));\n  }\n  const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n  return new Assembly({ geometry: member, color });\n}\n\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull: any, tag: string, which: number[], key: (c: number[]) => number): any[] {\n  const faces: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) faces.push(node.geometry);\n  };\n  walk(hull, false);\n  const centre = (f: any) => {\n    const s = [0, 0, 0];\n    let n = 0;\n    for (const e of f.edges) { const p = e.pointAt(0.5); s[0] += p.x; s[1] += p.y; s[2] += p.z; n++; }\n    return s.map((v) => v / n);\n  };\n  const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n  return (which || []).map((i: number) => {\n    if (!sorted[Number(i)]) throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n    return sorted[Number(i)].f;\n  });\n}\n",
-                  "compiledCode": "\"use strict\";\n/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is offset inward by\n * `inset` (the planking, giving the face that bears on it) and by `thickness`\n * (planking plus the member's depth, its back face) and closed into a solid\n * with ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull, sideStrips = [], bottomStrips = [4], inset = 9, thickness = -29, color = \"#b5835a\") {\n    const faces = [\n        ...pick(hull, \"side surface\", sideStrips, (c) => c[2]),\n        ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]),\n    ];\n    if (faces.length === 0)\n        throw new Error(\"No strips chosen for the member\");\n    const solids = [];\n    for (const face of faces) {\n        const inner = replicad.makeOffset(face, -Math.abs(inset)).faces[0];\n        const back = replicad.makeOffset(face, thickness).faces[0];\n        const w1 = replicad.assembleWire(inner.edges);\n        const w2 = replicad.assembleWire(back.edges);\n        const walls = replicad.loft([w2, w1], {}, true);\n        const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n        solids.push(replicad.makeSolid([shell]));\n    }\n    const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n    return new Assembly({ geometry: member, color });\n}\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull, tag, which, key) {\n    const faces = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            faces.push(node.geometry);\n    };\n    walk(hull, false);\n    const centre = (f) => {\n        const s = [0, 0, 0];\n        let n = 0;\n        for (const e of f.edges) {\n            const p = e.pointAt(0.5);\n            s[0] += p.x;\n            s[1] += p.y;\n            s[2] += p.z;\n            n++;\n        }\n        return s.map((v) => v / n);\n    };\n    const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n    return (which || []).map((i) => {\n        if (!sorted[Number(i)])\n            throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n        return sorted[Number(i)].f;\n    });\n}\n"
+                  "code": "/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is moved inward by\n * its planking thickness (sideInset for side strips, bottomInset for bottom\n * strips), giving the face that bears on the planking, and by that plus\n * `depth`, giving the member's back face. The two are closed into a solid with\n * ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull: Assembly, sideStrips: number[] = [4], bottomStrips: number[] = [0], sideInset: number = 6, bottomInset: number = 9, depth: number = 20, color: string = \"#b5835a\"): Assembly {\n  const strips = [\n    ...pick(hull, \"side surface\", sideStrips, (c) => c[2]).map((face) => ({ face, inset: Math.abs(Number(sideInset)) })),\n    ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]).map((face) => ({ face, inset: Math.abs(Number(bottomInset)) })),\n  ];\n  if (strips.length === 0) throw new Error(\"No strips chosen for the member\");\n  const solids: any[] = [];\n  for (const { face, inset } of strips) {\n    const inner = (replicad.makeOffset(face, -inset) as any).faces[0];\n    const back = (replicad.makeOffset(face, -(inset + Math.abs(Number(depth)))) as any).faces[0];\n    const w1 = replicad.assembleWire(inner.edges);\n    const w2 = replicad.assembleWire(back.edges);\n    const walls: any = replicad.loft([w2, w1], {}, true);\n    const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n    solids.push(replicad.makeSolid([shell]));\n  }\n  const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n  return new Assembly({ geometry: member, color });\n}\n\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull: any, tag: string, which: number[], key: (c: number[]) => number): any[] {\n  const faces: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) faces.push(node.geometry);\n  };\n  walk(hull, false);\n  const centre = (f: any) => {\n    const s = [0, 0, 0];\n    let n = 0;\n    for (const e of f.edges) { const p = e.pointAt(0.5); s[0] += p.x; s[1] += p.y; s[2] += p.z; n++; }\n    return s.map((v) => v / n);\n  };\n  const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n  return (which || []).map((i: number) => {\n    if (!sorted[Number(i)]) throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n    return sorted[Number(i)].f;\n  });\n}\n",
+                  "compiledCode": "\"use strict\";\n/**\n * Hull-hugging timber member on chosen planking strips of the hull surface.\n * sideStrips counts the side strips from the sheer down; bottomStrips counts\n * the bottom strips from the chine to the keel. Each strip is moved inward by\n * its planking thickness (sideInset for side strips, bottomInset for bottom\n * strips), giving the face that bears on the planking, and by that plus\n * `depth`, giving the member's back face. The two are closed into a solid with\n * ruled side walls, so the member follows the twist of the planking.\n */\nfunction run(hull, sideStrips = [4], bottomStrips = [0], sideInset = 6, bottomInset = 9, depth = 20, color = \"#b5835a\") {\n    const strips = [\n        ...pick(hull, \"side surface\", sideStrips, (c) => c[2]).map((face) => ({ face, inset: Math.abs(Number(sideInset)) })),\n        ...pick(hull, \"bottom surface\", bottomStrips, (c) => c[1]).map((face) => ({ face, inset: Math.abs(Number(bottomInset)) })),\n    ];\n    if (strips.length === 0)\n        throw new Error(\"No strips chosen for the member\");\n    const solids = [];\n    for (const { face, inset } of strips) {\n        const inner = replicad.makeOffset(face, -inset).faces[0];\n        const back = replicad.makeOffset(face, -(inset + Math.abs(Number(depth)))).faces[0];\n        const w1 = replicad.assembleWire(inner.edges);\n        const w2 = replicad.assembleWire(back.edges);\n        const walls = replicad.loft([w2, w1], {}, true);\n        const shell = replicad.weldShellsAndFaces([inner, back, ...walls.faces]);\n        solids.push(replicad.makeSolid([shell]));\n    }\n    const member = solids.length === 1 ? solids[0] : replicad.makeCompound(solids);\n    return new Assembly({ geometry: member, color });\n}\n// Strips with `tag`, ordered by key(centre) from high to low, picked by index.\nfunction pick(hull, tag, which, key) {\n    const faces = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            faces.push(node.geometry);\n    };\n    walk(hull, false);\n    const centre = (f) => {\n        const s = [0, 0, 0];\n        let n = 0;\n        for (const e of f.edges) {\n            const p = e.pointAt(0.5);\n            s[0] += p.x;\n            s[1] += p.y;\n            s[2] += p.z;\n            n++;\n        }\n        return s.map((v) => v / n);\n    };\n    const sorted = faces.map((f) => ({ f, k: key(centre(f)) })).sort((a, b) => b.k - a.k);\n    return (which || []).map((i) => {\n        if (!sorted[Number(i)])\n            throw new Error(`No ${tag} strip ${i} (there are ${sorted.length})`);\n        return sorted[Number(i)].f;\n    });\n}\n"
                 },
                 {
                   "atomType": "Input",
@@ -3332,7 +3425,8 @@
             },
             {
               "name": "DeckThickness",
-              "ioValue": 9
+              "ioValue": 9,
+              "currentEquation": "DeckPlywood"
             },
             {
               "name": "Depth",
@@ -6902,11 +6996,13 @@
             },
             {
               "name": "SideThickness",
-              "ioValue": 6
+              "ioValue": 6,
+              "currentEquation": "SidePlywood"
             },
             {
               "name": "BottomThickness",
-              "ioValue": 9
+              "ioValue": 9,
+              "currentEquation": "BottomPlywood"
             }
           ],
           "topLevel": false,
@@ -7892,7 +7988,8 @@
             },
             {
               "name": "Thickness",
-              "ioValue": 9
+              "ioValue": 9,
+              "currentEquation": "DeckPlywood"
             },
             {
               "name": "Hull Lines",
@@ -8788,7 +8885,8 @@
             },
             {
               "name": "DeckThickness",
-              "ioValue": 9
+              "ioValue": 9,
+              "currentEquation": "DeckPlywood"
             }
           ],
           "topLevel": false,
@@ -9418,11 +9516,13 @@
           "ioValues": [
             {
               "name": "SideThickness",
-              "ioValue": 6
+              "ioValue": 6,
+              "currentEquation": "SidePlywood"
             },
             {
               "name": "BottomThickness",
-              "ioValue": 9
+              "ioValue": 9,
+              "currentEquation": "BottomPlywood"
             },
             {
               "name": "Side Surface",
@@ -9492,7 +9592,7 @@
               "x": 0.58,
               "y": 0.3,
               "uniqueID": "id-8057",
-              "name": "plywood 6mm",
+              "name": "side plywood",
               "ioValues": [
                 {
                   "name": "geometry",
@@ -9500,7 +9600,7 @@
                 }
               ],
               "tags": [
-                "plywood 6mm"
+                "side plywood"
               ]
             },
             {
@@ -9508,7 +9608,7 @@
               "x": 0.58,
               "y": 0.7,
               "uniqueID": "id-8058",
-              "name": "plywood 9mm",
+              "name": "bottom plywood",
               "ioValues": [
                 {
                   "name": "geometry",
@@ -9516,7 +9616,7 @@
                 }
               ],
               "tags": [
-                "plywood 9mm"
+                "bottom plywood"
               ]
             },
             {
@@ -10099,7 +10199,8 @@
             },
             {
               "name": "Thickness",
-              "ioValue": 9
+              "ioValue": 9,
+              "currentEquation": "DeckPlywood"
             }
           ],
           "topLevel": false,
@@ -10507,7 +10608,7 @@
               "x": 0.8,
               "y": 0.4,
               "uniqueID": "id-8106",
-              "name": "plywood 9mm deck",
+              "name": "deck plywood",
               "ioValues": [
                 {
                   "name": "geometry",
@@ -10515,7 +10616,7 @@
                 }
               ],
               "tags": [
-                "plywood 9mm deck"
+                "deck plywood"
               ]
             },
             {

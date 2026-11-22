@@ -8,6 +8,10 @@
 
 - **Hull JSON** (string)
 - **FrameStations** (array)
+- **SidePlywood** (number)
+- **BottomPlywood** (number)
+- **DeckPlywood** (number)
+- **FramePlywood** (number)
 
 
 

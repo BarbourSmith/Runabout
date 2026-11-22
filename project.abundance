@@ -7380,23 +7380,23 @@
       "ioValues": [
         {
           "name": "Deck Plan",
-          "ioValue": 10
+          "ioValue": "__GEOMETRY_INPUT__"
         },
         {
           "name": "AftX",
-          "ioValue": 10
+          "ioValue": 720
         },
         {
           "name": "ForeX",
-          "ioValue": 10
+          "ioValue": 2780
         },
         {
           "name": "SideDeck",
-          "ioValue": 10
+          "ioValue": 200
         },
         {
           "name": "CornerRadius",
-          "ioValue": 10
+          "ioValue": 150
         }
       ],
       "topLevel": false,
@@ -7471,7 +7471,8 @@
             },
             {
               "name": "Offset",
-              "ioValue": 10
+              "ioValue": -200,
+              "currentEquation": "-SideDeck"
             }
           ],
           "topLevel": false,
@@ -7517,7 +7518,7 @@
                 },
                 {
                   "name": "distance",
-                  "ioValue": 10
+                  "ioValue": -200
                 }
               ],
               "interpreterVersion": 1,
@@ -7561,7 +7562,7 @@
           "ioValues": [
             {
               "name": "x length",
-              "ioValue": 0,
+              "ioValue": 2060,
               "currentEquation": "ForeX - AftX"
             },
             {
@@ -7582,7 +7583,7 @@
             },
             {
               "name": "xDist",
-              "ioValue": 10,
+              "ioValue": 1750,
               "currentEquation": "(AftX + ForeX) / 2"
             },
             {
@@ -7626,7 +7627,8 @@
             },
             {
               "name": "Offset",
-              "ioValue": 10
+              "ioValue": -150,
+              "currentEquation": "-CornerRadius"
             }
           ],
           "topLevel": false,
@@ -7672,7 +7674,7 @@
                 },
                 {
                   "name": "distance",
-                  "ioValue": 10
+                  "ioValue": -150
                 }
               ],
               "interpreterVersion": 1,
@@ -7721,7 +7723,8 @@
             },
             {
               "name": "Offset",
-              "ioValue": 10
+              "ioValue": 150,
+              "currentEquation": "CornerRadius"
             }
           ],
           "topLevel": false,
@@ -7767,7 +7770,7 @@
                 },
                 {
                   "name": "distance",
-                  "ioValue": 10
+                  "ioValue": 150
                 }
               ],
               "interpreterVersion": 1,
@@ -7806,9 +7809,39 @@
       ],
       "allConnectors": [
         {
+          "ap2Name": "2D_Shape",
+          "ap1ID": "id-2897",
+          "ap2ID": "id-2917"
+        },
+        {
+          "ap2Name": "geometry1",
+          "ap1ID": "id-2917",
+          "ap2ID": "id-2939"
+        },
+        {
           "ap2Name": "geometry",
           "ap1ID": "id-2929",
           "ap2ID": "id-2933"
+        },
+        {
+          "ap2Name": "geometry2",
+          "ap1ID": "id-2933",
+          "ap2ID": "id-2939"
+        },
+        {
+          "ap2Name": "2D_Shape",
+          "ap1ID": "id-2939",
+          "ap2ID": "id-2948"
+        },
+        {
+          "ap2Name": "2D_Shape",
+          "ap1ID": "id-2948",
+          "ap2ID": "id-2965"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-2965",
+          "ap2ID": "id-2895"
         }
       ],
       "fileTypeVersion": 1
@@ -8072,6 +8105,935 @@
           "ap2Name": "number or geometry",
           "ap1ID": "id-328",
           "ap2ID": "id-298"
+        }
+      ],
+      "fileTypeVersion": 1
+    },
+    {
+      "atomType": "Molecule",
+      "x": 0.72,
+      "y": 0.25,
+      "uniqueID": "id-2977",
+      "name": "Deck",
+      "ioValues": [
+        {
+          "name": "Deck Crown",
+          "ioValue": "__GEOMETRY_INPUT__"
+        },
+        {
+          "name": "Hull Interior",
+          "ioValue": "__GEOMETRY_INPUT__"
+        },
+        {
+          "name": "Cockpit Opening",
+          "ioValue": "__GEOMETRY_INPUT__"
+        },
+        {
+          "name": "Thickness",
+          "ioValue": 9
+        }
+      ],
+      "topLevel": false,
+      "allAtoms": [
+        {
+          "atomType": "Output",
+          "x": 0.98,
+          "y": 0.5,
+          "uniqueID": "id-2979",
+          "ioValues": [
+            {
+              "name": "number or geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.1538,
+          "uniqueID": "id-2981",
+          "name": "Deck Crown",
+          "type": "geometry",
+          "options": []
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.2462,
+          "uniqueID": "id-2984",
+          "name": "Hull Interior",
+          "type": "geometry",
+          "options": []
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.3385,
+          "uniqueID": "id-2987",
+          "name": "Cockpit Opening",
+          "type": "geometry",
+          "options": []
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.4308,
+          "uniqueID": "id-2990",
+          "name": "Thickness",
+          "type": "number",
+          "options": []
+        },
+        {
+          "atomType": "Molecule",
+          "x": 0.25,
+          "y": 0.45,
+          "uniqueID": "id-2993",
+          "name": "Deck Skin",
+          "ioValues": [
+            {
+              "name": "Deck Crown",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Hull Interior",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Cockpit Opening",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Thickness",
+              "ioValue": 9
+            }
+          ],
+          "topLevel": false,
+          "allAtoms": [
+            {
+              "atomType": "Output",
+              "x": 0.98,
+              "y": 0.5,
+              "uniqueID": "id-2995",
+              "ioValues": [
+                {
+                  "name": "number or geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.1538,
+              "uniqueID": "id-2997",
+              "name": "Deck Crown",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.2462,
+              "uniqueID": "id-3000",
+              "name": "Hull Interior",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.3385,
+              "uniqueID": "id-3003",
+              "name": "Cockpit Opening",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.4308,
+              "uniqueID": "id-3006",
+              "name": "Thickness",
+              "type": "number",
+              "options": []
+            },
+            {
+              "atomType": "Move",
+              "x": 0.2,
+              "y": 0.15,
+              "uniqueID": "id-3009",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "xDist",
+                  "ioValue": 0,
+                  "currentEquation": "0"
+                },
+                {
+                  "name": "yDist",
+                  "ioValue": 0,
+                  "currentEquation": "0"
+                },
+                {
+                  "name": "zDist",
+                  "ioValue": 5
+                }
+              ]
+            },
+            {
+              "atomType": "Move",
+              "x": 0.2,
+              "y": 0.3,
+              "uniqueID": "id-3015",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "xDist",
+                  "ioValue": 1
+                },
+                {
+                  "name": "yDist",
+                  "ioValue": 0,
+                  "currentEquation": "0"
+                },
+                {
+                  "name": "zDist",
+                  "ioValue": -9,
+                  "currentEquation": "-Thickness"
+                }
+              ]
+            },
+            {
+              "atomType": "Difference",
+              "x": 0.35,
+              "y": 0.22,
+              "uniqueID": "id-3021",
+              "ioValues": [
+                {
+                  "name": "retain",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "remove",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Intersection",
+              "x": 0.5,
+              "y": 0.3,
+              "uniqueID": "id-3025",
+              "ioValues": [
+                {
+                  "name": "geometry1",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "geometry2",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Extrude",
+              "x": 0.35,
+              "y": 0.6,
+              "uniqueID": "id-3029",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "height",
+                  "ioValue": 2000
+                }
+              ]
+            },
+            {
+              "atomType": "Move",
+              "x": 0.5,
+              "y": 0.6,
+              "uniqueID": "id-3033",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "xDist",
+                  "ioValue": 0,
+                  "currentEquation": "0"
+                },
+                {
+                  "name": "yDist",
+                  "ioValue": 0,
+                  "currentEquation": "0"
+                },
+                {
+                  "name": "zDist",
+                  "ioValue": -500
+                }
+              ]
+            },
+            {
+              "atomType": "Difference",
+              "x": 0.68,
+              "y": 0.45,
+              "uniqueID": "id-3039",
+              "ioValues": [
+                {
+                  "name": "retain",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "remove",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            }
+          ],
+          "allConnectors": [
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-2997",
+              "ap2ID": "id-3009"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-2997",
+              "ap2ID": "id-3015"
+            },
+            {
+              "ap2Name": "geometry2",
+              "ap1ID": "id-3000",
+              "ap2ID": "id-3025"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-3003",
+              "ap2ID": "id-3029"
+            },
+            {
+              "ap2Name": "retain",
+              "ap1ID": "id-3009",
+              "ap2ID": "id-3021"
+            },
+            {
+              "ap2Name": "remove",
+              "ap1ID": "id-3015",
+              "ap2ID": "id-3021"
+            },
+            {
+              "ap2Name": "geometry1",
+              "ap1ID": "id-3021",
+              "ap2ID": "id-3025"
+            },
+            {
+              "ap2Name": "retain",
+              "ap1ID": "id-3025",
+              "ap2ID": "id-3039"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-3029",
+              "ap2ID": "id-3033"
+            },
+            {
+              "ap2Name": "remove",
+              "ap1ID": "id-3033",
+              "ap2ID": "id-3039"
+            },
+            {
+              "ap2Name": "number or geometry",
+              "ap1ID": "id-3039",
+              "ap2ID": "id-2995"
+            }
+          ],
+          "fileTypeVersion": 1
+        },
+        {
+          "atomType": "Molecule",
+          "x": 0.45,
+          "y": 0.45,
+          "uniqueID": "id-3043",
+          "name": "Deck Half",
+          "ioValues": [
+            {
+              "name": "Deck Skin",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "topLevel": false,
+          "allAtoms": [
+            {
+              "atomType": "Output",
+              "x": 0.98,
+              "y": 0.5,
+              "uniqueID": "id-3045",
+              "ioValues": [
+                {
+                  "name": "number or geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.1538,
+              "uniqueID": "id-3047",
+              "name": "Deck Skin",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "Rectangle",
+              "x": 0.2,
+              "y": 0.25,
+              "uniqueID": "id-3050",
+              "ioValues": [
+                {
+                  "name": "x length",
+                  "ioValue": 6000
+                },
+                {
+                  "name": "y length",
+                  "ioValue": 1000
+                }
+              ]
+            },
+            {
+              "atomType": "Extrude",
+              "x": 0.32,
+              "y": 0.25,
+              "uniqueID": "id-3054",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "height",
+                  "ioValue": 2000
+                }
+              ]
+            },
+            {
+              "atomType": "Move",
+              "x": 0.44,
+              "y": 0.25,
+              "uniqueID": "id-3058",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "xDist",
+                  "ioValue": 2000
+                },
+                {
+                  "name": "yDist",
+                  "ioValue": 500
+                },
+                {
+                  "name": "zDist",
+                  "ioValue": -500
+                }
+              ]
+            },
+            {
+              "atomType": "Intersection",
+              "x": 0.58,
+              "y": 0.45,
+              "uniqueID": "id-3064",
+              "ioValues": [
+                {
+                  "name": "geometry1",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "geometry2",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Tag",
+              "x": 0.72,
+              "y": 0.45,
+              "uniqueID": "id-3068",
+              "name": "deck",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ],
+              "tags": [
+                "deck"
+              ]
+            },
+            {
+              "atomType": "Color",
+              "x": 0.85,
+              "y": 0.45,
+              "uniqueID": "id-3071",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ],
+              "selectedColor": "Orange"
+            }
+          ],
+          "allConnectors": [
+            {
+              "ap2Name": "geometry1",
+              "ap1ID": "id-3047",
+              "ap2ID": "id-3064"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-3050",
+              "ap2ID": "id-3054"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-3054",
+              "ap2ID": "id-3058"
+            },
+            {
+              "ap2Name": "geometry2",
+              "ap1ID": "id-3058",
+              "ap2ID": "id-3064"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-3064",
+              "ap2ID": "id-3068"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-3068",
+              "ap2ID": "id-3071"
+            },
+            {
+              "ap2Name": "number or geometry",
+              "ap1ID": "id-3071",
+              "ap2ID": "id-3045"
+            }
+          ],
+          "fileTypeVersion": 1
+        },
+        {
+          "atomType": "GitHubMolecule",
+          "x": 0.62,
+          "y": 0.65,
+          "uniqueID": "id-3087",
+          "name": "Mirror",
+          "ioValues": [
+            {
+              "name": "Shape",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Pivot",
+              "ioValue": 90
+            },
+            {
+              "name": "Plane",
+              "ioValue": "X",
+              "currentEquation": "X"
+            }
+          ],
+          "topLevel": false,
+          "allAtoms": [
+            {
+              "atomType": "Output",
+              "x": 0.98,
+              "y": 0.5,
+              "uniqueID": "id-3075",
+              "ioValues": [
+                {
+                  "name": "number or geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.1538,
+              "uniqueID": "id-3076",
+              "name": "Shape",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "Code",
+              "x": 0.5916,
+              "y": 0.5807,
+              "uniqueID": "id-3077",
+              "ioValues": [
+                {
+                  "name": "shape",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "pivot",
+                  "ioValue": 90
+                },
+                {
+                  "name": "plane",
+                  "ioValue": "X",
+                  "currentEquation": "X"
+                }
+              ],
+              "interpreterVersion": 0,
+              "code": "\n      const Inputs = [\n       {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n        {inputName: \"pivot\", type: \"number\", defaultValue: 90},\n        {inputName: \"plane\", type: \"string\", defaultValue: \"X\"}\n        \n        ]\n      //This defines the molecules inputs and creates variables with the same names which can be referenced in the code\n\n      //Gets the shape from the library - no need to clone or access geometry directly\n      let importedShape = library[shape]\n\n      const newPlane = new replicad.Plane().pivot(pivot, plane)\n      console.log(importedShape)\n      let mirroredShape = importedShape.geometry[0].mirror(newPlane,(0,0,0))\n\n\n      //Wrap the raw replicad geometry in our assembly format\n      let shape2 = {\n          geometry: [mirroredShape],\n          dimension: \"3D\",\n          tags: [\"createdShape\"],\n          color: '#A3CE5B',\n          plane: newPlane,\n          bom: []\n      }\n    \n      return shape2\n\n      /**\n      Built-in Functions Available:\n      - Move(geometry, x, y, z) - Move a shape in 3D space\n      - Rotate(geometry, x, y, z) - Rotate a shape around X, Y, Z axes (degrees)\n      - Scale(geometry, factor) - Scale a shape by a factor\n      - Assembly([shapes]) - Combine multiple shapes into an assembly\n      - Intersect(shape1, shape2) - Boolean intersection of two shapes\n      - GetBounds(geometry) - Get the bounding box of a shape\n      - Fillet(geometry, radius) - Round edges with specified radius\n      - Chamfer(geometry, size) - Bevel edges with specified size\n\n      To Use the Code Atom, enter your inputs to the input list as an object array:\n      const Inputs = [\n        {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n        {inputName: \"dist\", type: \"number\", defaultValue: 5},\n        {inputName: \"height\", type: \"number\", defaultValue: 10}\n      ]\n\n      Access imported geometry using library[inputName] - the built-in functions handle \n      the complexity of accessing geometry arrays and maintaining metadata automatically.\n\n      Simple Example - Move a shape:\n         const Inputs = [\n          {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n          {inputName: \"x\", type: \"number\", defaultValue: 5}\n        ]\n        let movedShape = await Move(library[shape], x, 0, 0)\n        return movedShape\n      */\n      "
+            },
+            {
+              "atomType": "Rectangle",
+              "x": 0.1558,
+              "y": 0.6584,
+              "uniqueID": "id-3078",
+              "ioValues": [
+                {
+                  "name": "x length",
+                  "ioValue": 10
+                },
+                {
+                  "name": "y length",
+                  "ioValue": 10
+                }
+              ]
+            },
+            {
+              "atomType": "Extrude",
+              "x": 0.272,
+              "y": 0.7981,
+              "uniqueID": "id-3079",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "height",
+                  "ioValue": 1
+                }
+              ]
+            },
+            {
+              "atomType": "Move",
+              "x": 0.4027,
+              "y": 0.7112,
+              "uniqueID": "id-3080",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "xDist",
+                  "ioValue": 0
+                },
+                {
+                  "name": "yDist",
+                  "ioValue": 10
+                },
+                {
+                  "name": "zDist",
+                  "ioValue": 0
+                }
+              ]
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.2462,
+              "uniqueID": "id-3081",
+              "name": "Pivot",
+              "type": "number",
+              "options": []
+            },
+            {
+              "atomType": "Assembly",
+              "x": 0.6893,
+              "y": 0.7919,
+              "uniqueID": "id-3082",
+              "ioValues": [
+                {
+                  "name": "makeDisjoint",
+                  "ioValue": true
+                },
+                {
+                  "name": "Shape 1",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "Shape 3",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "Shape4",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Readme",
+              "x": 0.8063,
+              "y": 0.7236,
+              "uniqueID": "id-3083",
+              "name": "README",
+              "ioValues": [
+                {
+                  "name": "value",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ],
+              "readMeText": "Mirror a given shape",
+              "global": true
+            },
+            {
+              "atomType": "Rotate",
+              "x": 0.4964,
+              "y": 0.7733,
+              "uniqueID": "id-3084",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "x-axis degrees",
+                  "ioValue": 0
+                },
+                {
+                  "name": "y-axis degrees",
+                  "ioValue": 30
+                },
+                {
+                  "name": "z-axis degrees",
+                  "ioValue": 0
+                }
+              ]
+            },
+            {
+              "atomType": "Code",
+              "x": 0.4972,
+              "y": 0.3292,
+              "uniqueID": "id-3085",
+              "ioValues": [
+                {
+                  "name": "shape",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "pivot",
+                  "ioValue": 90
+                },
+                {
+                  "name": "plane",
+                  "ioValue": "X",
+                  "currentEquation": "X"
+                }
+              ],
+              "interpreterVersion": 0,
+              "code": "\n      const Inputs = [\n       {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n        {inputName: \"pivot\", type: \"number\", defaultValue: 90},\n        {inputName: \"plane\", type: \"string\", defaultValue: \"X\"}\n        \n        ]\n      //This defines the molecules inputs and creates variables with the same names which can be referenced in the code\n\n      //Gets the shape from the library - no need to clone or access geometry directly\n      let importedShape = library[shape]\n\n      const newPlane = new replicad.Plane().pivot(pivot, plane)\n      console.log(importedShape)\n      let mirroredShape = importedShape.geometry[0].mirror(newPlane,(0,0,0))\n\n\n      //Wrap the raw replicad geometry in our assembly format\n      let shape2 = {\n          geometry: [mirroredShape],\n          dimension: \"3D\",\n          tags: [\"createdShape\"],\n          color: '#A3CE5B',\n          plane: newPlane,\n          bom: []\n      }\n    \n      return shape2\n\n      /**\n      Built-in Functions Available:\n      - Move(geometry, x, y, z) - Move a shape in 3D space\n      - Rotate(geometry, x, y, z) - Rotate a shape around X, Y, Z axes (degrees)\n      - Scale(geometry, factor) - Scale a shape by a factor\n      - Assembly([shapes]) - Combine multiple shapes into an assembly\n      - Intersect(shape1, shape2) - Boolean intersection of two shapes\n      - GetBounds(geometry) - Get the bounding box of a shape\n      - Fillet(geometry, radius) - Round edges with specified radius\n      - Chamfer(geometry, size) - Bevel edges with specified size\n\n      To Use the Code Atom, enter your inputs to the input list as an object array:\n      const Inputs = [\n        {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n        {inputName: \"dist\", type: \"number\", defaultValue: 5},\n        {inputName: \"height\", type: \"number\", defaultValue: 10}\n      ]\n\n      Access imported geometry using library[inputName] - the built-in functions handle \n      the complexity of accessing geometry arrays and maintaining metadata automatically.\n\n      Simple Example - Move a shape:\n         const Inputs = [\n          {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n          {inputName: \"x\", type: \"number\", defaultValue: 5}\n        ]\n        let movedShape = await Move(library[shape], x, 0, 0)\n        return movedShape\n      */\n      "
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.3385,
+              "uniqueID": "id-3086",
+              "name": "Plane",
+              "type": "string",
+              "options": []
+            }
+          ],
+          "allConnectors": [
+            {
+              "ap2Name": "shape",
+              "ap1ID": "id-3076",
+              "ap2ID": "id-3085"
+            },
+            {
+              "ap2Name": "Shape 1",
+              "ap1ID": "id-3077",
+              "ap2ID": "id-3082"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-3078",
+              "ap2ID": "id-3079"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-3079",
+              "ap2ID": "id-3080"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-3080",
+              "ap2ID": "id-3084"
+            },
+            {
+              "ap2Name": "pivot",
+              "ap1ID": "id-3081",
+              "ap2ID": "id-3085"
+            },
+            {
+              "ap2Name": "shape",
+              "ap1ID": "id-3084",
+              "ap2ID": "id-3077"
+            },
+            {
+              "ap2Name": "Shape 3",
+              "ap1ID": "id-3084",
+              "ap2ID": "id-3082"
+            },
+            {
+              "ap2Name": "number or geometry",
+              "ap1ID": "id-3085",
+              "ap2ID": "id-3075"
+            },
+            {
+              "ap2Name": "plane",
+              "ap1ID": "id-3086",
+              "ap2ID": "id-3085"
+            }
+          ],
+          "parentRepo": {
+            "owner": "alzatin",
+            "repoName": "Mirror",
+            "privateRepo": false
+          },
+          "unitsKey": "Unitless",
+          "fileTypeVersion": 1,
+          "scaleToProjectUnits": true,
+          "lastReloadedFromGithubAt": 1795315572170
+        },
+        {
+          "atomType": "Tag",
+          "x": 0.74,
+          "y": 0.65,
+          "uniqueID": "id-3127",
+          "name": "deck",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "tags": [
+            "deck"
+          ]
+        },
+        {
+          "atomType": "Color",
+          "x": 0.84,
+          "y": 0.65,
+          "uniqueID": "id-3130",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Orange"
+        },
+        {
+          "atomType": "Assembly",
+          "x": 0.92,
+          "y": 0.45,
+          "uniqueID": "id-3133",
+          "ioValues": [
+            {
+              "name": "makeDisjoint",
+              "ioValue": false
+            },
+            {
+              "name": "Shape 1",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Shape2",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Shape3",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        }
+      ],
+      "allConnectors": [
+        {
+          "ap2Name": "Deck Crown",
+          "ap1ID": "id-2981",
+          "ap2ID": "id-2993"
+        },
+        {
+          "ap2Name": "Hull Interior",
+          "ap1ID": "id-2984",
+          "ap2ID": "id-2993"
+        },
+        {
+          "ap2Name": "Cockpit Opening",
+          "ap1ID": "id-2987",
+          "ap2ID": "id-2993"
+        },
+        {
+          "ap2Name": "Thickness",
+          "ap1ID": "id-2990",
+          "ap2ID": "id-2993"
+        },
+        {
+          "ap2Name": "Deck Skin",
+          "ap1ID": "id-2993",
+          "ap2ID": "id-3043"
+        },
+        {
+          "ap2Name": "Shape",
+          "ap1ID": "id-3043",
+          "ap2ID": "id-3087"
+        },
+        {
+          "ap2Name": "Shape 1",
+          "ap1ID": "id-3043",
+          "ap2ID": "id-3133"
+        },
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-3087",
+          "ap2ID": "id-3127"
+        },
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-3127",
+          "ap2ID": "id-3130"
+        },
+        {
+          "ap2Name": "Shape2",
+          "ap1ID": "id-3130",
+          "ap2ID": "id-3133"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-3133",
+          "ap2ID": "id-2979"
         }
       ],
       "fileTypeVersion": 1
@@ -12867,6 +13829,16 @@
       "ap2ID": "id-2809"
     },
     {
+      "ap2Name": "Deck Plan",
+      "ap1ID": "id-2875",
+      "ap2ID": "id-2893"
+    },
+    {
+      "ap2Name": "Cockpit Opening",
+      "ap1ID": "id-2893",
+      "ap2ID": "id-2977"
+    },
+    {
       "ap2Name": "Hull Strips",
       "ap1ID": "id-296",
       "ap2ID": "id-2854"
@@ -12889,7 +13861,17 @@
     {
       "ap2Name": "Deck Crown",
       "ap1ID": "id-429",
+      "ap2ID": "id-2977"
+    },
+    {
+      "ap2Name": "Deck Crown",
+      "ap1ID": "id-429",
       "ap2ID": "id-451"
+    },
+    {
+      "ap2Name": "Hull Interior",
+      "ap1ID": "id-451",
+      "ap2ID": "id-2977"
     },
     {
       "ap2Name": "Side Surface",

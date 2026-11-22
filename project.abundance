@@ -12661,7 +12661,7 @@
             },
             {
               "name": "unrollTogether",
-              "ioValue": true
+              "ioValue": false
             },
             {
               "name": "meshTolerance",
@@ -12706,7 +12706,7 @@
                 },
                 {
                   "name": "asSingular",
-                  "ioValue": true
+                  "ioValue": false
                 },
                 {
                   "name": "maxTensileStrain",

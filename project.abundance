@@ -389,8 +389,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.5,
-          "y": 0.3,
+          "x": 0.3922,
+          "y": 0.2592,
           "uniqueID": "id-6442",
           "name": "Frames",
           "ioValues": [
@@ -784,8 +784,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.5,
-          "y": 0.4,
+          "x": 0.4266,
+          "y": 0.4845,
           "uniqueID": "id-6458",
           "name": "Transom",
           "ioValues": [
@@ -1020,8 +1020,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.5,
-          "y": 0.5,
+          "x": 0.4636,
+          "y": 0.6535,
           "uniqueID": "id-6468",
           "name": "Stem",
           "ioValues": [
@@ -1046,8 +1046,8 @@
             },
             {
               "atomType": "Code",
-              "x": 0.45,
-              "y": 0.5,
+              "x": 0.1343,
+              "y": 0.507,
               "uniqueID": "id-6470",
               "ioValues": [
                 {
@@ -1089,8 +1089,8 @@
             },
             {
               "atomType": "Move",
-              "x": 0.5,
-              "y": 0.55,
+              "x": 0.2513,
+              "y": 0.8732,
               "uniqueID": "id-6471",
               "ioValues": [
                 {
@@ -1113,8 +1113,8 @@
             },
             {
               "atomType": "Difference",
-              "x": 0.55,
-              "y": 0.5,
+              "x": 0.3254,
+              "y": 0.2817,
               "uniqueID": "id-6472",
               "ioValues": [
                 {
@@ -1129,8 +1129,8 @@
             },
             {
               "atomType": "Extrude",
-              "x": 0.6,
-              "y": 0.5,
+              "x": 0.3657,
+              "y": 0.6085,
               "uniqueID": "id-6473",
               "ioValues": [
                 {
@@ -1145,8 +1145,8 @@
             },
             {
               "atomType": "Rotate",
-              "x": 0.65,
-              "y": 0.5,
+              "x": 0.4987,
+              "y": 0.538,
               "uniqueID": "id-6474",
               "ioValues": [
                 {
@@ -1169,8 +1169,8 @@
             },
             {
               "atomType": "Move",
-              "x": 0.7,
-              "y": 0.55,
+              "x": 0.6362,
+              "y": 0.7972,
               "uniqueID": "id-6475",
               "ioValues": [
                 {
@@ -1193,8 +1193,8 @@
             },
             {
               "atomType": "Assembly",
-              "x": 0.75,
-              "y": 0.5,
+              "x": 0.6071,
+              "y": 0.3606,
               "uniqueID": "id-6476",
               "ioValues": [
                 {
@@ -1217,8 +1217,8 @@
             },
             {
               "atomType": "Tag",
-              "x": 0.8,
-              "y": 0.5,
+              "x": 0.7288,
+              "y": 0.4169,
               "uniqueID": "id-6477",
               "name": "plywood 18mm",
               "ioValues": [
@@ -1320,8 +1320,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.5,
-          "y": 0.6,
+          "x": 0.457,
+          "y": 0.8197,
           "uniqueID": "id-6480",
           "name": "Keel Hog",
           "ioValues": [
@@ -1346,8 +1346,8 @@
             },
             {
               "atomType": "Code",
-              "x": 0.45,
-              "y": 0.6,
+              "x": 0.254,
+              "y": 0.5155,
               "uniqueID": "id-6482",
               "ioValues": [
                 {
@@ -1393,8 +1393,8 @@
             },
             {
               "atomType": "Extrude",
-              "x": 0.5,
-              "y": 0.6,
+              "x": 0.4048,
+              "y": 0.4873,
               "uniqueID": "id-6483",
               "ioValues": [
                 {
@@ -1409,8 +1409,8 @@
             },
             {
               "atomType": "Rotate",
-              "x": 0.55,
-              "y": 0.6,
+              "x": 0.4874,
+              "y": 0.6648,
               "uniqueID": "id-6484",
               "ioValues": [
                 {
@@ -1433,8 +1433,8 @@
             },
             {
               "atomType": "Move",
-              "x": 0.6,
-              "y": 0.6,
+              "x": 0.5655,
+              "y": 0.5014,
               "uniqueID": "id-6485",
               "ioValues": [
                 {
@@ -1457,8 +1457,8 @@
             },
             {
               "atomType": "Tag",
-              "x": 0.65,
-              "y": 0.6,
+              "x": 0.7235,
+              "y": 0.5972,
               "uniqueID": "id-6486",
               "name": "timber",
               "ioValues": [
@@ -1473,8 +1473,8 @@
             },
             {
               "atomType": "Color",
-              "x": 0.7,
-              "y": 0.6,
+              "x": 0.7989,
+              "y": 0.5127,
               "uniqueID": "id-6487",
               "ioValues": [
                 {
@@ -1535,8 +1535,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.7487,
-          "y": 0.4197,
+          "x": 0.5688,
+          "y": 0.4423,
           "uniqueID": "id-6489",
           "name": "Longitudinals",
           "ioValues": [
@@ -3317,8 +3317,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.834,
-          "y": 0.2338,
+          "x": 0.6012,
+          "y": 0.1803,
           "uniqueID": "id-6567",
           "name": "Deck Framing",
           "ioValues": [
@@ -5779,8 +5779,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.8294,
-          "y": 0.7972,
+          "x": 0.6276,
+          "y": 0.8,
           "uniqueID": "id-6678",
           "name": "CNC Parts",
           "ioValues": [
@@ -6476,8 +6476,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.8955,
-          "y": 0.6563,
+          "x": 0.7612,
+          "y": 0.6197,
           "uniqueID": "id-6709",
           "name": "Cockpit Beam Cut",
           "ioValues": [
@@ -6624,8 +6624,8 @@
         },
         {
           "atomType": "Assembly",
-          "x": 0.8,
-          "y": 0.45,
+          "x": 0.7632,
+          "y": 0.338,
           "uniqueID": "id-6717",
           "ioValues": [
             {
@@ -11359,8 +11359,8 @@
         },
         {
           "atomType": "Tag",
-          "x": 0.213,
-          "y": 0.769,
+          "x": 0.2169,
+          "y": 0.8,
           "uniqueID": "id-8361",
           "name": "deck outline",
           "ioValues": [
@@ -11375,8 +11375,8 @@
         },
         {
           "atomType": "Tag",
-          "x": 0.3,
-          "y": 0.85,
+          "x": 0.4927,
+          "y": 0.3831,
           "uniqueID": "id-8362",
           "name": "cockpit opening",
           "ioValues": [

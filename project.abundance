@@ -713,6 +713,19 @@
           "interpreterVersion": 1,
           "code": "/**\n * Whole symmetric part from its starboard half: each part in the input is\n * fused with its own mirror image across the boat's centreline plane (XZ),\n * so the parts stay separate (one frame stays one frame).\n */\nfunction run(halves: Assembly): Assembly {\n  return halves.onLeafs((leaf) => {\n    const g = leaf.geometry as any;\n    leaf.geometry = g.fuse(g.clone().mirror(\"XZ\"));\n    return leaf;\n  });\n}\n",
           "compiledCode": "\"use strict\";\n/**\n * Whole symmetric part from its starboard half: each part in the input is\n * fused with its own mirror image across the boat's centreline plane (XZ),\n * so the parts stay separate (one frame stays one frame).\n */\nfunction run(halves) {\n    return halves.onLeafs((leaf) => {\n        const g = leaf.geometry;\n        leaf.geometry = g.fuse(g.clone().mirror(\"XZ\"));\n        return leaf;\n    });\n}\n"
+        },
+        {
+          "atomType": "Color",
+          "x": 0.95,
+          "y": 0.6,
+          "uniqueID": "id-2845",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Sand"
         }
       ],
       "allConnectors": [
@@ -762,14 +775,19 @@
           "ap2ID": "id-1188"
         },
         {
-          "ap2Name": "number or geometry",
+          "ap2Name": "geometry",
           "ap1ID": "id-1188",
-          "ap2ID": "id-1071"
+          "ap2ID": "id-2845"
         },
         {
           "ap2Name": "Blanks",
           "ap1ID": "id-2424",
           "ap2ID": "id-1124"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-2845",
+          "ap2ID": "id-1071"
         }
       ],
       "fileTypeVersion": 1
@@ -1005,6 +1023,19 @@
           "interpreterVersion": 1,
           "code": "/**\n * Whole symmetric part from its starboard half: each part in the input is\n * fused with its own mirror image across the boat's centreline plane (XZ).\n */\nfunction run(halves: Assembly): Assembly {\n  return halves.onLeafs((leaf) => {\n    const g = leaf.geometry as any;\n    leaf.geometry = g.fuse(g.clone().mirror(\"XZ\"));\n    return leaf;\n  });\n}\n",
           "compiledCode": "\"use strict\";\n/**\n * Whole symmetric part from its starboard half: each part in the input is\n * fused with its own mirror image across the boat's centreline plane (XZ).\n */\nfunction run(halves) {\n    return halves.onLeafs((leaf) => {\n        const g = leaf.geometry;\n        leaf.geometry = g.fuse(g.clone().mirror(\"XZ\"));\n        return leaf;\n    });\n}\n"
+        },
+        {
+          "atomType": "Color",
+          "x": 0.96,
+          "y": 0.6,
+          "uniqueID": "id-2848",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Sand"
         }
       ],
       "allConnectors": [
@@ -1044,14 +1075,19 @@
           "ap2ID": "id-2434"
         },
         {
-          "ap2Name": "number or geometry",
+          "ap2Name": "geometry",
           "ap1ID": "id-1237",
-          "ap2ID": "id-1193"
+          "ap2ID": "id-2848"
         },
         {
           "ap2Name": "geometry",
           "ap1ID": "id-2434",
           "ap2ID": "id-1237"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-2848",
+          "ap2ID": "id-1193"
         }
       ],
       "fileTypeVersion": 1
@@ -1687,6 +1723,19 @@
           "tags": [
             "plywood 18mm"
           ]
+        },
+        {
+          "atomType": "Color",
+          "x": 0.92,
+          "y": 0.6,
+          "uniqueID": "id-2842",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Sand"
         }
       ],
       "allConnectors": [
@@ -1711,14 +1760,19 @@
           "ap2ID": "id-1354"
         },
         {
-          "ap2Name": "number or geometry",
+          "ap2Name": "geometry",
           "ap1ID": "id-1347",
-          "ap2ID": "id-1242"
+          "ap2ID": "id-2842"
         },
         {
           "ap2Name": "Shape2",
           "ap1ID": "id-1354",
           "ap2ID": "id-1347"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-2842",
+          "ap2ID": "id-1242"
         }
       ],
       "fileTypeVersion": 1
@@ -2413,6 +2467,19 @@
           "interpreterVersion": 1,
           "code": "/**\n * Whole symmetric part from its starboard half: each part in the input is\n * fused with its own mirror image across the boat's centreline plane (XZ).\n */\nfunction run(halves: Assembly): Assembly {\n  return halves.onLeafs((leaf) => {\n    const g = leaf.geometry as any;\n    leaf.geometry = g.fuse(g.clone().mirror(\"XZ\"));\n    return leaf;\n  });\n}\n",
           "compiledCode": "\"use strict\";\n/**\n * Whole symmetric part from its starboard half: each part in the input is\n * fused with its own mirror image across the boat's centreline plane (XZ).\n */\nfunction run(halves) {\n    return halves.onLeafs((leaf) => {\n        const g = leaf.geometry;\n        leaf.geometry = g.fuse(g.clone().mirror(\"XZ\"));\n        return leaf;\n    });\n}\n"
+        },
+        {
+          "atomType": "Color",
+          "x": 0.95,
+          "y": 0.6,
+          "uniqueID": "id-2851",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Brown"
         }
       ],
       "allConnectors": [
@@ -2457,14 +2524,19 @@
           "ap2ID": "id-2444"
         },
         {
-          "ap2Name": "number or geometry",
+          "ap2Name": "geometry",
           "ap1ID": "id-1401",
-          "ap2ID": "id-1359"
+          "ap2ID": "id-2851"
         },
         {
           "ap2Name": "geometry",
           "ap1ID": "id-2444",
           "ap2ID": "id-1401"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-2851",
+          "ap2ID": "id-1359"
         }
       ],
       "fileTypeVersion": 1
@@ -5114,6 +5186,19 @@
               "ioValue": "__GEOMETRY_INPUT__"
             }
           ]
+        },
+        {
+          "atomType": "Color",
+          "x": 0.94,
+          "y": 0.6,
+          "uniqueID": "id-2839",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Brown"
         }
       ],
       "allConnectors": [
@@ -5218,9 +5303,9 @@
           "ap2ID": "id-1881"
         },
         {
-          "ap2Name": "number or geometry",
+          "ap2Name": "geometry",
           "ap1ID": "id-1881",
-          "ap2ID": "id-1406"
+          "ap2ID": "id-2839"
         },
         {
           "ap2Name": "geometry2",
@@ -5236,6 +5321,11 @@
           "ap2Name": "Shape 1",
           "ap1ID": "id-2761",
           "ap2ID": "id-1869"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-2839",
+          "ap2ID": "id-1406"
         }
       ],
       "fileTypeVersion": 1
@@ -6864,6 +6954,359 @@
     },
     {
       "atomType": "Molecule",
+      "x": 0.93,
+      "y": 0.95,
+      "uniqueID": "id-2809",
+      "name": "Cut Layout 18mm",
+      "ioValues": [
+        {
+          "name": "Parts",
+          "ioValue": "__GEOMETRY_INPUT__"
+        }
+      ],
+      "topLevel": false,
+      "allAtoms": [
+        {
+          "atomType": "Output",
+          "x": 0.98,
+          "y": 0.5,
+          "uniqueID": "id-2811",
+          "ioValues": [
+            {
+              "name": "number or geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.1538,
+          "uniqueID": "id-2813",
+          "name": "Parts",
+          "type": "geometry",
+          "options": []
+        },
+        {
+          "atomType": "CutOrient",
+          "x": 0.35,
+          "y": 0.5,
+          "uniqueID": "id-2816",
+          "name": "Cut Orient",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "orientations": [
+            {
+              "downwardFaceIndex": 100,
+              "faceCount": 122,
+              "faceNormal": [
+                -1,
+                0,
+                0
+              ]
+            },
+            {
+              "downwardFaceIndex": 94,
+              "faceCount": 116,
+              "faceNormal": [
+                -1,
+                0,
+                0
+              ]
+            },
+            {
+              "downwardFaceIndex": 5,
+              "faceCount": 99,
+              "faceNormal": [
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "downwardFaceIndex": 117,
+              "faceCount": 120,
+              "faceNormal": [
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "downwardFaceIndex": 5,
+              "faceCount": 118,
+              "faceNormal": [
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "downwardFaceIndex": 0,
+              "faceCount": 64,
+              "faceNormal": [
+                -0.9780858690388813,
+                0,
+                -0.20820190389729049
+              ]
+            },
+            {
+              "downwardFaceIndex": 0,
+              "faceCount": 24,
+              "faceNormal": [
+                0,
+                -1,
+                0
+              ]
+            },
+            {
+              "downwardFaceIndex": 0,
+              "faceCount": 24,
+              "faceNormal": [
+                0,
+                1,
+                -2.220446049250313e-16
+              ]
+            }
+          ],
+          "orientationsForHashed": 8
+        },
+        {
+          "atomType": "CutLayout",
+          "x": 0.65,
+          "y": 0.5,
+          "uniqueID": "id-2819",
+          "name": "Cut Layout",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Sheet Width",
+              "ioValue": 2440
+            },
+            {
+              "name": "Sheet Height",
+              "ioValue": 1220
+            },
+            {
+              "name": "Part Padding",
+              "ioValue": 12
+            },
+            {
+              "name": "Orientations",
+              "ioValue": 12
+            },
+            {
+              "name": "Search Time (minutes)",
+              "ioValue": 2
+            }
+          ],
+          "placements": [
+            [
+              {
+                "id": 1,
+                "rotate": 90,
+                "translate": {
+                  "x": 822.1800537109375,
+                  "y": 299.9599914550781
+                }
+              },
+              {
+                "id": 0,
+                "rotate": 270,
+                "translate": {
+                  "x": 715.489990234375,
+                  "y": 859.5999755859375
+                }
+              },
+              {
+                "id": 5,
+                "rotate": 180,
+                "translate": {
+                  "x": 1718.760009765625,
+                  "y": 1199.4600830078125
+                }
+              }
+            ],
+            [
+              {
+                "id": 7,
+                "rotate": 270,
+                "translate": {
+                  "x": 560.9000244140625,
+                  "y": 142.1999969482422
+                }
+              },
+              {
+                "id": 4,
+                "rotate": 270,
+                "translate": {
+                  "x": 662.5700073242188,
+                  "y": 591.7999877929688
+                }
+              },
+              {
+                "id": 6,
+                "rotate": 90,
+                "translate": {
+                  "x": 560.9500122070312,
+                  "y": 1041.3399658203125
+                }
+              }
+            ],
+            [
+              {
+                "id": 3,
+                "rotate": 270,
+                "translate": {
+                  "x": 827.0999755859375,
+                  "y": 337.0400085449219
+                }
+              }
+            ],
+            [
+              {
+                "id": 2,
+                "rotate": 90,
+                "translate": {
+                  "x": 864.8199462890625,
+                  "y": 327.3500061035156
+                }
+              }
+            ]
+          ],
+          "placementsVersion": 2
+        }
+      ],
+      "allConnectors": [
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-2813",
+          "ap2ID": "id-2816"
+        },
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-2816",
+          "ap2ID": "id-2819"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-2819",
+          "ap2ID": "id-2811"
+        }
+      ],
+      "fileTypeVersion": 1
+    },
+    {
+      "atomType": "Molecule",
+      "x": 0.55,
+      "y": 0.92,
+      "uniqueID": "id-2854",
+      "name": "Hull vs Reference Check",
+      "ioValues": [
+        {
+          "name": "Hull Strips",
+          "ioValue": "__GEOMETRY_INPUT__"
+        },
+        {
+          "name": "Reference Hull",
+          "ioValue": "__GEOMETRY_INPUT__"
+        }
+      ],
+      "topLevel": false,
+      "allAtoms": [
+        {
+          "atomType": "Output",
+          "x": 0.98,
+          "y": 0.5,
+          "uniqueID": "id-2856",
+          "ioValues": [
+            {
+              "name": "number or geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Assembly",
+          "x": 0.4927,
+          "y": 0.9014,
+          "uniqueID": "id-2858",
+          "ioValues": [
+            {
+              "name": "makeDisjoint",
+              "ioValue": false
+            },
+            {
+              "name": "Shape 1",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Shape2",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Shape3",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.1538,
+          "uniqueID": "id-2864",
+          "name": "Hull Strips",
+          "type": "geometry",
+          "options": []
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.2462,
+          "uniqueID": "id-2867",
+          "name": "Reference Hull",
+          "type": "geometry",
+          "options": []
+        }
+      ],
+      "allConnectors": [
+        {
+          "ap2Name": "Shape 1",
+          "ap1ID": "id-2864",
+          "ap2ID": "id-2858"
+        },
+        {
+          "ap2Name": "Shape2",
+          "ap1ID": "id-2867",
+          "ap2ID": "id-2858"
+        }
+      ],
+      "fileTypeVersion": 1
+    },
+    {
+      "atomType": "Readme",
+      "x": 0.05,
+      "y": 0.05,
+      "uniqueID": "id-2872",
+      "name": "README",
+      "ioValues": [
+        {
+          "name": "value",
+          "ioValue": "__GEOMETRY_INPUT__"
+        }
+      ],
+      "readMeText": "# Zephyr runabout\n\nA 4.33 m (14 ft 2 in) barrel-back plywood runabout, modelled from the hull reference `Zephyr runabout.stl` and the build photos in **Refrences** (the STL is in metres; Refrences scales it x1000 to mm).\n\n## Hull lines: a camber hull definition\n- **Hull JSON** (project input) is a camber v1 hull in mm, fitted to the STL: 24 stations from 420 mm aft of the transom to the stem head, one template per station (one-hot blend weights) with 14 points each: deck edge, a point 5 mm above the sheer, sheer clamp edge, two side points, chine log edge, chine, chine log edge, outer and inner batten edges, keel hog edge, and a point past the centreline. The flat camber deck plane is 720 mm above the keel and `sheerTrim` brings it down to the real sheer.\n- **Hull Lines** runs tristan-huber/CamberToWires and moves the wires into the boat frame (x = 0 at the transom bottom, z = 0 at the keel). **Hull Cutters** trims at the centreline and the 12.0 deg raked transom. Strips come from crv.OpenWireLoft + util.FaceDifference, as in tristan-huber/CamberInterpreter.\n- Fit to the STL: mean 0.7 mm, 95 % within 2.2 mm, worst 5.2 mm (on the barrel-back curve at the transom corner).\n- CamberToWires scales its wires so their X extent equals `HullLengthInches`. It is set to the raw wire extent (Hull Lines 4713.971, Extended Hull Lines 4713.971, Inner Hull Lines 4710.283) so the scale is exactly 1. **If you edit the JSON, copy the new value from the `Width` atom inside each CamberToWires into its `HullLengthInches`.**\n\n## Parts\n- **Planking**: Side Panel 6 mm and Bottom Panel 9 mm per side (port copies mirrored). **Flat Patterns** unrolls them with tristan-huber/crv.MeshUnroll: side 4575 x 724 mm, bottom 4176 x 864 mm (scarf two 8 ft sheets for each).\n- **Frames**: 5 ring frames in 18 mm plywood at `Stations` = 700, 1400, 2100, 2800, 3500 mm from the transom bottom, 90 mm band, with the crowned deck beam on top (6 m crown radius, matching the 22 mm crown of the STL transom).\n- **Transom** 18 mm, **Stem** two 18 mm laminations from x = 3300 mm to the stem head, **Keel Hog** 64 x 25 mm to x = 3300 mm.\n- **Longitudinals**: sheer clamps, chine logs and two bottom battens per side. Each is a strip of the camber hull between two hull lines, given depth inward, so it follows the twist of the planking.\n- Frames, transom, stem and keel hog are cut from **Inner Hull Interior Starboard**, the volume inside the planking and a 9 mm deck (built from **Inner Hull Lines**, the camber sections offset inward by the planking).\n- **CNC Parts**: frames and transom notched by the keel hog and longitudinals. **Cut Layout 18mm** nests them, with the transom and stem, on 4 sheets of 2440 x 1220.\n\n## Assumed (not in the references)\nPlywood thicknesses (6 / 9 / 18 mm, 9 mm deck), frame stations, member sizes and where the stem starts are estimates from the photos; all are inputs. The deck, cockpit, deck battens and hardware are not modelled yet.",
+      "global": true
+    },
+    {
+      "atomType": "Molecule",
       "x": 0.38,
       "y": 0.3,
       "uniqueID": "id-296",
@@ -7124,30 +7567,6 @@
         }
       ],
       "fileTypeVersion": 1
-    },
-    {
-      "atomType": "Assembly",
-      "x": 0.4927,
-      "y": 0.9014,
-      "uniqueID": "id-340",
-      "ioValues": [
-        {
-          "name": "makeDisjoint",
-          "ioValue": false
-        },
-        {
-          "name": "Shape 1",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "Shape2",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "Shape3",
-          "ioValue": "__GEOMETRY_INPUT__"
-        }
-      ]
     },
     {
       "atomType": "Molecule",
@@ -11137,6 +11556,58 @@
           ]
         },
         {
+          "atomType": "Color",
+          "x": 0.68,
+          "y": 0.2,
+          "uniqueID": "id-2827",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Tan"
+        },
+        {
+          "atomType": "Color",
+          "x": 0.55,
+          "y": 0.05,
+          "uniqueID": "id-2830",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Tan"
+        },
+        {
+          "atomType": "Color",
+          "x": 0.55,
+          "y": 0.95,
+          "uniqueID": "id-2833",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Clay"
+        },
+        {
+          "atomType": "Color",
+          "x": 0.68,
+          "y": 0.8,
+          "uniqueID": "id-2836",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Clay"
+        },
+        {
           "atomType": "Output",
           "x": 0.98,
           "y": 0.5,
@@ -11653,14 +12124,34 @@
       ],
       "allConnectors": [
         {
-          "ap2Name": "Shape4",
+          "ap2Name": "geometry",
           "ap1ID": "id-1020",
-          "ap2ID": "id-1060"
+          "ap2ID": "id-2836"
         },
         {
           "ap2Name": "number or geometry",
           "ap1ID": "id-1060",
           "ap2ID": "id-856"
+        },
+        {
+          "ap2Name": "Shape2",
+          "ap1ID": "id-2827",
+          "ap2ID": "id-1060"
+        },
+        {
+          "ap2Name": "Shape 1",
+          "ap1ID": "id-2830",
+          "ap2ID": "id-1060"
+        },
+        {
+          "ap2Name": "Shape3",
+          "ap1ID": "id-2833",
+          "ap2ID": "id-1060"
+        },
+        {
+          "ap2Name": "Shape4",
+          "ap1ID": "id-2836",
+          "ap2ID": "id-1060"
         },
         {
           "ap2Name": "Surface",
@@ -11683,9 +12174,9 @@
           "ap2ID": "id-901"
         },
         {
-          "ap2Name": "Shape 1",
+          "ap2Name": "geometry",
           "ap1ID": "id-870",
-          "ap2ID": "id-1060"
+          "ap2ID": "id-2830"
         },
         {
           "ap2Name": "Shape",
@@ -11698,14 +12189,14 @@
           "ap2ID": "id-1020"
         },
         {
-          "ap2Name": "Shape3",
+          "ap2Name": "geometry",
           "ap1ID": "id-901",
-          "ap2ID": "id-1060"
+          "ap2ID": "id-2833"
         },
         {
-          "ap2Name": "Shape2",
+          "ap2Name": "geometry",
           "ap1ID": "id-966",
-          "ap2ID": "id-1060"
+          "ap2ID": "id-2827"
         }
       ],
       "fileTypeVersion": 1
@@ -11868,9 +12359,14 @@
       "ap2ID": "id-2162"
     },
     {
-      "ap2Name": "Shape 1",
+      "ap2Name": "Parts",
+      "ap1ID": "id-2765",
+      "ap2ID": "id-2809"
+    },
+    {
+      "ap2Name": "Hull Strips",
       "ap1ID": "id-296",
-      "ap2ID": "id-340"
+      "ap2ID": "id-2854"
     },
     {
       "ap2Name": "Extended Hull Lines",
@@ -11878,9 +12374,9 @@
       "ap2ID": "id-451"
     },
     {
-      "ap2Name": "Shape2",
+      "ap2Name": "Reference Hull",
       "ap1ID": "id-4",
-      "ap2ID": "id-340"
+      "ap2ID": "id-2854"
     },
     {
       "ap2Name": "Deck Crown",

@@ -11,5 +11,26 @@
 
 
 
- 
+ # Zephyr runabout
+
+A 4.33 m (14 ft 2 in) barrel-back plywood runabout, modelled from the hull reference `Zephyr runabout.stl` and the build photos in **Refrences** (the STL is in metres; Refrences scales it x1000 to mm).
+
+## Hull lines: a camber hull definition
+- **Hull JSON** (project input) is a camber v1 hull in mm, fitted to the STL: 24 stations from 420 mm aft of the transom to the stem head, one template per station (one-hot blend weights) with 14 points each: deck edge, a point 5 mm above the sheer, sheer clamp edge, two side points, chine log edge, chine, chine log edge, outer and inner batten edges, keel hog edge, and a point past the centreline. The flat camber deck plane is 720 mm above the keel and `sheerTrim` brings it down to the real sheer.
+- **Hull Lines** runs tristan-huber/CamberToWires and moves the wires into the boat frame (x = 0 at the transom bottom, z = 0 at the keel). **Hull Cutters** trims at the centreline and the 12.0 deg raked transom. Strips come from crv.OpenWireLoft + util.FaceDifference, as in tristan-huber/CamberInterpreter.
+- Fit to the STL: mean 0.7 mm, 95 % within 2.2 mm, worst 5.2 mm (on the barrel-back curve at the transom corner).
+- CamberToWires scales its wires so their X extent equals `HullLengthInches`. It is set to the raw wire extent (Hull Lines 4713.971, Extended Hull Lines 4713.971, Inner Hull Lines 4710.283) so the scale is exactly 1. **If you edit the JSON, copy the new value from the `Width` atom inside each CamberToWires into its `HullLengthInches`.**
+
+## Parts
+- **Planking**: Side Panel 6 mm and Bottom Panel 9 mm per side (port copies mirrored). **Flat Patterns** unrolls them with tristan-huber/crv.MeshUnroll: side 4575 x 724 mm, bottom 4176 x 864 mm (scarf two 8 ft sheets for each).
+- **Frames**: 5 ring frames in 18 mm plywood at `Stations` = 700, 1400, 2100, 2800, 3500 mm from the transom bottom, 90 mm band, with the crowned deck beam on top (6 m crown radius, matching the 22 mm crown of the STL transom).
+- **Transom** 18 mm, **Stem** two 18 mm laminations from x = 3300 mm to the stem head, **Keel Hog** 64 x 25 mm to x = 3300 mm.
+- **Longitudinals**: sheer clamps, chine logs and two bottom battens per side. Each is a strip of the camber hull between two hull lines, given depth inward, so it follows the twist of the planking.
+- Frames, transom, stem and keel hog are cut from **Inner Hull Interior Starboard**, the volume inside the planking and a 9 mm deck (built from **Inner Hull Lines**, the camber sections offset inward by the planking).
+- **CNC Parts**: frames and transom notched by the keel hog and longitudinals. **Cut Layout 18mm** nests them, with the transom and stem, on 4 sheets of 2440 x 1220.
+
+## Assumed (not in the references)
+Plywood thicknesses (6 / 9 / 18 mm, 9 mm deck), frame stations, member sizes and where the stem starts are estimates from the photos; all are inputs. The deck, cockpit, deck battens and hardware are not modelled yet.
+
+
 

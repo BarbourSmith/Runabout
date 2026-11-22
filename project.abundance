@@ -9030,141 +9030,24 @@
       ]
     },
     {
-      "atomType": "Code",
-      "x": 0.45,
-      "y": 0.3,
-      "uniqueID": "id-5927",
-      "ioValues": [
-        {
-          "name": "hull",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "stations",
-          "ioValue": [
-            700,
-            1400,
-            2100,
-            2800,
-            3500
-          ]
-        },
-        {
-          "name": "band",
-          "ioValue": 90
-        },
-        {
-          "name": "sideThickness",
-          "ioValue": 6
-        },
-        {
-          "name": "bottomThickness",
-          "ioValue": 9
-        },
-        {
-          "name": "deckThickness",
-          "ioValue": 9
-        },
-        {
-          "name": "crownRadius",
-          "ioValue": 6000
-        }
-      ],
-      "interpreterVersion": 1,
-      "code": "/**\n * Frame outlines from the hull surface. At each station the edges of the side\n * and bottom planking strips cross the station plane; joined, they are the\n * outside of the hull there. That outline is moved inward by the planking\n * thickness (side or bottom), capped by the crowned deck (radius crownRadius\n * through the sheer, lowered by the deck thickness), mirrored to port and\n * hollowed into a ring `band` wide. One sketch per station, in station order,\n * with X = boat y and Y = boat z: Extrude, Rotate and crv.PolyMove atoms stand\n * them up as frames at their stations. Edges are square; bevel them by hand.\n * (One atom draws all the rings because they are cuts through the same hull at\n * the one list of stations that the notches also use.)\n */\nfunction run(\n  hull: Assembly,\n  stations: number[] = [700, 1400, 2100, 2800, 3500],\n  band: number = 90,\n  sideThickness: number = 6,\n  bottomThickness: number = 9,\n  deckThickness: number = 9,\n  crownRadius: number = 6000,\n): Assembly {\n  const side = hullLines(tagged(hull, \"side surface\"));\n  const bottom = hullLines(tagged(hull, \"bottom surface\"));\n  if (!side.length) throw new Error(\"No faces tagged 'side surface' in the hull\");\n  const rings = stations.map((st: number) => {\n    const s = Number(st);\n    const o = outsideAt(side, bottom, s, sideThickness, bottomThickness);\n    if (!o) throw new Error(`No hull section at x = ${s}`);\n    const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness);\n    const outline = mirroredOutline(insideHalf(inset(o.pts, o.t), top), top(0));\n    let ring = outline;\n    try {\n      ring = outline.cut(outline.offset(-band));\n    } catch (e) {\n      console.warn(`frame at ${s}: kept solid, the ring offset failed (${e})`);\n    }\n    return new Assembly({ geometry: ring, tags: [`station ${s}`] });\n  });\n  return new Assembly({ geometry: rings }).skipDisjointPostprocess();\n}\n\n// ---- hull section helpers (shared by the frame, transom, stem and keel hog outlines) ----\ntype P = number[];\n\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull: any, tag: string): any[] {\n  const out: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) out.push(node.geometry);\n  };\n  walk(hull, false);\n  return out;\n}\n\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces: any[]): any[] {\n  const out: any[] = [];\n  for (const f of faces) for (const e of f.edges) {\n    const a = e.pointAt(0), b = e.pointAt(1);\n    if (Math.abs(b.x - a.x) > 300) out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n  }\n  return out;\n}\n\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l: any, s: number): P | null {\n  if (s <= l.lo || s >= l.hi) return null;\n  let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n  if (flo * (l.e.pointAt(1).x - s) > 0) return null;\n  for (let i = 0; i < 40; i++) {\n    const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n    if ((fm < 0) === (flo < 0)) { lo = m; flo = fm; } else hi = m;\n  }\n  const p = l.e.pointAt((lo + hi) / 2);\n  return [p.y, p.z];\n}\n\nfunction uniq(pts: P[]): P[] {\n  const out: P[] = [];\n  for (const p of pts) if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5)) out.push(p);\n  return out;\n}\n\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side: any[], bottom: any[], s: number, sideT: number, bottomT: number) {\n  const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[1] - a[1]);\n  const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[0] - a[0]);\n  return joinOutside(sp, bp, sideT, bottomT);\n}\n\nfunction joinOutside(sp: P[], bp: P[], sideT: number, bottomT: number) {\n  if (sp.length < 2) return null;\n  const pts: P[] = [...sp];\n  const t: number[] = sp.slice(1).map(() => sideT);\n  for (const p of bp) {\n    const last = pts[pts.length - 1];\n    if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5) continue; // the chine, shared\n    t.push(bottomT);\n    pts.push(p);\n  }\n  return { pts, t };\n}\n\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O: P[], t: number[]): P[] {\n  const n = O.length, L: any[] = [];\n  for (let i = 0; i < n - 1; i++) {\n    const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n    const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n    L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n  }\n  const Q: P[] = [L[0].p];\n  for (let j = 1; j < n - 1; j++) {\n    const a = L[j - 1], b = L[j];\n    const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n    const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n    if (Math.abs(cr) < 0.25) { Q.push(mean); continue; }\n    const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n    const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n    Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n  }\n  const z = L[n - 2];\n  Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n  return Q;\n}\n\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys: number, zs: number, R: number, deckT: number) {\n  const zc = zs - Math.sqrt(R * R - ys * ys);\n  return (y: number) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n\n// Starboard half of the inside outline, from where it meets the deck's\n// underside down to the centreline: [[y, z], ...], last point on y = 0.\nfunction insideHalf(Q: P[], top: (y: number) => number): P[] {\n  const k = Q.findIndex((q) => q[1] <= top(q[0]));\n  if (k < 0) throw new Error(\"The section never gets below the deck\");\n  const S: P[] = [];\n  if (k === 0) S.push(Q[0]);\n  else {\n    const a = Q[k - 1], b = Q[k];\n    let lo = 0, hi = 1;\n    for (let i = 0; i < 50; i++) {\n      const m = (lo + hi) / 2, y = a[0] + (b[0] - a[0]) * m, z = a[1] + (b[1] - a[1]) * m;\n      if (z > top(y)) lo = m; else hi = m;\n    }\n    const m = (lo + hi) / 2;\n    S.push([a[0] + (b[0] - a[0]) * m, a[1] + (b[1] - a[1]) * m]);\n  }\n  for (let i = k; i < Q.length; i++) {\n    const q = Q[i], a = S[S.length - 1];\n    if (q[0] <= 0) { S.push([0, a[1] + ((q[1] - a[1]) * a[0]) / (a[0] - q[0])]); return tidy(S); }\n    S.push(q);\n  }\n  S.push([0, S[S.length - 1][1]]);\n  return tidy(S);\n}\n\nfunction tidy(S: P[]): P[] {\n  return S.filter((p, i) => i === 0 || Math.hypot(p[0] - S[i - 1][0], p[1] - S[i - 1][1]) > 0.01);\n}\n\n// Closed outline from a starboard half: down the starboard side, up the\n// mirrored port side, and back across along the deck through (0, topMid).\nfunction mirroredOutline(S: P[], topMid: number) {\n  let pen = replicad.draw([S[0][0], S[0][1]]);\n  for (let i = 1; i < S.length; i++) pen = pen.lineTo([S[i][0], S[i][1]]);\n  for (let i = S.length - 2; i >= 0; i--) pen = pen.lineTo([-S[i][0], S[i][1]]);\n  return pen.threePointsArcTo([S[0][0], S[0][1]], [0, topMid]).close();\n}\n\n// Inside of the planking at x = s, as [y, z] points, or null outside the hull.\nfunction insideAt(side: any[], bottom: any[], s: number, sideT: number, bottomT: number): P[] | null {\n  const o = outsideAt(side, bottom, s, sideT, bottomT);\n  return o ? inset(o.pts, o.t) : null;\n}\n\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q: P[], c: number): number | null {\n  for (let i = 0; i < Q.length - 1; i++) {\n    const a = Q[i], b = Q[i + 1];\n    if (a[0] >= c && b[0] < c) return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n  }\n  return null;\n}\n",
-      "compiledCode": "\"use strict\";\n/**\n * Frame outlines from the hull surface. At each station the edges of the side\n * and bottom planking strips cross the station plane; joined, they are the\n * outside of the hull there. That outline is moved inward by the planking\n * thickness (side or bottom), capped by the crowned deck (radius crownRadius\n * through the sheer, lowered by the deck thickness), mirrored to port and\n * hollowed into a ring `band` wide. One sketch per station, in station order,\n * with X = boat y and Y = boat z: Extrude, Rotate and crv.PolyMove atoms stand\n * them up as frames at their stations. Edges are square; bevel them by hand.\n * (One atom draws all the rings because they are cuts through the same hull at\n * the one list of stations that the notches also use.)\n */\nfunction run(hull, stations = [700, 1400, 2100, 2800, 3500], band = 90, sideThickness = 6, bottomThickness = 9, deckThickness = 9, crownRadius = 6000) {\n    const side = hullLines(tagged(hull, \"side surface\"));\n    const bottom = hullLines(tagged(hull, \"bottom surface\"));\n    if (!side.length)\n        throw new Error(\"No faces tagged 'side surface' in the hull\");\n    const rings = stations.map((st) => {\n        const s = Number(st);\n        const o = outsideAt(side, bottom, s, sideThickness, bottomThickness);\n        if (!o)\n            throw new Error(`No hull section at x = ${s}`);\n        const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness);\n        const outline = mirroredOutline(insideHalf(inset(o.pts, o.t), top), top(0));\n        let ring = outline;\n        try {\n            ring = outline.cut(outline.offset(-band));\n        }\n        catch (e) {\n            console.warn(`frame at ${s}: kept solid, the ring offset failed (${e})`);\n        }\n        return new Assembly({ geometry: ring, tags: [`station ${s}`] });\n    });\n    return new Assembly({ geometry: rings }).skipDisjointPostprocess();\n}\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull, tag) {\n    const out = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            out.push(node.geometry);\n    };\n    walk(hull, false);\n    return out;\n}\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces) {\n    const out = [];\n    for (const f of faces)\n        for (const e of f.edges) {\n            const a = e.pointAt(0), b = e.pointAt(1);\n            if (Math.abs(b.x - a.x) > 300)\n                out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n        }\n    return out;\n}\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l, s) {\n    if (s <= l.lo || s >= l.hi)\n        return null;\n    let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n    if (flo * (l.e.pointAt(1).x - s) > 0)\n        return null;\n    for (let i = 0; i < 40; i++) {\n        const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n        if ((fm < 0) === (flo < 0)) {\n            lo = m;\n            flo = fm;\n        }\n        else\n            hi = m;\n    }\n    const p = l.e.pointAt((lo + hi) / 2);\n    return [p.y, p.z];\n}\nfunction uniq(pts) {\n    const out = [];\n    for (const p of pts)\n        if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5))\n            out.push(p);\n    return out;\n}\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side, bottom, s, sideT, bottomT) {\n    const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[1] - a[1]);\n    const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[0] - a[0]);\n    return joinOutside(sp, bp, sideT, bottomT);\n}\nfunction joinOutside(sp, bp, sideT, bottomT) {\n    if (sp.length < 2)\n        return null;\n    const pts = [...sp];\n    const t = sp.slice(1).map(() => sideT);\n    for (const p of bp) {\n        const last = pts[pts.length - 1];\n        if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5)\n            continue; // the chine, shared\n        t.push(bottomT);\n        pts.push(p);\n    }\n    return { pts, t };\n}\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O, t) {\n    const n = O.length, L = [];\n    for (let i = 0; i < n - 1; i++) {\n        const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n        const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n        L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n    }\n    const Q = [L[0].p];\n    for (let j = 1; j < n - 1; j++) {\n        const a = L[j - 1], b = L[j];\n        const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n        const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n        if (Math.abs(cr) < 0.25) {\n            Q.push(mean);\n            continue;\n        }\n        const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n        const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n        Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n    }\n    const z = L[n - 2];\n    Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n    return Q;\n}\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys, zs, R, deckT) {\n    const zc = zs - Math.sqrt(R * R - ys * ys);\n    return (y) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n// Starboard half of the inside outline, from where it meets the deck's\n// underside down to the centreline: [[y, z], ...], last point on y = 0.\nfunction insideHalf(Q, top) {\n    const k = Q.findIndex((q) => q[1] <= top(q[0]));\n    if (k < 0)\n        throw new Error(\"The section never gets below the deck\");\n    const S = [];\n    if (k === 0)\n        S.push(Q[0]);\n    else {\n        const a = Q[k - 1], b = Q[k];\n        let lo = 0, hi = 1;\n        for (let i = 0; i < 50; i++) {\n            const m = (lo + hi) / 2, y = a[0] + (b[0] - a[0]) * m, z = a[1] + (b[1] - a[1]) * m;\n            if (z > top(y))\n                lo = m;\n            else\n                hi = m;\n        }\n        const m = (lo + hi) / 2;\n        S.push([a[0] + (b[0] - a[0]) * m, a[1] + (b[1] - a[1]) * m]);\n    }\n    for (let i = k; i < Q.length; i++) {\n        const q = Q[i], a = S[S.length - 1];\n        if (q[0] <= 0) {\n            S.push([0, a[1] + ((q[1] - a[1]) * a[0]) / (a[0] - q[0])]);\n            return tidy(S);\n        }\n        S.push(q);\n    }\n    S.push([0, S[S.length - 1][1]]);\n    return tidy(S);\n}\nfunction tidy(S) {\n    return S.filter((p, i) => i === 0 || Math.hypot(p[0] - S[i - 1][0], p[1] - S[i - 1][1]) > 0.01);\n}\n// Closed outline from a starboard half: down the starboard side, up the\n// mirrored port side, and back across along the deck through (0, topMid).\nfunction mirroredOutline(S, topMid) {\n    let pen = replicad.draw([S[0][0], S[0][1]]);\n    for (let i = 1; i < S.length; i++)\n        pen = pen.lineTo([S[i][0], S[i][1]]);\n    for (let i = S.length - 2; i >= 0; i--)\n        pen = pen.lineTo([-S[i][0], S[i][1]]);\n    return pen.threePointsArcTo([S[0][0], S[0][1]], [0, topMid]).close();\n}\n// Inside of the planking at x = s, as [y, z] points, or null outside the hull.\nfunction insideAt(side, bottom, s, sideT, bottomT) {\n    const o = outsideAt(side, bottom, s, sideT, bottomT);\n    return o ? inset(o.pts, o.t) : null;\n}\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q, c) {\n    for (let i = 0; i < Q.length - 1; i++) {\n        const a = Q[i], b = Q[i + 1];\n        if (a[0] >= c && b[0] < c)\n            return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n    }\n    return null;\n}\n"
-    },
-    {
-      "atomType": "Extrude",
+      "atomType": "Molecule",
       "x": 0.5,
       "y": 0.3,
-      "uniqueID": "id-5986",
+      "uniqueID": "id-6218",
+      "name": "Frames",
       "ioValues": [
         {
-          "name": "geometry",
+          "name": "Hull",
           "ioValue": "__GEOMETRY_INPUT__"
         },
         {
-          "name": "height",
-          "ioValue": 18
-        }
-      ]
-    },
-    {
-      "atomType": "Rotate",
-      "x": 0.55,
-      "y": 0.3,
-      "uniqueID": "id-5990",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "x-axis degrees",
-          "ioValue": 90
-        },
-        {
-          "name": "y-axis degrees",
-          "ioValue": 0
-        },
-        {
-          "name": "z-axis degrees",
-          "ioValue": 90
-        }
-      ]
-    },
-    {
-      "atomType": "Move",
-      "x": 0.6,
-      "y": 0.3,
-      "uniqueID": "id-5996",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "xDist",
-          "ioValue": -9
-        },
-        {
-          "name": "yDist",
-          "ioValue": 0
-        },
-        {
-          "name": "zDist",
-          "ioValue": 0
-        }
-      ]
-    },
-    {
-      "atomType": "GitHubMolecule",
-      "x": 0.65,
-      "y": 0.3,
-      "uniqueID": "id-6008",
-      "name": "crv.PolyMove",
-      "ioValues": [
-        {
-          "name": "toMove",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "offsets",
+          "name": "Stations",
           "ioValue": [
             700,
             1400,
             2100,
             2800,
             3500
-          ]
-        },
-        {
-          "name": "direction",
-          "ioValue": [
-            1,
-            0,
-            0
           ]
         }
       ],
@@ -9174,7 +9057,7 @@
           "atomType": "Output",
           "x": 0.98,
           "y": 0.5,
-          "uniqueID": "id-6003",
+          "uniqueID": "id-6220",
           "ioValues": [
             {
               "name": "number or geometry",
@@ -9183,38 +9066,120 @@
           ]
         },
         {
-          "atomType": "Input",
-          "x": 0.0254,
-          "y": 0.1538,
-          "uniqueID": "id-6004",
-          "name": "toMove",
-          "type": "geometry",
-          "options": []
-        },
-        {
-          "atomType": "Input",
-          "x": 0.0254,
-          "y": 0.2462,
-          "uniqueID": "id-6005",
-          "name": "offsets",
-          "type": "array",
-          "options": []
-        },
-        {
-          "atomType": "Input",
-          "x": 0.0254,
-          "y": 0.3385,
-          "uniqueID": "id-6006",
-          "name": "direction",
-          "type": "point3d",
-          "options": [],
-          "pointValue": null
-        },
-        {
           "atomType": "Code",
-          "x": 0.4323,
-          "y": 0.3571,
-          "uniqueID": "id-6007",
+          "x": 0.45,
+          "y": 0.3,
+          "uniqueID": "id-6222",
+          "ioValues": [
+            {
+              "name": "hull",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "stations",
+              "ioValue": [
+                700,
+                1400,
+                2100,
+                2800,
+                3500
+              ]
+            },
+            {
+              "name": "band",
+              "ioValue": 90
+            },
+            {
+              "name": "sideThickness",
+              "ioValue": 6
+            },
+            {
+              "name": "bottomThickness",
+              "ioValue": 9
+            },
+            {
+              "name": "deckThickness",
+              "ioValue": 9
+            },
+            {
+              "name": "crownRadius",
+              "ioValue": 6000
+            }
+          ],
+          "interpreterVersion": 1,
+          "code": "/**\n * Frame outlines from the hull surface. At each station the edges of the side\n * and bottom planking strips cross the station plane; joined, they are the\n * outside of the hull there. That outline is moved inward by the planking\n * thickness (side or bottom), capped by the crowned deck (radius crownRadius\n * through the sheer, lowered by the deck thickness), mirrored to port and\n * hollowed into a ring `band` wide. One sketch per station, in station order,\n * with X = boat y and Y = boat z: Extrude, Rotate and crv.PolyMove atoms stand\n * them up as frames at their stations. Edges are square; bevel them by hand.\n * (One atom draws all the rings because they are cuts through the same hull at\n * the one list of stations that the notches also use.)\n */\nfunction run(\n  hull: Assembly,\n  stations: number[] = [700, 1400, 2100, 2800, 3500],\n  band: number = 90,\n  sideThickness: number = 6,\n  bottomThickness: number = 9,\n  deckThickness: number = 9,\n  crownRadius: number = 6000,\n): Assembly {\n  const side = hullLines(tagged(hull, \"side surface\"));\n  const bottom = hullLines(tagged(hull, \"bottom surface\"));\n  if (!side.length) throw new Error(\"No faces tagged 'side surface' in the hull\");\n  const rings = stations.map((st: number) => {\n    const s = Number(st);\n    const o = outsideAt(side, bottom, s, sideThickness, bottomThickness);\n    if (!o) throw new Error(`No hull section at x = ${s}`);\n    const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness);\n    const outline = mirroredOutline(insideHalf(inset(o.pts, o.t), top), top(0));\n    let ring = outline;\n    try {\n      ring = outline.cut(outline.offset(-band));\n    } catch (e) {\n      console.warn(`frame at ${s}: kept solid, the ring offset failed (${e})`);\n    }\n    return new Assembly({ geometry: ring, tags: [`station ${s}`] });\n  });\n  return new Assembly({ geometry: rings }).skipDisjointPostprocess();\n}\n\n// ---- hull section helpers (shared by the frame, transom, stem and keel hog outlines) ----\ntype P = number[];\n\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull: any, tag: string): any[] {\n  const out: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) out.push(node.geometry);\n  };\n  walk(hull, false);\n  return out;\n}\n\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces: any[]): any[] {\n  const out: any[] = [];\n  for (const f of faces) for (const e of f.edges) {\n    const a = e.pointAt(0), b = e.pointAt(1);\n    if (Math.abs(b.x - a.x) > 300) out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n  }\n  return out;\n}\n\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l: any, s: number): P | null {\n  if (s <= l.lo || s >= l.hi) return null;\n  let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n  if (flo * (l.e.pointAt(1).x - s) > 0) return null;\n  for (let i = 0; i < 40; i++) {\n    const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n    if ((fm < 0) === (flo < 0)) { lo = m; flo = fm; } else hi = m;\n  }\n  const p = l.e.pointAt((lo + hi) / 2);\n  return [p.y, p.z];\n}\n\nfunction uniq(pts: P[]): P[] {\n  const out: P[] = [];\n  for (const p of pts) if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5)) out.push(p);\n  return out;\n}\n\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side: any[], bottom: any[], s: number, sideT: number, bottomT: number) {\n  const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[1] - a[1]);\n  const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[0] - a[0]);\n  return joinOutside(sp, bp, sideT, bottomT);\n}\n\nfunction joinOutside(sp: P[], bp: P[], sideT: number, bottomT: number) {\n  if (sp.length < 2) return null;\n  const pts: P[] = [...sp];\n  const t: number[] = sp.slice(1).map(() => sideT);\n  for (const p of bp) {\n    const last = pts[pts.length - 1];\n    if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5) continue; // the chine, shared\n    t.push(bottomT);\n    pts.push(p);\n  }\n  return { pts, t };\n}\n\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O: P[], t: number[]): P[] {\n  const n = O.length, L: any[] = [];\n  for (let i = 0; i < n - 1; i++) {\n    const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n    const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n    L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n  }\n  const Q: P[] = [L[0].p];\n  for (let j = 1; j < n - 1; j++) {\n    const a = L[j - 1], b = L[j];\n    const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n    const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n    if (Math.abs(cr) < 0.25) { Q.push(mean); continue; }\n    const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n    const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n    Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n  }\n  const z = L[n - 2];\n  Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n  return Q;\n}\n\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys: number, zs: number, R: number, deckT: number) {\n  const zc = zs - Math.sqrt(R * R - ys * ys);\n  return (y: number) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n\n// Starboard half of the inside outline, from where it meets the deck's\n// underside down to the centreline: [[y, z], ...], last point on y = 0.\nfunction insideHalf(Q: P[], top: (y: number) => number): P[] {\n  const k = Q.findIndex((q) => q[1] <= top(q[0]));\n  if (k < 0) throw new Error(\"The section never gets below the deck\");\n  const S: P[] = [];\n  if (k === 0) S.push(Q[0]);\n  else {\n    const a = Q[k - 1], b = Q[k];\n    let lo = 0, hi = 1;\n    for (let i = 0; i < 50; i++) {\n      const m = (lo + hi) / 2, y = a[0] + (b[0] - a[0]) * m, z = a[1] + (b[1] - a[1]) * m;\n      if (z > top(y)) lo = m; else hi = m;\n    }\n    const m = (lo + hi) / 2;\n    S.push([a[0] + (b[0] - a[0]) * m, a[1] + (b[1] - a[1]) * m]);\n  }\n  for (let i = k; i < Q.length; i++) {\n    const q = Q[i], a = S[S.length - 1];\n    if (q[0] <= 0) { S.push([0, a[1] + ((q[1] - a[1]) * a[0]) / (a[0] - q[0])]); return tidy(S); }\n    S.push(q);\n  }\n  S.push([0, S[S.length - 1][1]]);\n  return tidy(S);\n}\n\nfunction tidy(S: P[]): P[] {\n  return S.filter((p, i) => i === 0 || Math.hypot(p[0] - S[i - 1][0], p[1] - S[i - 1][1]) > 0.01);\n}\n\n// Closed outline from a starboard half: down the starboard side, up the\n// mirrored port side, and back across along the deck through (0, topMid).\nfunction mirroredOutline(S: P[], topMid: number) {\n  let pen = replicad.draw([S[0][0], S[0][1]]);\n  for (let i = 1; i < S.length; i++) pen = pen.lineTo([S[i][0], S[i][1]]);\n  for (let i = S.length - 2; i >= 0; i--) pen = pen.lineTo([-S[i][0], S[i][1]]);\n  return pen.threePointsArcTo([S[0][0], S[0][1]], [0, topMid]).close();\n}\n\n// Inside of the planking at x = s, as [y, z] points, or null outside the hull.\nfunction insideAt(side: any[], bottom: any[], s: number, sideT: number, bottomT: number): P[] | null {\n  const o = outsideAt(side, bottom, s, sideT, bottomT);\n  return o ? inset(o.pts, o.t) : null;\n}\n\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q: P[], c: number): number | null {\n  for (let i = 0; i < Q.length - 1; i++) {\n    const a = Q[i], b = Q[i + 1];\n    if (a[0] >= c && b[0] < c) return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n  }\n  return null;\n}\n",
+          "compiledCode": "\"use strict\";\n/**\n * Frame outlines from the hull surface. At each station the edges of the side\n * and bottom planking strips cross the station plane; joined, they are the\n * outside of the hull there. That outline is moved inward by the planking\n * thickness (side or bottom), capped by the crowned deck (radius crownRadius\n * through the sheer, lowered by the deck thickness), mirrored to port and\n * hollowed into a ring `band` wide. One sketch per station, in station order,\n * with X = boat y and Y = boat z: Extrude, Rotate and crv.PolyMove atoms stand\n * them up as frames at their stations. Edges are square; bevel them by hand.\n * (One atom draws all the rings because they are cuts through the same hull at\n * the one list of stations that the notches also use.)\n */\nfunction run(hull, stations = [700, 1400, 2100, 2800, 3500], band = 90, sideThickness = 6, bottomThickness = 9, deckThickness = 9, crownRadius = 6000) {\n    const side = hullLines(tagged(hull, \"side surface\"));\n    const bottom = hullLines(tagged(hull, \"bottom surface\"));\n    if (!side.length)\n        throw new Error(\"No faces tagged 'side surface' in the hull\");\n    const rings = stations.map((st) => {\n        const s = Number(st);\n        const o = outsideAt(side, bottom, s, sideThickness, bottomThickness);\n        if (!o)\n            throw new Error(`No hull section at x = ${s}`);\n        const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness);\n        const outline = mirroredOutline(insideHalf(inset(o.pts, o.t), top), top(0));\n        let ring = outline;\n        try {\n            ring = outline.cut(outline.offset(-band));\n        }\n        catch (e) {\n            console.warn(`frame at ${s}: kept solid, the ring offset failed (${e})`);\n        }\n        return new Assembly({ geometry: ring, tags: [`station ${s}`] });\n    });\n    return new Assembly({ geometry: rings }).skipDisjointPostprocess();\n}\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull, tag) {\n    const out = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            out.push(node.geometry);\n    };\n    walk(hull, false);\n    return out;\n}\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces) {\n    const out = [];\n    for (const f of faces)\n        for (const e of f.edges) {\n            const a = e.pointAt(0), b = e.pointAt(1);\n            if (Math.abs(b.x - a.x) > 300)\n                out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n        }\n    return out;\n}\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l, s) {\n    if (s <= l.lo || s >= l.hi)\n        return null;\n    let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n    if (flo * (l.e.pointAt(1).x - s) > 0)\n        return null;\n    for (let i = 0; i < 40; i++) {\n        const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n        if ((fm < 0) === (flo < 0)) {\n            lo = m;\n            flo = fm;\n        }\n        else\n            hi = m;\n    }\n    const p = l.e.pointAt((lo + hi) / 2);\n    return [p.y, p.z];\n}\nfunction uniq(pts) {\n    const out = [];\n    for (const p of pts)\n        if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5))\n            out.push(p);\n    return out;\n}\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side, bottom, s, sideT, bottomT) {\n    const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[1] - a[1]);\n    const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[0] - a[0]);\n    return joinOutside(sp, bp, sideT, bottomT);\n}\nfunction joinOutside(sp, bp, sideT, bottomT) {\n    if (sp.length < 2)\n        return null;\n    const pts = [...sp];\n    const t = sp.slice(1).map(() => sideT);\n    for (const p of bp) {\n        const last = pts[pts.length - 1];\n        if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5)\n            continue; // the chine, shared\n        t.push(bottomT);\n        pts.push(p);\n    }\n    return { pts, t };\n}\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O, t) {\n    const n = O.length, L = [];\n    for (let i = 0; i < n - 1; i++) {\n        const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n        const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n        L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n    }\n    const Q = [L[0].p];\n    for (let j = 1; j < n - 1; j++) {\n        const a = L[j - 1], b = L[j];\n        const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n        const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n        if (Math.abs(cr) < 0.25) {\n            Q.push(mean);\n            continue;\n        }\n        const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n        const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n        Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n    }\n    const z = L[n - 2];\n    Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n    return Q;\n}\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys, zs, R, deckT) {\n    const zc = zs - Math.sqrt(R * R - ys * ys);\n    return (y) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n// Starboard half of the inside outline, from where it meets the deck's\n// underside down to the centreline: [[y, z], ...], last point on y = 0.\nfunction insideHalf(Q, top) {\n    const k = Q.findIndex((q) => q[1] <= top(q[0]));\n    if (k < 0)\n        throw new Error(\"The section never gets below the deck\");\n    const S = [];\n    if (k === 0)\n        S.push(Q[0]);\n    else {\n        const a = Q[k - 1], b = Q[k];\n        let lo = 0, hi = 1;\n        for (let i = 0; i < 50; i++) {\n            const m = (lo + hi) / 2, y = a[0] + (b[0] - a[0]) * m, z = a[1] + (b[1] - a[1]) * m;\n            if (z > top(y))\n                lo = m;\n            else\n                hi = m;\n        }\n        const m = (lo + hi) / 2;\n        S.push([a[0] + (b[0] - a[0]) * m, a[1] + (b[1] - a[1]) * m]);\n    }\n    for (let i = k; i < Q.length; i++) {\n        const q = Q[i], a = S[S.length - 1];\n        if (q[0] <= 0) {\n            S.push([0, a[1] + ((q[1] - a[1]) * a[0]) / (a[0] - q[0])]);\n            return tidy(S);\n        }\n        S.push(q);\n    }\n    S.push([0, S[S.length - 1][1]]);\n    return tidy(S);\n}\nfunction tidy(S) {\n    return S.filter((p, i) => i === 0 || Math.hypot(p[0] - S[i - 1][0], p[1] - S[i - 1][1]) > 0.01);\n}\n// Closed outline from a starboard half: down the starboard side, up the\n// mirrored port side, and back across along the deck through (0, topMid).\nfunction mirroredOutline(S, topMid) {\n    let pen = replicad.draw([S[0][0], S[0][1]]);\n    for (let i = 1; i < S.length; i++)\n        pen = pen.lineTo([S[i][0], S[i][1]]);\n    for (let i = S.length - 2; i >= 0; i--)\n        pen = pen.lineTo([-S[i][0], S[i][1]]);\n    return pen.threePointsArcTo([S[0][0], S[0][1]], [0, topMid]).close();\n}\n// Inside of the planking at x = s, as [y, z] points, or null outside the hull.\nfunction insideAt(side, bottom, s, sideT, bottomT) {\n    const o = outsideAt(side, bottom, s, sideT, bottomT);\n    return o ? inset(o.pts, o.t) : null;\n}\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q, c) {\n    for (let i = 0; i < Q.length - 1; i++) {\n        const a = Q[i], b = Q[i + 1];\n        if (a[0] >= c && b[0] < c)\n            return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n    }\n    return null;\n}\n"
+        },
+        {
+          "atomType": "Extrude",
+          "x": 0.5,
+          "y": 0.3,
+          "uniqueID": "id-6223",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "height",
+              "ioValue": 18
+            }
+          ]
+        },
+        {
+          "atomType": "Rotate",
+          "x": 0.55,
+          "y": 0.3,
+          "uniqueID": "id-6224",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "x-axis degrees",
+              "ioValue": 90
+            },
+            {
+              "name": "y-axis degrees",
+              "ioValue": 0
+            },
+            {
+              "name": "z-axis degrees",
+              "ioValue": 90
+            }
+          ]
+        },
+        {
+          "atomType": "Move",
+          "x": 0.6,
+          "y": 0.3,
+          "uniqueID": "id-6225",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "xDist",
+              "ioValue": -9
+            },
+            {
+              "name": "yDist",
+              "ioValue": 0
+            },
+            {
+              "name": "zDist",
+              "ioValue": 0
+            }
+          ]
+        },
+        {
+          "atomType": "GitHubMolecule",
+          "x": 0.65,
+          "y": 0.3,
+          "uniqueID": "id-6226",
+          "name": "crv.PolyMove",
           "ioValues": [
             {
               "name": "toMove",
@@ -9239,567 +9204,972 @@
               ]
             }
           ],
-          "interpreterVersion": 1,
-          "code": "\n/**\n * This code atom implements a simple linear layout funtion which repeats\n * shape count times in the positive X direction with offset space\n * between each. Works for either 2D or 3D shapes. Negative offset\n * and negative counts invert the direction.\n * \n * Notice that defaults are set for both count and offset.\n */\nfunction move(shape: Assembly, v: [number, number, number]): Assembly | null {\n  return shape.onLeafs((l: Assembly<LeafGeom>) => {\n    const mvd = l.is2D() ? l.geometry.translate([v[0], v[1]]) : l.geometry.clone().translate(v)\n    return new Assembly({ ...l, geometry: mvd })\n  })\n}\n\nfunction run(toMove: Assembly, offsets: number[], direction: number[]) {\n  if (!offsets.length || offsets.length == 0) {\n    throw new Error(\"Missing offsets list\")\n  }\n  offsets = offsets.map((n) => Number(n))\n  if (direction.length != 3) {\n    throw new Error(\"Direction needs to be an [x,y,z] vector. Was: \" + direction)\n  }\n  const vec = new replicad.Vector(direction as [number, number, number]).normalize()\n  let leafCount = 0;\n  toMove.onLeafs((l) => {\n    leafCount++;\n    return l;\n  })\n\n  if (leafCount == 1) {\n    console.log(\"moving single object n times\")\n    console.log(offsets)\n    const result: (Assembly | null)[] = []\n    offsets.forEach((magnitude) => {\n      result.push(move(toMove, vec.multiply(magnitude).toTuple()))\n    });\n    console.log(result.length)\n    console.log(result)\n    return result;\n  } else if (leafCount === offsets.length) {\n    console.log(\"moving batch of objects by independent amounts\")\n    let index = 0;\n    let result: Assembly<AnyGeom>[] = []\n    toMove.onLeafs((l: Assembly<LeafGeom>) => {\n      const v = vec.multiply(offsets[index]).toTuple()\n      console.log(v)\n      index += 1\n      const mvd = l.is2D() ? l.geometry.translate([v[0], v[1]]) : l.geometry.clone().translate(v)\n      const res = new Assembly({ ...l, geometry: mvd })\n      result.push(res)\n      return res;\n    })\n    return result;\n  } else {\n    throw new Error(\"Assembly needs to be singleton or match offsets length. Was: \" + leafCount + \" offsets len: \" + offsets.length)\n  }\n}\n",
-          "compiledCode": "\"use strict\";\n/**\n * This code atom implements a simple linear layout funtion which repeats\n * shape count times in the positive X direction with offset space\n * between each. Works for either 2D or 3D shapes. Negative offset\n * and negative counts invert the direction.\n *\n * Notice that defaults are set for both count and offset.\n */\nfunction move(shape, v) {\n    return shape.onLeafs((l) => {\n        const mvd = l.is2D() ? l.geometry.translate([v[0], v[1]]) : l.geometry.clone().translate(v);\n        return new Assembly({ ...l, geometry: mvd });\n    });\n}\nfunction run(toMove, offsets, direction) {\n    if (!offsets.length || offsets.length == 0) {\n        throw new Error(\"Missing offsets list\");\n    }\n    offsets = offsets.map((n) => Number(n));\n    if (direction.length != 3) {\n        throw new Error(\"Direction needs to be an [x,y,z] vector. Was: \" + direction);\n    }\n    const vec = new replicad.Vector(direction).normalize();\n    let leafCount = 0;\n    toMove.onLeafs((l) => {\n        leafCount++;\n        return l;\n    });\n    if (leafCount == 1) {\n        console.log(\"moving single object n times\");\n        console.log(offsets);\n        const result = [];\n        offsets.forEach((magnitude) => {\n            result.push(move(toMove, vec.multiply(magnitude).toTuple()));\n        });\n        console.log(result.length);\n        console.log(result);\n        return result;\n    }\n    else if (leafCount === offsets.length) {\n        console.log(\"moving batch of objects by independent amounts\");\n        let index = 0;\n        let result = [];\n        toMove.onLeafs((l) => {\n            const v = vec.multiply(offsets[index]).toTuple();\n            console.log(v);\n            index += 1;\n            const mvd = l.is2D() ? l.geometry.translate([v[0], v[1]]) : l.geometry.clone().translate(v);\n            const res = new Assembly({ ...l, geometry: mvd });\n            result.push(res);\n            return res;\n        });\n        return result;\n    }\n    else {\n        throw new Error(\"Assembly needs to be singleton or match offsets length. Was: \" + leafCount + \" offsets len: \" + offsets.length);\n    }\n}\n"
+          "topLevel": false,
+          "allAtoms": [
+            {
+              "atomType": "Output",
+              "x": 0.98,
+              "y": 0.5,
+              "uniqueID": "id-6227",
+              "ioValues": [
+                {
+                  "name": "number or geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.1538,
+              "uniqueID": "id-6228",
+              "name": "toMove",
+              "type": "geometry",
+              "options": []
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.2462,
+              "uniqueID": "id-6229",
+              "name": "offsets",
+              "type": "array",
+              "options": []
+            },
+            {
+              "atomType": "Input",
+              "x": 0.0254,
+              "y": 0.3385,
+              "uniqueID": "id-6230",
+              "name": "direction",
+              "type": "point3d",
+              "options": [],
+              "pointValue": null
+            },
+            {
+              "atomType": "Code",
+              "x": 0.4323,
+              "y": 0.3571,
+              "uniqueID": "id-6231",
+              "ioValues": [
+                {
+                  "name": "toMove",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "offsets",
+                  "ioValue": [
+                    700,
+                    1400,
+                    2100,
+                    2800,
+                    3500
+                  ]
+                },
+                {
+                  "name": "direction",
+                  "ioValue": [
+                    1,
+                    0,
+                    0
+                  ]
+                }
+              ],
+              "interpreterVersion": 1,
+              "code": "\n/**\n * This code atom implements a simple linear layout funtion which repeats\n * shape count times in the positive X direction with offset space\n * between each. Works for either 2D or 3D shapes. Negative offset\n * and negative counts invert the direction.\n * \n * Notice that defaults are set for both count and offset.\n */\nfunction move(shape: Assembly, v: [number, number, number]): Assembly | null {\n  return shape.onLeafs((l: Assembly<LeafGeom>) => {\n    const mvd = l.is2D() ? l.geometry.translate([v[0], v[1]]) : l.geometry.clone().translate(v)\n    return new Assembly({ ...l, geometry: mvd })\n  })\n}\n\nfunction run(toMove: Assembly, offsets: number[], direction: number[]) {\n  if (!offsets.length || offsets.length == 0) {\n    throw new Error(\"Missing offsets list\")\n  }\n  offsets = offsets.map((n) => Number(n))\n  if (direction.length != 3) {\n    throw new Error(\"Direction needs to be an [x,y,z] vector. Was: \" + direction)\n  }\n  const vec = new replicad.Vector(direction as [number, number, number]).normalize()\n  let leafCount = 0;\n  toMove.onLeafs((l) => {\n    leafCount++;\n    return l;\n  })\n\n  if (leafCount == 1) {\n    console.log(\"moving single object n times\")\n    console.log(offsets)\n    const result: (Assembly | null)[] = []\n    offsets.forEach((magnitude) => {\n      result.push(move(toMove, vec.multiply(magnitude).toTuple()))\n    });\n    console.log(result.length)\n    console.log(result)\n    return result;\n  } else if (leafCount === offsets.length) {\n    console.log(\"moving batch of objects by independent amounts\")\n    let index = 0;\n    let result: Assembly<AnyGeom>[] = []\n    toMove.onLeafs((l: Assembly<LeafGeom>) => {\n      const v = vec.multiply(offsets[index]).toTuple()\n      console.log(v)\n      index += 1\n      const mvd = l.is2D() ? l.geometry.translate([v[0], v[1]]) : l.geometry.clone().translate(v)\n      const res = new Assembly({ ...l, geometry: mvd })\n      result.push(res)\n      return res;\n    })\n    return result;\n  } else {\n    throw new Error(\"Assembly needs to be singleton or match offsets length. Was: \" + leafCount + \" offsets len: \" + offsets.length)\n  }\n}\n",
+              "compiledCode": "\"use strict\";\n/**\n * This code atom implements a simple linear layout funtion which repeats\n * shape count times in the positive X direction with offset space\n * between each. Works for either 2D or 3D shapes. Negative offset\n * and negative counts invert the direction.\n *\n * Notice that defaults are set for both count and offset.\n */\nfunction move(shape, v) {\n    return shape.onLeafs((l) => {\n        const mvd = l.is2D() ? l.geometry.translate([v[0], v[1]]) : l.geometry.clone().translate(v);\n        return new Assembly({ ...l, geometry: mvd });\n    });\n}\nfunction run(toMove, offsets, direction) {\n    if (!offsets.length || offsets.length == 0) {\n        throw new Error(\"Missing offsets list\");\n    }\n    offsets = offsets.map((n) => Number(n));\n    if (direction.length != 3) {\n        throw new Error(\"Direction needs to be an [x,y,z] vector. Was: \" + direction);\n    }\n    const vec = new replicad.Vector(direction).normalize();\n    let leafCount = 0;\n    toMove.onLeafs((l) => {\n        leafCount++;\n        return l;\n    });\n    if (leafCount == 1) {\n        console.log(\"moving single object n times\");\n        console.log(offsets);\n        const result = [];\n        offsets.forEach((magnitude) => {\n            result.push(move(toMove, vec.multiply(magnitude).toTuple()));\n        });\n        console.log(result.length);\n        console.log(result);\n        return result;\n    }\n    else if (leafCount === offsets.length) {\n        console.log(\"moving batch of objects by independent amounts\");\n        let index = 0;\n        let result = [];\n        toMove.onLeafs((l) => {\n            const v = vec.multiply(offsets[index]).toTuple();\n            console.log(v);\n            index += 1;\n            const mvd = l.is2D() ? l.geometry.translate([v[0], v[1]]) : l.geometry.clone().translate(v);\n            const res = new Assembly({ ...l, geometry: mvd });\n            result.push(res);\n            return res;\n        });\n        return result;\n    }\n    else {\n        throw new Error(\"Assembly needs to be singleton or match offsets length. Was: \" + leafCount + \" offsets len: \" + offsets.length);\n    }\n}\n"
+            }
+          ],
+          "allConnectors": [
+            {
+              "ap2Name": "toMove",
+              "ap1ID": "id-6228",
+              "ap2ID": "id-6231"
+            },
+            {
+              "ap2Name": "offsets",
+              "ap1ID": "id-6229",
+              "ap2ID": "id-6231"
+            },
+            {
+              "ap2Name": "direction",
+              "ap1ID": "id-6230",
+              "ap2ID": "id-6231"
+            },
+            {
+              "ap2Name": "number or geometry",
+              "ap1ID": "id-6231",
+              "ap2ID": "id-6227"
+            }
+          ],
+          "parentRepo": {
+            "owner": "tristan-huber",
+            "repoName": "crv.PolyMove",
+            "privateRepo": false
+          },
+          "unitsKey": "Unitless",
+          "fileTypeVersion": 1,
+          "scaleToProjectUnits": true,
+          "lastReloadedFromGithubAt": 1795328951814
+        },
+        {
+          "atomType": "Tag",
+          "x": 0.7,
+          "y": 0.3,
+          "uniqueID": "id-6232",
+          "name": "plywood 18mm",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "tags": [
+            "plywood 18mm"
+          ]
+        },
+        {
+          "atomType": "Color",
+          "x": 0.75,
+          "y": 0.3,
+          "uniqueID": "id-6233",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Sand"
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.1538,
+          "uniqueID": "id-6273",
+          "name": "Hull",
+          "type": "geometry",
+          "options": []
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.2462,
+          "uniqueID": "id-6276",
+          "name": "Stations",
+          "type": "array",
+          "options": [
+            700,
+            1400,
+            2100,
+            2800,
+            3500
+          ]
         }
       ],
       "allConnectors": [
         {
+          "ap2Name": "geometry",
+          "ap1ID": "id-6222",
+          "ap2ID": "id-6223"
+        },
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-6223",
+          "ap2ID": "id-6224"
+        },
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-6224",
+          "ap2ID": "id-6225"
+        },
+        {
           "ap2Name": "toMove",
-          "ap1ID": "id-6004",
-          "ap2ID": "id-6007"
+          "ap1ID": "id-6225",
+          "ap2ID": "id-6226"
         },
         {
-          "ap2Name": "offsets",
-          "ap1ID": "id-6005",
-          "ap2ID": "id-6007"
+          "ap2Name": "geometry",
+          "ap1ID": "id-6226",
+          "ap2ID": "id-6232"
         },
         {
-          "ap2Name": "direction",
-          "ap1ID": "id-6006",
-          "ap2ID": "id-6007"
+          "ap2Name": "geometry",
+          "ap1ID": "id-6232",
+          "ap2ID": "id-6233"
         },
         {
           "ap2Name": "number or geometry",
-          "ap1ID": "id-6007",
-          "ap2ID": "id-6003"
+          "ap1ID": "id-6233",
+          "ap2ID": "id-6220"
+        },
+        {
+          "ap2Name": "hull",
+          "ap1ID": "id-6273",
+          "ap2ID": "id-6222"
+        },
+        {
+          "ap2Name": "stations",
+          "ap1ID": "id-6276",
+          "ap2ID": "id-6222"
+        },
+        {
+          "ap2Name": "offsets",
+          "ap1ID": "id-6276",
+          "ap2ID": "id-6226"
         }
       ],
-      "parentRepo": {
-        "owner": "tristan-huber",
-        "repoName": "crv.PolyMove",
-        "privateRepo": false
-      },
-      "unitsKey": "Unitless",
-      "fileTypeVersion": 1,
-      "scaleToProjectUnits": true,
-      "lastReloadedFromGithubAt": 1795328951814
+      "fileTypeVersion": 1
     },
     {
-      "atomType": "Tag",
-      "x": 0.7,
-      "y": 0.3,
-      "uniqueID": "id-6023",
-      "name": "plywood 18mm",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        }
-      ],
-      "tags": [
-        "plywood 18mm"
-      ]
-    },
-    {
-      "atomType": "Color",
-      "x": 0.75,
-      "y": 0.3,
-      "uniqueID": "id-6026",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        }
-      ],
-      "selectedColor": "Sand"
-    },
-    {
-      "atomType": "Code",
-      "x": 0.45,
-      "y": 0.4,
-      "uniqueID": "id-6029",
-      "ioValues": [
-        {
-          "name": "hull",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "rakeDeg",
-          "ioValue": 12.017
-        },
-        {
-          "name": "xAtKeel",
-          "ioValue": 0.622
-        },
-        {
-          "name": "sideThickness",
-          "ioValue": 6
-        },
-        {
-          "name": "bottomThickness",
-          "ioValue": 9
-        },
-        {
-          "name": "deckThickness",
-          "ioValue": 9
-        },
-        {
-          "name": "crownRadius",
-          "ioValue": 6000
-        }
-      ],
-      "interpreterVersion": 1,
-      "code": "/**\n * Transom outline from the hull surface. The planking strips are trimmed at the\n * raked transom plane (x = xAtKeel - z tan(rake)), so the aft ends of their\n * edges lie on it; joined, they are the outside of the hull at the transom.\n * The outline is moved inward by the planking thickness, capped by the crowned\n * deck and mirrored to port. The sketch lies in the transom plane: X = boat y,\n * Y = distance up the transom. Extrude, Rotate and Move atoms place it.\n */\nfunction run(\n  hull: Assembly,\n  rakeDeg: number = 12.017,\n  xAtKeel: number = 0.622,\n  sideThickness: number = 6,\n  bottomThickness: number = 9,\n  deckThickness: number = 9,\n  crownRadius: number = 6000,\n): Assembly {\n  const r = (rakeDeg * Math.PI) / 180, c = Math.cos(r), tr = Math.tan(r);\n  const aftEnds = (lines: any[]): P[] =>\n    uniq(lines.map((l: any) => {\n      const a = l.e.pointAt(0), b = l.e.pointAt(1), p = a.x < b.x ? a : b;\n      return Math.abs(p.x - (xAtKeel - p.z * tr)) < 3 ? [p.y, p.z] : null;\n    }).filter((p: any) => p) as P[]);\n  const sp = aftEnds(hullLines(tagged(hull, \"side surface\"))).sort((a, b) => b[1] - a[1]);\n  const bp = aftEnds(hullLines(tagged(hull, \"bottom surface\"))).sort((a, b) => b[0] - a[0]);\n  const o = joinOutside(sp, bp, sideThickness, bottomThickness);\n  if (!o) throw new Error(\"No hull edges end on the transom plane\");\n  // Work in the transom plane: v = z / cos(rake) is the distance up the transom.\n  const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness);\n  const topV = (y: number) => top(y) / c;\n  const Q = inset(o.pts.map((p: P) => [p[0], p[1] / c]), o.t);\n  const outline = mirroredOutline(insideHalf(Q, topV), topV(0));\n  return new Assembly({ geometry: outline, tags: [\"transom\"] });\n}\n\n// ---- hull section helpers (shared by the frame, transom, stem and keel hog outlines) ----\ntype P = number[];\n\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull: any, tag: string): any[] {\n  const out: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) out.push(node.geometry);\n  };\n  walk(hull, false);\n  return out;\n}\n\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces: any[]): any[] {\n  const out: any[] = [];\n  for (const f of faces) for (const e of f.edges) {\n    const a = e.pointAt(0), b = e.pointAt(1);\n    if (Math.abs(b.x - a.x) > 300) out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n  }\n  return out;\n}\n\nfunction uniq(pts: P[]): P[] {\n  const out: P[] = [];\n  for (const p of pts) if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5)) out.push(p);\n  return out;\n}\n\nfunction joinOutside(sp: P[], bp: P[], sideT: number, bottomT: number) {\n  if (sp.length < 2) return null;\n  const pts: P[] = [...sp];\n  const t: number[] = sp.slice(1).map(() => sideT);\n  for (const p of bp) {\n    const last = pts[pts.length - 1];\n    if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5) continue; // the chine, shared\n    t.push(bottomT);\n    pts.push(p);\n  }\n  return { pts, t };\n}\n\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O: P[], t: number[]): P[] {\n  const n = O.length, L: any[] = [];\n  for (let i = 0; i < n - 1; i++) {\n    const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n    const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n    L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n  }\n  const Q: P[] = [L[0].p];\n  for (let j = 1; j < n - 1; j++) {\n    const a = L[j - 1], b = L[j];\n    const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n    const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n    if (Math.abs(cr) < 0.25) { Q.push(mean); continue; }\n    const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n    const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n    Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n  }\n  const z = L[n - 2];\n  Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n  return Q;\n}\n\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys: number, zs: number, R: number, deckT: number) {\n  const zc = zs - Math.sqrt(R * R - ys * ys);\n  return (y: number) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n\n// Starboard half of the inside outline, from where it meets the deck's\n// underside down to the centreline: [[y, z], ...], last point on y = 0.\nfunction insideHalf(Q: P[], top: (y: number) => number): P[] {\n  const k = Q.findIndex((q) => q[1] <= top(q[0]));\n  if (k < 0) throw new Error(\"The section never gets below the deck\");\n  const S: P[] = [];\n  if (k === 0) S.push(Q[0]);\n  else {\n    const a = Q[k - 1], b = Q[k];\n    let lo = 0, hi = 1;\n    for (let i = 0; i < 50; i++) {\n      const m = (lo + hi) / 2, y = a[0] + (b[0] - a[0]) * m, z = a[1] + (b[1] - a[1]) * m;\n      if (z > top(y)) lo = m; else hi = m;\n    }\n    const m = (lo + hi) / 2;\n    S.push([a[0] + (b[0] - a[0]) * m, a[1] + (b[1] - a[1]) * m]);\n  }\n  for (let i = k; i < Q.length; i++) {\n    const q = Q[i], a = S[S.length - 1];\n    if (q[0] <= 0) { S.push([0, a[1] + ((q[1] - a[1]) * a[0]) / (a[0] - q[0])]); return tidy(S); }\n    S.push(q);\n  }\n  S.push([0, S[S.length - 1][1]]);\n  return tidy(S);\n}\n\nfunction tidy(S: P[]): P[] {\n  return S.filter((p, i) => i === 0 || Math.hypot(p[0] - S[i - 1][0], p[1] - S[i - 1][1]) > 0.5);\n}\n\n// Closed outline from a starboard half: down the starboard side, up the\n// mirrored port side, and back across along the deck through (0, topMid).\nfunction mirroredOutline(S: P[], topMid: number) {\n  let pen = replicad.draw([S[0][0], S[0][1]]);\n  for (let i = 1; i < S.length; i++) pen = pen.lineTo([S[i][0], S[i][1]]);\n  for (let i = S.length - 2; i >= 0; i--) pen = pen.lineTo([-S[i][0], S[i][1]]);\n  return pen.threePointsArcTo([S[0][0], S[0][1]], [0, topMid]).close();\n}\n",
-      "compiledCode": "\"use strict\";\n/**\n * Transom outline from the hull surface. The planking strips are trimmed at the\n * raked transom plane (x = xAtKeel - z tan(rake)), so the aft ends of their\n * edges lie on it; joined, they are the outside of the hull at the transom.\n * The outline is moved inward by the planking thickness, capped by the crowned\n * deck and mirrored to port. The sketch lies in the transom plane: X = boat y,\n * Y = distance up the transom. Extrude, Rotate and Move atoms place it.\n */\nfunction run(hull, rakeDeg = 12.017, xAtKeel = 0.622, sideThickness = 6, bottomThickness = 9, deckThickness = 9, crownRadius = 6000) {\n    const r = (rakeDeg * Math.PI) / 180, c = Math.cos(r), tr = Math.tan(r);\n    const aftEnds = (lines) => uniq(lines.map((l) => {\n        const a = l.e.pointAt(0), b = l.e.pointAt(1), p = a.x < b.x ? a : b;\n        return Math.abs(p.x - (xAtKeel - p.z * tr)) < 3 ? [p.y, p.z] : null;\n    }).filter((p) => p));\n    const sp = aftEnds(hullLines(tagged(hull, \"side surface\"))).sort((a, b) => b[1] - a[1]);\n    const bp = aftEnds(hullLines(tagged(hull, \"bottom surface\"))).sort((a, b) => b[0] - a[0]);\n    const o = joinOutside(sp, bp, sideThickness, bottomThickness);\n    if (!o)\n        throw new Error(\"No hull edges end on the transom plane\");\n    // Work in the transom plane: v = z / cos(rake) is the distance up the transom.\n    const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness);\n    const topV = (y) => top(y) / c;\n    const Q = inset(o.pts.map((p) => [p[0], p[1] / c]), o.t);\n    const outline = mirroredOutline(insideHalf(Q, topV), topV(0));\n    return new Assembly({ geometry: outline, tags: [\"transom\"] });\n}\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull, tag) {\n    const out = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            out.push(node.geometry);\n    };\n    walk(hull, false);\n    return out;\n}\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces) {\n    const out = [];\n    for (const f of faces)\n        for (const e of f.edges) {\n            const a = e.pointAt(0), b = e.pointAt(1);\n            if (Math.abs(b.x - a.x) > 300)\n                out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n        }\n    return out;\n}\nfunction uniq(pts) {\n    const out = [];\n    for (const p of pts)\n        if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5))\n            out.push(p);\n    return out;\n}\nfunction joinOutside(sp, bp, sideT, bottomT) {\n    if (sp.length < 2)\n        return null;\n    const pts = [...sp];\n    const t = sp.slice(1).map(() => sideT);\n    for (const p of bp) {\n        const last = pts[pts.length - 1];\n        if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5)\n            continue; // the chine, shared\n        t.push(bottomT);\n        pts.push(p);\n    }\n    return { pts, t };\n}\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O, t) {\n    const n = O.length, L = [];\n    for (let i = 0; i < n - 1; i++) {\n        const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n        const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n        L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n    }\n    const Q = [L[0].p];\n    for (let j = 1; j < n - 1; j++) {\n        const a = L[j - 1], b = L[j];\n        const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n        const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n        if (Math.abs(cr) < 0.25) {\n            Q.push(mean);\n            continue;\n        }\n        const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n        const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n        Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n    }\n    const z = L[n - 2];\n    Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n    return Q;\n}\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys, zs, R, deckT) {\n    const zc = zs - Math.sqrt(R * R - ys * ys);\n    return (y) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n// Starboard half of the inside outline, from where it meets the deck's\n// underside down to the centreline: [[y, z], ...], last point on y = 0.\nfunction insideHalf(Q, top) {\n    const k = Q.findIndex((q) => q[1] <= top(q[0]));\n    if (k < 0)\n        throw new Error(\"The section never gets below the deck\");\n    const S = [];\n    if (k === 0)\n        S.push(Q[0]);\n    else {\n        const a = Q[k - 1], b = Q[k];\n        let lo = 0, hi = 1;\n        for (let i = 0; i < 50; i++) {\n            const m = (lo + hi) / 2, y = a[0] + (b[0] - a[0]) * m, z = a[1] + (b[1] - a[1]) * m;\n            if (z > top(y))\n                lo = m;\n            else\n                hi = m;\n        }\n        const m = (lo + hi) / 2;\n        S.push([a[0] + (b[0] - a[0]) * m, a[1] + (b[1] - a[1]) * m]);\n    }\n    for (let i = k; i < Q.length; i++) {\n        const q = Q[i], a = S[S.length - 1];\n        if (q[0] <= 0) {\n            S.push([0, a[1] + ((q[1] - a[1]) * a[0]) / (a[0] - q[0])]);\n            return tidy(S);\n        }\n        S.push(q);\n    }\n    S.push([0, S[S.length - 1][1]]);\n    return tidy(S);\n}\nfunction tidy(S) {\n    return S.filter((p, i) => i === 0 || Math.hypot(p[0] - S[i - 1][0], p[1] - S[i - 1][1]) > 0.5);\n}\n// Closed outline from a starboard half: down the starboard side, up the\n// mirrored port side, and back across along the deck through (0, topMid).\nfunction mirroredOutline(S, topMid) {\n    let pen = replicad.draw([S[0][0], S[0][1]]);\n    for (let i = 1; i < S.length; i++)\n        pen = pen.lineTo([S[i][0], S[i][1]]);\n    for (let i = S.length - 2; i >= 0; i--)\n        pen = pen.lineTo([-S[i][0], S[i][1]]);\n    return pen.threePointsArcTo([S[0][0], S[0][1]], [0, topMid]).close();\n}\n"
-    },
-    {
-      "atomType": "Extrude",
+      "atomType": "Molecule",
       "x": 0.5,
       "y": 0.4,
-      "uniqueID": "id-6045",
+      "uniqueID": "id-6279",
+      "name": "Transom",
       "ioValues": [
         {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "height",
-          "ioValue": 18
-        }
-      ]
-    },
-    {
-      "atomType": "Rotate",
-      "x": 0.55,
-      "y": 0.4,
-      "uniqueID": "id-6049",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "x-axis degrees",
-          "ioValue": 90
-        },
-        {
-          "name": "y-axis degrees",
-          "ioValue": 0
-        },
-        {
-          "name": "z-axis degrees",
-          "ioValue": 90
-        }
-      ]
-    },
-    {
-      "atomType": "Rotate",
-      "x": 0.6,
-      "y": 0.4,
-      "uniqueID": "id-6055",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "x-axis degrees",
-          "ioValue": 0
-        },
-        {
-          "name": "y-axis degrees",
-          "ioValue": -12.017
-        },
-        {
-          "name": "z-axis degrees",
-          "ioValue": 0
-        }
-      ]
-    },
-    {
-      "atomType": "Move",
-      "x": 0.65,
-      "y": 0.4,
-      "uniqueID": "id-6061",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "xDist",
-          "ioValue": 0.622
-        },
-        {
-          "name": "yDist",
-          "ioValue": 0
-        },
-        {
-          "name": "zDist",
-          "ioValue": 0
-        }
-      ]
-    },
-    {
-      "atomType": "Tag",
-      "x": 0.7,
-      "y": 0.4,
-      "uniqueID": "id-6067",
-      "name": "plywood 18mm",
-      "ioValues": [
-        {
-          "name": "geometry",
+          "name": "Hull",
           "ioValue": "__GEOMETRY_INPUT__"
         }
       ],
-      "tags": [
-        "plywood 18mm"
-      ]
-    },
-    {
-      "atomType": "Color",
-      "x": 0.75,
-      "y": 0.4,
-      "uniqueID": "id-6070",
-      "ioValues": [
+      "topLevel": false,
+      "allAtoms": [
         {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
+          "atomType": "Output",
+          "x": 0.98,
+          "y": 0.5,
+          "uniqueID": "id-6281",
+          "ioValues": [
+            {
+              "name": "number or geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Code",
+          "x": 0.45,
+          "y": 0.4,
+          "uniqueID": "id-6283",
+          "ioValues": [
+            {
+              "name": "hull",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "rakeDeg",
+              "ioValue": 12.017
+            },
+            {
+              "name": "xAtKeel",
+              "ioValue": 0.622
+            },
+            {
+              "name": "sideThickness",
+              "ioValue": 6
+            },
+            {
+              "name": "bottomThickness",
+              "ioValue": 9
+            },
+            {
+              "name": "deckThickness",
+              "ioValue": 9
+            },
+            {
+              "name": "crownRadius",
+              "ioValue": 6000
+            }
+          ],
+          "interpreterVersion": 1,
+          "code": "/**\n * Transom outline from the hull surface. The planking strips are trimmed at the\n * raked transom plane (x = xAtKeel - z tan(rake)), so the aft ends of their\n * edges lie on it; joined, they are the outside of the hull at the transom.\n * The outline is moved inward by the planking thickness, capped by the crowned\n * deck and mirrored to port. The sketch lies in the transom plane: X = boat y,\n * Y = distance up the transom. Extrude, Rotate and Move atoms place it.\n */\nfunction run(\n  hull: Assembly,\n  rakeDeg: number = 12.017,\n  xAtKeel: number = 0.622,\n  sideThickness: number = 6,\n  bottomThickness: number = 9,\n  deckThickness: number = 9,\n  crownRadius: number = 6000,\n): Assembly {\n  const r = (rakeDeg * Math.PI) / 180, c = Math.cos(r), tr = Math.tan(r);\n  const aftEnds = (lines: any[]): P[] =>\n    uniq(lines.map((l: any) => {\n      const a = l.e.pointAt(0), b = l.e.pointAt(1), p = a.x < b.x ? a : b;\n      return Math.abs(p.x - (xAtKeel - p.z * tr)) < 3 ? [p.y, p.z] : null;\n    }).filter((p: any) => p) as P[]);\n  const sp = aftEnds(hullLines(tagged(hull, \"side surface\"))).sort((a, b) => b[1] - a[1]);\n  const bp = aftEnds(hullLines(tagged(hull, \"bottom surface\"))).sort((a, b) => b[0] - a[0]);\n  const o = joinOutside(sp, bp, sideThickness, bottomThickness);\n  if (!o) throw new Error(\"No hull edges end on the transom plane\");\n  // Work in the transom plane: v = z / cos(rake) is the distance up the transom.\n  const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness);\n  const topV = (y: number) => top(y) / c;\n  const Q = inset(o.pts.map((p: P) => [p[0], p[1] / c]), o.t);\n  const outline = mirroredOutline(insideHalf(Q, topV), topV(0));\n  return new Assembly({ geometry: outline, tags: [\"transom\"] });\n}\n\n// ---- hull section helpers (shared by the frame, transom, stem and keel hog outlines) ----\ntype P = number[];\n\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull: any, tag: string): any[] {\n  const out: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) out.push(node.geometry);\n  };\n  walk(hull, false);\n  return out;\n}\n\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces: any[]): any[] {\n  const out: any[] = [];\n  for (const f of faces) for (const e of f.edges) {\n    const a = e.pointAt(0), b = e.pointAt(1);\n    if (Math.abs(b.x - a.x) > 300) out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n  }\n  return out;\n}\n\nfunction uniq(pts: P[]): P[] {\n  const out: P[] = [];\n  for (const p of pts) if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5)) out.push(p);\n  return out;\n}\n\nfunction joinOutside(sp: P[], bp: P[], sideT: number, bottomT: number) {\n  if (sp.length < 2) return null;\n  const pts: P[] = [...sp];\n  const t: number[] = sp.slice(1).map(() => sideT);\n  for (const p of bp) {\n    const last = pts[pts.length - 1];\n    if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5) continue; // the chine, shared\n    t.push(bottomT);\n    pts.push(p);\n  }\n  return { pts, t };\n}\n\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O: P[], t: number[]): P[] {\n  const n = O.length, L: any[] = [];\n  for (let i = 0; i < n - 1; i++) {\n    const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n    const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n    L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n  }\n  const Q: P[] = [L[0].p];\n  for (let j = 1; j < n - 1; j++) {\n    const a = L[j - 1], b = L[j];\n    const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n    const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n    if (Math.abs(cr) < 0.25) { Q.push(mean); continue; }\n    const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n    const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n    Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n  }\n  const z = L[n - 2];\n  Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n  return Q;\n}\n\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys: number, zs: number, R: number, deckT: number) {\n  const zc = zs - Math.sqrt(R * R - ys * ys);\n  return (y: number) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n\n// Starboard half of the inside outline, from where it meets the deck's\n// underside down to the centreline: [[y, z], ...], last point on y = 0.\nfunction insideHalf(Q: P[], top: (y: number) => number): P[] {\n  const k = Q.findIndex((q) => q[1] <= top(q[0]));\n  if (k < 0) throw new Error(\"The section never gets below the deck\");\n  const S: P[] = [];\n  if (k === 0) S.push(Q[0]);\n  else {\n    const a = Q[k - 1], b = Q[k];\n    let lo = 0, hi = 1;\n    for (let i = 0; i < 50; i++) {\n      const m = (lo + hi) / 2, y = a[0] + (b[0] - a[0]) * m, z = a[1] + (b[1] - a[1]) * m;\n      if (z > top(y)) lo = m; else hi = m;\n    }\n    const m = (lo + hi) / 2;\n    S.push([a[0] + (b[0] - a[0]) * m, a[1] + (b[1] - a[1]) * m]);\n  }\n  for (let i = k; i < Q.length; i++) {\n    const q = Q[i], a = S[S.length - 1];\n    if (q[0] <= 0) { S.push([0, a[1] + ((q[1] - a[1]) * a[0]) / (a[0] - q[0])]); return tidy(S); }\n    S.push(q);\n  }\n  S.push([0, S[S.length - 1][1]]);\n  return tidy(S);\n}\n\nfunction tidy(S: P[]): P[] {\n  return S.filter((p, i) => i === 0 || Math.hypot(p[0] - S[i - 1][0], p[1] - S[i - 1][1]) > 0.5);\n}\n\n// Closed outline from a starboard half: down the starboard side, up the\n// mirrored port side, and back across along the deck through (0, topMid).\nfunction mirroredOutline(S: P[], topMid: number) {\n  let pen = replicad.draw([S[0][0], S[0][1]]);\n  for (let i = 1; i < S.length; i++) pen = pen.lineTo([S[i][0], S[i][1]]);\n  for (let i = S.length - 2; i >= 0; i--) pen = pen.lineTo([-S[i][0], S[i][1]]);\n  return pen.threePointsArcTo([S[0][0], S[0][1]], [0, topMid]).close();\n}\n",
+          "compiledCode": "\"use strict\";\n/**\n * Transom outline from the hull surface. The planking strips are trimmed at the\n * raked transom plane (x = xAtKeel - z tan(rake)), so the aft ends of their\n * edges lie on it; joined, they are the outside of the hull at the transom.\n * The outline is moved inward by the planking thickness, capped by the crowned\n * deck and mirrored to port. The sketch lies in the transom plane: X = boat y,\n * Y = distance up the transom. Extrude, Rotate and Move atoms place it.\n */\nfunction run(hull, rakeDeg = 12.017, xAtKeel = 0.622, sideThickness = 6, bottomThickness = 9, deckThickness = 9, crownRadius = 6000) {\n    const r = (rakeDeg * Math.PI) / 180, c = Math.cos(r), tr = Math.tan(r);\n    const aftEnds = (lines) => uniq(lines.map((l) => {\n        const a = l.e.pointAt(0), b = l.e.pointAt(1), p = a.x < b.x ? a : b;\n        return Math.abs(p.x - (xAtKeel - p.z * tr)) < 3 ? [p.y, p.z] : null;\n    }).filter((p) => p));\n    const sp = aftEnds(hullLines(tagged(hull, \"side surface\"))).sort((a, b) => b[1] - a[1]);\n    const bp = aftEnds(hullLines(tagged(hull, \"bottom surface\"))).sort((a, b) => b[0] - a[0]);\n    const o = joinOutside(sp, bp, sideThickness, bottomThickness);\n    if (!o)\n        throw new Error(\"No hull edges end on the transom plane\");\n    // Work in the transom plane: v = z / cos(rake) is the distance up the transom.\n    const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness);\n    const topV = (y) => top(y) / c;\n    const Q = inset(o.pts.map((p) => [p[0], p[1] / c]), o.t);\n    const outline = mirroredOutline(insideHalf(Q, topV), topV(0));\n    return new Assembly({ geometry: outline, tags: [\"transom\"] });\n}\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull, tag) {\n    const out = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            out.push(node.geometry);\n    };\n    walk(hull, false);\n    return out;\n}\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces) {\n    const out = [];\n    for (const f of faces)\n        for (const e of f.edges) {\n            const a = e.pointAt(0), b = e.pointAt(1);\n            if (Math.abs(b.x - a.x) > 300)\n                out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n        }\n    return out;\n}\nfunction uniq(pts) {\n    const out = [];\n    for (const p of pts)\n        if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5))\n            out.push(p);\n    return out;\n}\nfunction joinOutside(sp, bp, sideT, bottomT) {\n    if (sp.length < 2)\n        return null;\n    const pts = [...sp];\n    const t = sp.slice(1).map(() => sideT);\n    for (const p of bp) {\n        const last = pts[pts.length - 1];\n        if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5)\n            continue; // the chine, shared\n        t.push(bottomT);\n        pts.push(p);\n    }\n    return { pts, t };\n}\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O, t) {\n    const n = O.length, L = [];\n    for (let i = 0; i < n - 1; i++) {\n        const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n        const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n        L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n    }\n    const Q = [L[0].p];\n    for (let j = 1; j < n - 1; j++) {\n        const a = L[j - 1], b = L[j];\n        const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n        const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n        if (Math.abs(cr) < 0.25) {\n            Q.push(mean);\n            continue;\n        }\n        const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n        const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n        Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n    }\n    const z = L[n - 2];\n    Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n    return Q;\n}\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys, zs, R, deckT) {\n    const zc = zs - Math.sqrt(R * R - ys * ys);\n    return (y) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n// Starboard half of the inside outline, from where it meets the deck's\n// underside down to the centreline: [[y, z], ...], last point on y = 0.\nfunction insideHalf(Q, top) {\n    const k = Q.findIndex((q) => q[1] <= top(q[0]));\n    if (k < 0)\n        throw new Error(\"The section never gets below the deck\");\n    const S = [];\n    if (k === 0)\n        S.push(Q[0]);\n    else {\n        const a = Q[k - 1], b = Q[k];\n        let lo = 0, hi = 1;\n        for (let i = 0; i < 50; i++) {\n            const m = (lo + hi) / 2, y = a[0] + (b[0] - a[0]) * m, z = a[1] + (b[1] - a[1]) * m;\n            if (z > top(y))\n                lo = m;\n            else\n                hi = m;\n        }\n        const m = (lo + hi) / 2;\n        S.push([a[0] + (b[0] - a[0]) * m, a[1] + (b[1] - a[1]) * m]);\n    }\n    for (let i = k; i < Q.length; i++) {\n        const q = Q[i], a = S[S.length - 1];\n        if (q[0] <= 0) {\n            S.push([0, a[1] + ((q[1] - a[1]) * a[0]) / (a[0] - q[0])]);\n            return tidy(S);\n        }\n        S.push(q);\n    }\n    S.push([0, S[S.length - 1][1]]);\n    return tidy(S);\n}\nfunction tidy(S) {\n    return S.filter((p, i) => i === 0 || Math.hypot(p[0] - S[i - 1][0], p[1] - S[i - 1][1]) > 0.5);\n}\n// Closed outline from a starboard half: down the starboard side, up the\n// mirrored port side, and back across along the deck through (0, topMid).\nfunction mirroredOutline(S, topMid) {\n    let pen = replicad.draw([S[0][0], S[0][1]]);\n    for (let i = 1; i < S.length; i++)\n        pen = pen.lineTo([S[i][0], S[i][1]]);\n    for (let i = S.length - 2; i >= 0; i--)\n        pen = pen.lineTo([-S[i][0], S[i][1]]);\n    return pen.threePointsArcTo([S[0][0], S[0][1]], [0, topMid]).close();\n}\n"
+        },
+        {
+          "atomType": "Extrude",
+          "x": 0.5,
+          "y": 0.4,
+          "uniqueID": "id-6284",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "height",
+              "ioValue": 18
+            }
+          ]
+        },
+        {
+          "atomType": "Rotate",
+          "x": 0.55,
+          "y": 0.4,
+          "uniqueID": "id-6285",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "x-axis degrees",
+              "ioValue": 90
+            },
+            {
+              "name": "y-axis degrees",
+              "ioValue": 0
+            },
+            {
+              "name": "z-axis degrees",
+              "ioValue": 90
+            }
+          ]
+        },
+        {
+          "atomType": "Rotate",
+          "x": 0.6,
+          "y": 0.4,
+          "uniqueID": "id-6286",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "x-axis degrees",
+              "ioValue": 0
+            },
+            {
+              "name": "y-axis degrees",
+              "ioValue": -12.017
+            },
+            {
+              "name": "z-axis degrees",
+              "ioValue": 0
+            }
+          ]
+        },
+        {
+          "atomType": "Move",
+          "x": 0.65,
+          "y": 0.4,
+          "uniqueID": "id-6287",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "xDist",
+              "ioValue": 0.622
+            },
+            {
+              "name": "yDist",
+              "ioValue": 0
+            },
+            {
+              "name": "zDist",
+              "ioValue": 0
+            }
+          ]
+        },
+        {
+          "atomType": "Tag",
+          "x": 0.7,
+          "y": 0.4,
+          "uniqueID": "id-6288",
+          "name": "plywood 18mm",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "tags": [
+            "plywood 18mm"
+          ]
+        },
+        {
+          "atomType": "Color",
+          "x": 0.75,
+          "y": 0.4,
+          "uniqueID": "id-6289",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Sand"
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.1538,
+          "uniqueID": "id-6409",
+          "name": "Hull",
+          "type": "geometry",
+          "options": []
         }
       ],
-      "selectedColor": "Sand"
-    },
-    {
-      "atomType": "Code",
-      "x": 0.45,
-      "y": 0.5,
-      "uniqueID": "id-6073",
-      "ioValues": [
+      "allConnectors": [
         {
-          "name": "hull",
-          "ioValue": "__GEOMETRY_INPUT__"
+          "ap2Name": "geometry",
+          "ap1ID": "id-6283",
+          "ap2ID": "id-6284"
         },
         {
-          "name": "startX",
-          "ioValue": 3300
+          "ap2Name": "geometry",
+          "ap1ID": "id-6284",
+          "ap2ID": "id-6285"
         },
         {
-          "name": "halfWidth",
-          "ioValue": 18
+          "ap2Name": "geometry",
+          "ap1ID": "id-6285",
+          "ap2ID": "id-6286"
         },
         {
-          "name": "step",
-          "ioValue": 10
+          "ap2Name": "geometry",
+          "ap1ID": "id-6286",
+          "ap2ID": "id-6287"
         },
         {
-          "name": "sideThickness",
-          "ioValue": 6
+          "ap2Name": "geometry",
+          "ap1ID": "id-6287",
+          "ap2ID": "id-6288"
         },
         {
-          "name": "bottomThickness",
-          "ioValue": 9
+          "ap2Name": "geometry",
+          "ap1ID": "id-6288",
+          "ap2ID": "id-6289"
         },
         {
-          "name": "deckThickness",
-          "ioValue": 9
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-6289",
+          "ap2ID": "id-6281"
         },
         {
-          "name": "crownRadius",
-          "ioValue": 6000
+          "ap2Name": "hull",
+          "ap1ID": "id-6409",
+          "ap2ID": "id-6283"
         }
       ],
-      "interpreterVersion": 1,
-      "code": "/**\n * Stem profile: side view of one stem lamination, from x = startX to the stem\n * head. At each x the inside of the planking comes from the hull section there;\n * where it passes the lamination's outer face (y = halfWidth) sets the lower\n * edge, and the underside of the crowned deck sets the top. Returns a sketch\n * with X = boat x and Y = boat z: Move and Difference atoms cut its inner edge\n * and Extrude, Rotate and Move atoms make the two laminations.\n */\nfunction run(\n  hull: Assembly,\n  startX: number = 3300,\n  halfWidth: number = 18,\n  step: number = 10,\n  sideThickness: number = 6,\n  bottomThickness: number = 9,\n  deckThickness: number = 9,\n  crownRadius: number = 6000,\n): Assembly {\n  const side = hullLines(tagged(hull, \"side surface\"));\n  const bottom = hullLines(tagged(hull, \"bottom surface\"));\n  const end = Math.max(...side.map((l: any) => l.hi));\n  const lower: P[] = [], upper: P[] = [];\n  for (let x = startX; x < end; x += step) {\n    const o = outsideAt(side, bottom, x, sideThickness, bottomThickness);\n    if (!o) { console.log(`stem ends at x = ${x}: no section`); break; }\n    const z = heightAtY(inset(o.pts, o.t), halfWidth);\n    const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness)(halfWidth);\n    if (z === null || z >= top - 1) { console.log(`stem ends at x = ${x}: ${z === null ? \"narrower than the lamination\" : \"meets the deck\"}`); break; }\n    lower.push([x, z]);\n    upper.push([x, top]);\n  }\n  if (lower.length < 2) throw new Error(`No room for the stem at y = ${halfWidth}`);\n  let pen = replicad.draw(lower[0]);\n  for (let i = 1; i < lower.length; i++) pen = pen.lineTo(lower[i]);\n  for (let i = upper.length - 1; i >= 0; i--) pen = pen.lineTo(upper[i]);\n  return new Assembly({ geometry: pen.close(), tags: [\"stem\"] });\n}\n\n// ---- hull section helpers (shared by the frame, transom, stem and keel hog outlines) ----\ntype P = number[];\n\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull: any, tag: string): any[] {\n  const out: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) out.push(node.geometry);\n  };\n  walk(hull, false);\n  return out;\n}\n\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces: any[]): any[] {\n  const out: any[] = [];\n  for (const f of faces) for (const e of f.edges) {\n    const a = e.pointAt(0), b = e.pointAt(1);\n    if (Math.abs(b.x - a.x) > 10) out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n  }\n  return out;\n}\n\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l: any, s: number): P | null {\n  if (s <= l.lo || s >= l.hi) return null;\n  let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n  if (flo * (l.e.pointAt(1).x - s) > 0) return null;\n  for (let i = 0; i < 40; i++) {\n    const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n    if ((fm < 0) === (flo < 0)) { lo = m; flo = fm; } else hi = m;\n  }\n  const p = l.e.pointAt((lo + hi) / 2);\n  return [p.y, p.z];\n}\n\nfunction uniq(pts: P[]): P[] {\n  const out: P[] = [];\n  for (const p of pts) if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5)) out.push(p);\n  return out;\n}\n\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side: any[], bottom: any[], s: number, sideT: number, bottomT: number) {\n  const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[1] - a[1]);\n  const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[0] - a[0]);\n  return joinOutside(sp, bp, sideT, bottomT);\n}\n\nfunction joinOutside(sp: P[], bp: P[], sideT: number, bottomT: number) {\n  if (sp.length < 2) return null;\n  const pts: P[] = [...sp];\n  const t: number[] = sp.slice(1).map(() => sideT);\n  for (const p of bp) {\n    const last = pts[pts.length - 1];\n    if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5) continue; // the chine, shared\n    t.push(bottomT);\n    pts.push(p);\n  }\n  return { pts, t };\n}\n\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O: P[], t: number[]): P[] {\n  const n = O.length, L: any[] = [];\n  for (let i = 0; i < n - 1; i++) {\n    const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n    const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n    L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n  }\n  const Q: P[] = [L[0].p];\n  for (let j = 1; j < n - 1; j++) {\n    const a = L[j - 1], b = L[j];\n    const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n    const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n    if (Math.abs(cr) < 0.25) { Q.push(mean); continue; }\n    const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n    const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n    Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n  }\n  const z = L[n - 2];\n  Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n  return Q;\n}\n\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys: number, zs: number, R: number, deckT: number) {\n  const zc = zs - Math.sqrt(R * R - ys * ys);\n  return (y: number) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q: P[], c: number): number | null {\n  for (let i = 0; i < Q.length - 1; i++) {\n    const a = Q[i], b = Q[i + 1];\n    if (a[0] >= c && b[0] < c) return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n  }\n  return null;\n}\n",
-      "compiledCode": "\"use strict\";\n/**\n * Stem profile: side view of one stem lamination, from x = startX to the stem\n * head. At each x the inside of the planking comes from the hull section there;\n * where it passes the lamination's outer face (y = halfWidth) sets the lower\n * edge, and the underside of the crowned deck sets the top. Returns a sketch\n * with X = boat x and Y = boat z: Move and Difference atoms cut its inner edge\n * and Extrude, Rotate and Move atoms make the two laminations.\n */\nfunction run(hull, startX = 3300, halfWidth = 18, step = 10, sideThickness = 6, bottomThickness = 9, deckThickness = 9, crownRadius = 6000) {\n    const side = hullLines(tagged(hull, \"side surface\"));\n    const bottom = hullLines(tagged(hull, \"bottom surface\"));\n    const end = Math.max(...side.map((l) => l.hi));\n    const lower = [], upper = [];\n    for (let x = startX; x < end; x += step) {\n        const o = outsideAt(side, bottom, x, sideThickness, bottomThickness);\n        if (!o) {\n            console.log(`stem ends at x = ${x}: no section`);\n            break;\n        }\n        const z = heightAtY(inset(o.pts, o.t), halfWidth);\n        const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness)(halfWidth);\n        if (z === null || z >= top - 1) {\n            console.log(`stem ends at x = ${x}: ${z === null ? \"narrower than the lamination\" : \"meets the deck\"}`);\n            break;\n        }\n        lower.push([x, z]);\n        upper.push([x, top]);\n    }\n    if (lower.length < 2)\n        throw new Error(`No room for the stem at y = ${halfWidth}`);\n    let pen = replicad.draw(lower[0]);\n    for (let i = 1; i < lower.length; i++)\n        pen = pen.lineTo(lower[i]);\n    for (let i = upper.length - 1; i >= 0; i--)\n        pen = pen.lineTo(upper[i]);\n    return new Assembly({ geometry: pen.close(), tags: [\"stem\"] });\n}\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull, tag) {\n    const out = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            out.push(node.geometry);\n    };\n    walk(hull, false);\n    return out;\n}\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces) {\n    const out = [];\n    for (const f of faces)\n        for (const e of f.edges) {\n            const a = e.pointAt(0), b = e.pointAt(1);\n            if (Math.abs(b.x - a.x) > 10)\n                out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n        }\n    return out;\n}\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l, s) {\n    if (s <= l.lo || s >= l.hi)\n        return null;\n    let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n    if (flo * (l.e.pointAt(1).x - s) > 0)\n        return null;\n    for (let i = 0; i < 40; i++) {\n        const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n        if ((fm < 0) === (flo < 0)) {\n            lo = m;\n            flo = fm;\n        }\n        else\n            hi = m;\n    }\n    const p = l.e.pointAt((lo + hi) / 2);\n    return [p.y, p.z];\n}\nfunction uniq(pts) {\n    const out = [];\n    for (const p of pts)\n        if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5))\n            out.push(p);\n    return out;\n}\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side, bottom, s, sideT, bottomT) {\n    const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[1] - a[1]);\n    const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[0] - a[0]);\n    return joinOutside(sp, bp, sideT, bottomT);\n}\nfunction joinOutside(sp, bp, sideT, bottomT) {\n    if (sp.length < 2)\n        return null;\n    const pts = [...sp];\n    const t = sp.slice(1).map(() => sideT);\n    for (const p of bp) {\n        const last = pts[pts.length - 1];\n        if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5)\n            continue; // the chine, shared\n        t.push(bottomT);\n        pts.push(p);\n    }\n    return { pts, t };\n}\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O, t) {\n    const n = O.length, L = [];\n    for (let i = 0; i < n - 1; i++) {\n        const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n        const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n        L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n    }\n    const Q = [L[0].p];\n    for (let j = 1; j < n - 1; j++) {\n        const a = L[j - 1], b = L[j];\n        const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n        const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n        if (Math.abs(cr) < 0.25) {\n            Q.push(mean);\n            continue;\n        }\n        const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n        const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n        Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n    }\n    const z = L[n - 2];\n    Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n    return Q;\n}\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys, zs, R, deckT) {\n    const zc = zs - Math.sqrt(R * R - ys * ys);\n    return (y) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q, c) {\n    for (let i = 0; i < Q.length - 1; i++) {\n        const a = Q[i], b = Q[i + 1];\n        if (a[0] >= c && b[0] < c)\n            return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n    }\n    return null;\n}\n"
+      "fileTypeVersion": 1
     },
     {
-      "atomType": "Move",
+      "atomType": "Molecule",
       "x": 0.5,
-      "y": 0.55,
-      "uniqueID": "id-6090",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "xDist",
-          "ioValue": -110
-        },
-        {
-          "name": "yDist",
-          "ioValue": 110
-        },
-        {
-          "name": "zDist",
-          "ioValue": 0
-        }
-      ]
-    },
-    {
-      "atomType": "Difference",
-      "x": 0.55,
       "y": 0.5,
-      "uniqueID": "id-6096",
+      "uniqueID": "id-6320",
+      "name": "Stem",
       "ioValues": [
         {
-          "name": "retain",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "remove",
-          "ioValue": "__GEOMETRY_INPUT__"
-        }
-      ]
-    },
-    {
-      "atomType": "Extrude",
-      "x": 0.6,
-      "y": 0.5,
-      "uniqueID": "id-6100",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "height",
-          "ioValue": 18
-        }
-      ]
-    },
-    {
-      "atomType": "Rotate",
-      "x": 0.65,
-      "y": 0.5,
-      "uniqueID": "id-6104",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "x-axis degrees",
-          "ioValue": 90
-        },
-        {
-          "name": "y-axis degrees",
-          "ioValue": 0
-        },
-        {
-          "name": "z-axis degrees",
-          "ioValue": 0
-        }
-      ]
-    },
-    {
-      "atomType": "Move",
-      "x": 0.7,
-      "y": 0.55,
-      "uniqueID": "id-6110",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "xDist",
-          "ioValue": 0
-        },
-        {
-          "name": "yDist",
-          "ioValue": 18
-        },
-        {
-          "name": "zDist",
-          "ioValue": 0
-        }
-      ]
-    },
-    {
-      "atomType": "Assembly",
-      "x": 0.75,
-      "y": 0.5,
-      "uniqueID": "id-6116",
-      "ioValues": [
-        {
-          "name": "makeDisjoint",
-          "ioValue": false
-        },
-        {
-          "name": "Shape 1",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "Shape2",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "Shape3",
-          "ioValue": "__GEOMETRY_INPUT__"
-        }
-      ]
-    },
-    {
-      "atomType": "Tag",
-      "x": 0.8,
-      "y": 0.5,
-      "uniqueID": "id-6122",
-      "name": "plywood 18mm",
-      "ioValues": [
-        {
-          "name": "geometry",
+          "name": "Hull",
           "ioValue": "__GEOMETRY_INPUT__"
         }
       ],
-      "tags": [
-        "plywood 18mm"
-      ]
-    },
-    {
-      "atomType": "Color",
-      "x": 0.85,
-      "y": 0.5,
-      "uniqueID": "id-6125",
-      "ioValues": [
+      "topLevel": false,
+      "allAtoms": [
         {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
+          "atomType": "Output",
+          "x": 0.98,
+          "y": 0.5,
+          "uniqueID": "id-6322",
+          "ioValues": [
+            {
+              "name": "number or geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Code",
+          "x": 0.45,
+          "y": 0.5,
+          "uniqueID": "id-6324",
+          "ioValues": [
+            {
+              "name": "hull",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "startX",
+              "ioValue": 3300
+            },
+            {
+              "name": "halfWidth",
+              "ioValue": 18
+            },
+            {
+              "name": "step",
+              "ioValue": 10
+            },
+            {
+              "name": "sideThickness",
+              "ioValue": 6
+            },
+            {
+              "name": "bottomThickness",
+              "ioValue": 9
+            },
+            {
+              "name": "deckThickness",
+              "ioValue": 9
+            },
+            {
+              "name": "crownRadius",
+              "ioValue": 6000
+            }
+          ],
+          "interpreterVersion": 1,
+          "code": "/**\n * Stem profile: side view of one stem lamination, from x = startX to the stem\n * head. At each x the inside of the planking comes from the hull section there;\n * where it passes the lamination's outer face (y = halfWidth) sets the lower\n * edge, and the underside of the crowned deck sets the top. Returns a sketch\n * with X = boat x and Y = boat z: Move and Difference atoms cut its inner edge\n * and Extrude, Rotate and Move atoms make the two laminations.\n */\nfunction run(\n  hull: Assembly,\n  startX: number = 3300,\n  halfWidth: number = 18,\n  step: number = 10,\n  sideThickness: number = 6,\n  bottomThickness: number = 9,\n  deckThickness: number = 9,\n  crownRadius: number = 6000,\n): Assembly {\n  const side = hullLines(tagged(hull, \"side surface\"));\n  const bottom = hullLines(tagged(hull, \"bottom surface\"));\n  const end = Math.max(...side.map((l: any) => l.hi));\n  const lower: P[] = [], upper: P[] = [];\n  for (let x = startX; x < end; x += step) {\n    const o = outsideAt(side, bottom, x, sideThickness, bottomThickness);\n    if (!o) { console.log(`stem ends at x = ${x}: no section`); break; }\n    const z = heightAtY(inset(o.pts, o.t), halfWidth);\n    const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness)(halfWidth);\n    if (z === null || z >= top - 1) { console.log(`stem ends at x = ${x}: ${z === null ? \"narrower than the lamination\" : \"meets the deck\"}`); break; }\n    lower.push([x, z]);\n    upper.push([x, top]);\n  }\n  if (lower.length < 2) throw new Error(`No room for the stem at y = ${halfWidth}`);\n  let pen = replicad.draw(lower[0]);\n  for (let i = 1; i < lower.length; i++) pen = pen.lineTo(lower[i]);\n  for (let i = upper.length - 1; i >= 0; i--) pen = pen.lineTo(upper[i]);\n  return new Assembly({ geometry: pen.close(), tags: [\"stem\"] });\n}\n\n// ---- hull section helpers (shared by the frame, transom, stem and keel hog outlines) ----\ntype P = number[];\n\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull: any, tag: string): any[] {\n  const out: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) out.push(node.geometry);\n  };\n  walk(hull, false);\n  return out;\n}\n\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces: any[]): any[] {\n  const out: any[] = [];\n  for (const f of faces) for (const e of f.edges) {\n    const a = e.pointAt(0), b = e.pointAt(1);\n    if (Math.abs(b.x - a.x) > 10) out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n  }\n  return out;\n}\n\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l: any, s: number): P | null {\n  if (s <= l.lo || s >= l.hi) return null;\n  let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n  if (flo * (l.e.pointAt(1).x - s) > 0) return null;\n  for (let i = 0; i < 40; i++) {\n    const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n    if ((fm < 0) === (flo < 0)) { lo = m; flo = fm; } else hi = m;\n  }\n  const p = l.e.pointAt((lo + hi) / 2);\n  return [p.y, p.z];\n}\n\nfunction uniq(pts: P[]): P[] {\n  const out: P[] = [];\n  for (const p of pts) if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5)) out.push(p);\n  return out;\n}\n\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side: any[], bottom: any[], s: number, sideT: number, bottomT: number) {\n  const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[1] - a[1]);\n  const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[0] - a[0]);\n  return joinOutside(sp, bp, sideT, bottomT);\n}\n\nfunction joinOutside(sp: P[], bp: P[], sideT: number, bottomT: number) {\n  if (sp.length < 2) return null;\n  const pts: P[] = [...sp];\n  const t: number[] = sp.slice(1).map(() => sideT);\n  for (const p of bp) {\n    const last = pts[pts.length - 1];\n    if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5) continue; // the chine, shared\n    t.push(bottomT);\n    pts.push(p);\n  }\n  return { pts, t };\n}\n\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O: P[], t: number[]): P[] {\n  const n = O.length, L: any[] = [];\n  for (let i = 0; i < n - 1; i++) {\n    const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n    const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n    L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n  }\n  const Q: P[] = [L[0].p];\n  for (let j = 1; j < n - 1; j++) {\n    const a = L[j - 1], b = L[j];\n    const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n    const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n    if (Math.abs(cr) < 0.25) { Q.push(mean); continue; }\n    const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n    const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n    Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n  }\n  const z = L[n - 2];\n  Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n  return Q;\n}\n\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys: number, zs: number, R: number, deckT: number) {\n  const zc = zs - Math.sqrt(R * R - ys * ys);\n  return (y: number) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q: P[], c: number): number | null {\n  for (let i = 0; i < Q.length - 1; i++) {\n    const a = Q[i], b = Q[i + 1];\n    if (a[0] >= c && b[0] < c) return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n  }\n  return null;\n}\n",
+          "compiledCode": "\"use strict\";\n/**\n * Stem profile: side view of one stem lamination, from x = startX to the stem\n * head. At each x the inside of the planking comes from the hull section there;\n * where it passes the lamination's outer face (y = halfWidth) sets the lower\n * edge, and the underside of the crowned deck sets the top. Returns a sketch\n * with X = boat x and Y = boat z: Move and Difference atoms cut its inner edge\n * and Extrude, Rotate and Move atoms make the two laminations.\n */\nfunction run(hull, startX = 3300, halfWidth = 18, step = 10, sideThickness = 6, bottomThickness = 9, deckThickness = 9, crownRadius = 6000) {\n    const side = hullLines(tagged(hull, \"side surface\"));\n    const bottom = hullLines(tagged(hull, \"bottom surface\"));\n    const end = Math.max(...side.map((l) => l.hi));\n    const lower = [], upper = [];\n    for (let x = startX; x < end; x += step) {\n        const o = outsideAt(side, bottom, x, sideThickness, bottomThickness);\n        if (!o) {\n            console.log(`stem ends at x = ${x}: no section`);\n            break;\n        }\n        const z = heightAtY(inset(o.pts, o.t), halfWidth);\n        const top = deckUnderside(o.pts[0][0], o.pts[0][1], crownRadius, deckThickness)(halfWidth);\n        if (z === null || z >= top - 1) {\n            console.log(`stem ends at x = ${x}: ${z === null ? \"narrower than the lamination\" : \"meets the deck\"}`);\n            break;\n        }\n        lower.push([x, z]);\n        upper.push([x, top]);\n    }\n    if (lower.length < 2)\n        throw new Error(`No room for the stem at y = ${halfWidth}`);\n    let pen = replicad.draw(lower[0]);\n    for (let i = 1; i < lower.length; i++)\n        pen = pen.lineTo(lower[i]);\n    for (let i = upper.length - 1; i >= 0; i--)\n        pen = pen.lineTo(upper[i]);\n    return new Assembly({ geometry: pen.close(), tags: [\"stem\"] });\n}\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull, tag) {\n    const out = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            out.push(node.geometry);\n    };\n    walk(hull, false);\n    return out;\n}\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces) {\n    const out = [];\n    for (const f of faces)\n        for (const e of f.edges) {\n            const a = e.pointAt(0), b = e.pointAt(1);\n            if (Math.abs(b.x - a.x) > 10)\n                out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n        }\n    return out;\n}\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l, s) {\n    if (s <= l.lo || s >= l.hi)\n        return null;\n    let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n    if (flo * (l.e.pointAt(1).x - s) > 0)\n        return null;\n    for (let i = 0; i < 40; i++) {\n        const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n        if ((fm < 0) === (flo < 0)) {\n            lo = m;\n            flo = fm;\n        }\n        else\n            hi = m;\n    }\n    const p = l.e.pointAt((lo + hi) / 2);\n    return [p.y, p.z];\n}\nfunction uniq(pts) {\n    const out = [];\n    for (const p of pts)\n        if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5))\n            out.push(p);\n    return out;\n}\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side, bottom, s, sideT, bottomT) {\n    const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[1] - a[1]);\n    const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[0] - a[0]);\n    return joinOutside(sp, bp, sideT, bottomT);\n}\nfunction joinOutside(sp, bp, sideT, bottomT) {\n    if (sp.length < 2)\n        return null;\n    const pts = [...sp];\n    const t = sp.slice(1).map(() => sideT);\n    for (const p of bp) {\n        const last = pts[pts.length - 1];\n        if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5)\n            continue; // the chine, shared\n        t.push(bottomT);\n        pts.push(p);\n    }\n    return { pts, t };\n}\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O, t) {\n    const n = O.length, L = [];\n    for (let i = 0; i < n - 1; i++) {\n        const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n        const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n        L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n    }\n    const Q = [L[0].p];\n    for (let j = 1; j < n - 1; j++) {\n        const a = L[j - 1], b = L[j];\n        const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n        const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n        if (Math.abs(cr) < 0.25) {\n            Q.push(mean);\n            continue;\n        }\n        const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n        const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n        Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n    }\n    const z = L[n - 2];\n    Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n    return Q;\n}\n// The crowned deck's underside over a section whose sheer is (ys, zs).\nfunction deckUnderside(ys, zs, R, deckT) {\n    const zc = zs - Math.sqrt(R * R - ys * ys);\n    return (y) => zc + Math.sqrt(R * R - y * y) - deckT;\n}\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q, c) {\n    for (let i = 0; i < Q.length - 1; i++) {\n        const a = Q[i], b = Q[i + 1];\n        if (a[0] >= c && b[0] < c)\n            return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n    }\n    return null;\n}\n"
+        },
+        {
+          "atomType": "Move",
+          "x": 0.5,
+          "y": 0.55,
+          "uniqueID": "id-6325",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "xDist",
+              "ioValue": -110
+            },
+            {
+              "name": "yDist",
+              "ioValue": 110
+            },
+            {
+              "name": "zDist",
+              "ioValue": 0
+            }
+          ]
+        },
+        {
+          "atomType": "Difference",
+          "x": 0.55,
+          "y": 0.5,
+          "uniqueID": "id-6326",
+          "ioValues": [
+            {
+              "name": "retain",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "remove",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Extrude",
+          "x": 0.6,
+          "y": 0.5,
+          "uniqueID": "id-6327",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "height",
+              "ioValue": 18
+            }
+          ]
+        },
+        {
+          "atomType": "Rotate",
+          "x": 0.65,
+          "y": 0.5,
+          "uniqueID": "id-6328",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "x-axis degrees",
+              "ioValue": 90
+            },
+            {
+              "name": "y-axis degrees",
+              "ioValue": 0
+            },
+            {
+              "name": "z-axis degrees",
+              "ioValue": 0
+            }
+          ]
+        },
+        {
+          "atomType": "Move",
+          "x": 0.7,
+          "y": 0.55,
+          "uniqueID": "id-6329",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "xDist",
+              "ioValue": 0
+            },
+            {
+              "name": "yDist",
+              "ioValue": 18
+            },
+            {
+              "name": "zDist",
+              "ioValue": 0
+            }
+          ]
+        },
+        {
+          "atomType": "Assembly",
+          "x": 0.75,
+          "y": 0.5,
+          "uniqueID": "id-6330",
+          "ioValues": [
+            {
+              "name": "makeDisjoint",
+              "ioValue": false
+            },
+            {
+              "name": "Shape 1",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Shape2",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "Shape3",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Tag",
+          "x": 0.8,
+          "y": 0.5,
+          "uniqueID": "id-6331",
+          "name": "plywood 18mm",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "tags": [
+            "plywood 18mm"
+          ]
+        },
+        {
+          "atomType": "Color",
+          "x": 0.85,
+          "y": 0.5,
+          "uniqueID": "id-6332",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Sand"
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.1538,
+          "uniqueID": "id-6412",
+          "name": "Hull",
+          "type": "geometry",
+          "options": []
         }
       ],
-      "selectedColor": "Sand"
-    },
-    {
-      "atomType": "Code",
-      "x": 0.45,
-      "y": 0.6,
-      "uniqueID": "id-6128",
-      "ioValues": [
+      "allConnectors": [
         {
-          "name": "depth",
-          "ioValue": 30
+          "ap2Name": "geometry",
+          "ap1ID": "id-6324",
+          "ap2ID": "id-6325"
         },
         {
-          "name": "hull",
-          "ioValue": "__GEOMETRY_INPUT__"
+          "ap2Name": "retain",
+          "ap1ID": "id-6324",
+          "ap2ID": "id-6326"
         },
         {
-          "name": "endX",
-          "ioValue": 3300
+          "ap2Name": "remove",
+          "ap1ID": "id-6325",
+          "ap2ID": "id-6326"
         },
         {
-          "name": "halfWidth",
-          "ioValue": 32
+          "ap2Name": "geometry",
+          "ap1ID": "id-6326",
+          "ap2ID": "id-6327"
         },
         {
-          "name": "step",
-          "ioValue": 50
+          "ap2Name": "geometry",
+          "ap1ID": "id-6327",
+          "ap2ID": "id-6328"
         },
         {
-          "name": "rakeDeg",
-          "ioValue": 12.017
+          "ap2Name": "geometry",
+          "ap1ID": "id-6328",
+          "ap2ID": "id-6329"
         },
         {
-          "name": "xAtKeel",
-          "ioValue": 0.622
+          "ap2Name": "Shape 1",
+          "ap1ID": "id-6328",
+          "ap2ID": "id-6330"
         },
         {
-          "name": "sideThickness",
-          "ioValue": 6
+          "ap2Name": "Shape2",
+          "ap1ID": "id-6329",
+          "ap2ID": "id-6330"
         },
         {
-          "name": "bottomThickness",
-          "ioValue": 9
+          "ap2Name": "geometry",
+          "ap1ID": "id-6330",
+          "ap2ID": "id-6331"
+        },
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-6331",
+          "ap2ID": "id-6332"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-6332",
+          "ap2ID": "id-6322"
+        },
+        {
+          "ap2Name": "hull",
+          "ap1ID": "id-6412",
+          "ap2ID": "id-6324"
         }
       ],
-      "interpreterVersion": 1,
-      "code": "/**\n * Keel hog profile: side view of the keel hog, a timber 2 x halfWidth wide and\n * `depth` deep lying on the bottom planking along the centreline, from the\n * transom to x = endX. Its lower edge is where the inside of the planking\n * passes y = halfWidth, so it bears on the planking at its edges; its aft end\n * follows the raked transom. Returns a sketch with X = boat x and Y = boat z\n * for Extrude, Rotate and Move atoms.\n */\nfunction run(\n  hull: Assembly,\n  endX: number = 3300,\n  halfWidth: number = 32,\n  depth: number = 34,\n  step: number = 50,\n  rakeDeg: number = 12.017,\n  xAtKeel: number = 0.622,\n  sideThickness: number = 6,\n  bottomThickness: number = 9,\n): Assembly {\n  const side = hullLines(tagged(hull, \"side surface\"));\n  const bottom = hullLines(tagged(hull, \"bottom surface\"));\n  const tr = Math.tan((rakeDeg * Math.PI) / 180);\n  const xs: number[] = [];\n  for (let x = 5; x < endX; x += step) xs.push(x);\n  xs.push(endX);\n  const lower: P[] = [];\n  for (const x of xs) {\n    const o = outsideAt(side, bottom, x, sideThickness, bottomThickness);\n    const z = o ? heightAtY(inset(o.pts, o.t), halfWidth) : null;\n    if (z !== null) lower.push([x, z]);\n  }\n  if (lower.length < 2) throw new Error(\"No hull sections along the keel\");\n  const z0 = lower[0][1];\n  let pen = replicad.draw([xAtKeel - z0 * tr, z0]); // aft end on the transom plane\n  for (const p of lower) pen = pen.lineTo(p);\n  for (let i = lower.length - 1; i >= 0; i--) pen = pen.lineTo([lower[i][0], lower[i][1] + depth]);\n  pen = pen.lineTo([xAtKeel - (z0 + depth) * tr, z0 + depth]);\n  return new Assembly({ geometry: pen.close(), tags: [\"keel hog\"] });\n}\n\n// ---- hull section helpers (shared by the frame, transom, stem and keel hog outlines) ----\ntype P = number[];\n\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull: any, tag: string): any[] {\n  const out: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) out.push(node.geometry);\n  };\n  walk(hull, false);\n  return out;\n}\n\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces: any[]): any[] {\n  const out: any[] = [];\n  for (const f of faces) for (const e of f.edges) {\n    const a = e.pointAt(0), b = e.pointAt(1);\n    if (Math.abs(b.x - a.x) > 10) out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n  }\n  return out;\n}\n\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l: any, s: number): P | null {\n  if (s <= l.lo || s >= l.hi) return null;\n  let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n  if (flo * (l.e.pointAt(1).x - s) > 0) return null;\n  for (let i = 0; i < 40; i++) {\n    const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n    if ((fm < 0) === (flo < 0)) { lo = m; flo = fm; } else hi = m;\n  }\n  const p = l.e.pointAt((lo + hi) / 2);\n  return [p.y, p.z];\n}\n\nfunction uniq(pts: P[]): P[] {\n  const out: P[] = [];\n  for (const p of pts) if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5)) out.push(p);\n  return out;\n}\n\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side: any[], bottom: any[], s: number, sideT: number, bottomT: number) {\n  const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[1] - a[1]);\n  const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[0] - a[0]);\n  return joinOutside(sp, bp, sideT, bottomT);\n}\n\nfunction joinOutside(sp: P[], bp: P[], sideT: number, bottomT: number) {\n  if (sp.length < 2) return null;\n  const pts: P[] = [...sp];\n  const t: number[] = sp.slice(1).map(() => sideT);\n  for (const p of bp) {\n    const last = pts[pts.length - 1];\n    if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5) continue; // the chine, shared\n    t.push(bottomT);\n    pts.push(p);\n  }\n  return { pts, t };\n}\n\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O: P[], t: number[]): P[] {\n  const n = O.length, L: any[] = [];\n  for (let i = 0; i < n - 1; i++) {\n    const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n    const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n    L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n  }\n  const Q: P[] = [L[0].p];\n  for (let j = 1; j < n - 1; j++) {\n    const a = L[j - 1], b = L[j];\n    const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n    const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n    if (Math.abs(cr) < 0.25) { Q.push(mean); continue; }\n    const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n    const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n    Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n  }\n  const z = L[n - 2];\n  Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n  return Q;\n}\n\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q: P[], c: number): number | null {\n  for (let i = 0; i < Q.length - 1; i++) {\n    const a = Q[i], b = Q[i + 1];\n    if (a[0] >= c && b[0] < c) return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n  }\n  return null;\n}\n",
-      "compiledCode": "\"use strict\";\n/**\n * Keel hog profile: side view of the keel hog, a timber 2 x halfWidth wide and\n * `depth` deep lying on the bottom planking along the centreline, from the\n * transom to x = endX. Its lower edge is where the inside of the planking\n * passes y = halfWidth, so it bears on the planking at its edges; its aft end\n * follows the raked transom. Returns a sketch with X = boat x and Y = boat z\n * for Extrude, Rotate and Move atoms.\n */\nfunction run(hull, endX = 3300, halfWidth = 32, depth = 34, step = 50, rakeDeg = 12.017, xAtKeel = 0.622, sideThickness = 6, bottomThickness = 9) {\n    const side = hullLines(tagged(hull, \"side surface\"));\n    const bottom = hullLines(tagged(hull, \"bottom surface\"));\n    const tr = Math.tan((rakeDeg * Math.PI) / 180);\n    const xs = [];\n    for (let x = 5; x < endX; x += step)\n        xs.push(x);\n    xs.push(endX);\n    const lower = [];\n    for (const x of xs) {\n        const o = outsideAt(side, bottom, x, sideThickness, bottomThickness);\n        const z = o ? heightAtY(inset(o.pts, o.t), halfWidth) : null;\n        if (z !== null)\n            lower.push([x, z]);\n    }\n    if (lower.length < 2)\n        throw new Error(\"No hull sections along the keel\");\n    const z0 = lower[0][1];\n    let pen = replicad.draw([xAtKeel - z0 * tr, z0]); // aft end on the transom plane\n    for (const p of lower)\n        pen = pen.lineTo(p);\n    for (let i = lower.length - 1; i >= 0; i--)\n        pen = pen.lineTo([lower[i][0], lower[i][1] + depth]);\n    pen = pen.lineTo([xAtKeel - (z0 + depth) * tr, z0 + depth]);\n    return new Assembly({ geometry: pen.close(), tags: [\"keel hog\"] });\n}\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull, tag) {\n    const out = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            out.push(node.geometry);\n    };\n    walk(hull, false);\n    return out;\n}\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces) {\n    const out = [];\n    for (const f of faces)\n        for (const e of f.edges) {\n            const a = e.pointAt(0), b = e.pointAt(1);\n            if (Math.abs(b.x - a.x) > 10)\n                out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n        }\n    return out;\n}\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l, s) {\n    if (s <= l.lo || s >= l.hi)\n        return null;\n    let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n    if (flo * (l.e.pointAt(1).x - s) > 0)\n        return null;\n    for (let i = 0; i < 40; i++) {\n        const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n        if ((fm < 0) === (flo < 0)) {\n            lo = m;\n            flo = fm;\n        }\n        else\n            hi = m;\n    }\n    const p = l.e.pointAt((lo + hi) / 2);\n    return [p.y, p.z];\n}\nfunction uniq(pts) {\n    const out = [];\n    for (const p of pts)\n        if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5))\n            out.push(p);\n    return out;\n}\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side, bottom, s, sideT, bottomT) {\n    const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[1] - a[1]);\n    const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[0] - a[0]);\n    return joinOutside(sp, bp, sideT, bottomT);\n}\nfunction joinOutside(sp, bp, sideT, bottomT) {\n    if (sp.length < 2)\n        return null;\n    const pts = [...sp];\n    const t = sp.slice(1).map(() => sideT);\n    for (const p of bp) {\n        const last = pts[pts.length - 1];\n        if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5)\n            continue; // the chine, shared\n        t.push(bottomT);\n        pts.push(p);\n    }\n    return { pts, t };\n}\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O, t) {\n    const n = O.length, L = [];\n    for (let i = 0; i < n - 1; i++) {\n        const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n        const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n        L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n    }\n    const Q = [L[0].p];\n    for (let j = 1; j < n - 1; j++) {\n        const a = L[j - 1], b = L[j];\n        const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n        const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n        if (Math.abs(cr) < 0.25) {\n            Q.push(mean);\n            continue;\n        }\n        const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n        const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n        Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n    }\n    const z = L[n - 2];\n    Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n    return Q;\n}\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q, c) {\n    for (let i = 0; i < Q.length - 1; i++) {\n        const a = Q[i], b = Q[i + 1];\n        if (a[0] >= c && b[0] < c)\n            return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n    }\n    return null;\n}\n"
+      "fileTypeVersion": 1
     },
     {
-      "atomType": "Extrude",
+      "atomType": "Molecule",
       "x": 0.5,
       "y": 0.6,
-      "uniqueID": "id-6145",
+      "uniqueID": "id-6372",
+      "name": "Keel Hog",
       "ioValues": [
         {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "height",
-          "ioValue": 64
-        }
-      ]
-    },
-    {
-      "atomType": "Rotate",
-      "x": 0.55,
-      "y": 0.6,
-      "uniqueID": "id-6149",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "x-axis degrees",
-          "ioValue": 90
-        },
-        {
-          "name": "y-axis degrees",
-          "ioValue": 0
-        },
-        {
-          "name": "z-axis degrees",
-          "ioValue": 0
-        }
-      ]
-    },
-    {
-      "atomType": "Move",
-      "x": 0.6,
-      "y": 0.6,
-      "uniqueID": "id-6155",
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "xDist",
-          "ioValue": 0
-        },
-        {
-          "name": "yDist",
-          "ioValue": 32
-        },
-        {
-          "name": "zDist",
-          "ioValue": 0
-        }
-      ]
-    },
-    {
-      "atomType": "Tag",
-      "x": 0.65,
-      "y": 0.6,
-      "uniqueID": "id-6161",
-      "name": "timber",
-      "ioValues": [
-        {
-          "name": "geometry",
+          "name": "Hull",
           "ioValue": "__GEOMETRY_INPUT__"
         }
       ],
-      "tags": [
-        "timber"
-      ]
-    },
-    {
-      "atomType": "Color",
-      "x": 0.7,
-      "y": 0.6,
-      "uniqueID": "id-6164",
-      "ioValues": [
+      "topLevel": false,
+      "allAtoms": [
         {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
+          "atomType": "Output",
+          "x": 0.98,
+          "y": 0.5,
+          "uniqueID": "id-6374",
+          "ioValues": [
+            {
+              "name": "number or geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ]
+        },
+        {
+          "atomType": "Code",
+          "x": 0.45,
+          "y": 0.6,
+          "uniqueID": "id-6376",
+          "ioValues": [
+            {
+              "name": "hull",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "endX",
+              "ioValue": 3300
+            },
+            {
+              "name": "halfWidth",
+              "ioValue": 32
+            },
+            {
+              "name": "depth",
+              "ioValue": 30
+            },
+            {
+              "name": "step",
+              "ioValue": 50
+            },
+            {
+              "name": "rakeDeg",
+              "ioValue": 12.017
+            },
+            {
+              "name": "xAtKeel",
+              "ioValue": 0.622
+            },
+            {
+              "name": "sideThickness",
+              "ioValue": 6
+            },
+            {
+              "name": "bottomThickness",
+              "ioValue": 9
+            }
+          ],
+          "interpreterVersion": 1,
+          "code": "/**\n * Keel hog profile: side view of the keel hog, a timber 2 x halfWidth wide and\n * `depth` deep lying on the bottom planking along the centreline, from the\n * transom to x = endX. Its lower edge is where the inside of the planking\n * passes y = halfWidth, so it bears on the planking at its edges; its aft end\n * follows the raked transom. Returns a sketch with X = boat x and Y = boat z\n * for Extrude, Rotate and Move atoms.\n */\nfunction run(\n  hull: Assembly,\n  endX: number = 3300,\n  halfWidth: number = 32,\n  depth: number = 34,\n  step: number = 50,\n  rakeDeg: number = 12.017,\n  xAtKeel: number = 0.622,\n  sideThickness: number = 6,\n  bottomThickness: number = 9,\n): Assembly {\n  const side = hullLines(tagged(hull, \"side surface\"));\n  const bottom = hullLines(tagged(hull, \"bottom surface\"));\n  const tr = Math.tan((rakeDeg * Math.PI) / 180);\n  const xs: number[] = [];\n  for (let x = 5; x < endX; x += step) xs.push(x);\n  xs.push(endX);\n  const lower: P[] = [];\n  for (const x of xs) {\n    const o = outsideAt(side, bottom, x, sideThickness, bottomThickness);\n    const z = o ? heightAtY(inset(o.pts, o.t), halfWidth) : null;\n    if (z !== null) lower.push([x, z]);\n  }\n  if (lower.length < 2) throw new Error(\"No hull sections along the keel\");\n  const z0 = lower[0][1];\n  let pen = replicad.draw([xAtKeel - z0 * tr, z0]); // aft end on the transom plane\n  for (const p of lower) pen = pen.lineTo(p);\n  for (let i = lower.length - 1; i >= 0; i--) pen = pen.lineTo([lower[i][0], lower[i][1] + depth]);\n  pen = pen.lineTo([xAtKeel - (z0 + depth) * tr, z0 + depth]);\n  return new Assembly({ geometry: pen.close(), tags: [\"keel hog\"] });\n}\n\n// ---- hull section helpers (shared by the frame, transom, stem and keel hog outlines) ----\ntype P = number[];\n\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull: any, tag: string): any[] {\n  const out: any[] = [];\n  const walk = (node: any, has: boolean) => {\n    const h = has || (node.tags || []).includes(tag);\n    if (Array.isArray(node.geometry)) node.geometry.forEach((c: any) => walk(c, h));\n    else if (h && node.geometry) out.push(node.geometry);\n  };\n  walk(hull, false);\n  return out;\n}\n\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces: any[]): any[] {\n  const out: any[] = [];\n  for (const f of faces) for (const e of f.edges) {\n    const a = e.pointAt(0), b = e.pointAt(1);\n    if (Math.abs(b.x - a.x) > 10) out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n  }\n  return out;\n}\n\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l: any, s: number): P | null {\n  if (s <= l.lo || s >= l.hi) return null;\n  let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n  if (flo * (l.e.pointAt(1).x - s) > 0) return null;\n  for (let i = 0; i < 40; i++) {\n    const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n    if ((fm < 0) === (flo < 0)) { lo = m; flo = fm; } else hi = m;\n  }\n  const p = l.e.pointAt((lo + hi) / 2);\n  return [p.y, p.z];\n}\n\nfunction uniq(pts: P[]): P[] {\n  const out: P[] = [];\n  for (const p of pts) if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5)) out.push(p);\n  return out;\n}\n\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side: any[], bottom: any[], s: number, sideT: number, bottomT: number) {\n  const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[1] - a[1]);\n  const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p) as P[]).sort((a, b) => b[0] - a[0]);\n  return joinOutside(sp, bp, sideT, bottomT);\n}\n\nfunction joinOutside(sp: P[], bp: P[], sideT: number, bottomT: number) {\n  if (sp.length < 2) return null;\n  const pts: P[] = [...sp];\n  const t: number[] = sp.slice(1).map(() => sideT);\n  for (const p of bp) {\n    const last = pts[pts.length - 1];\n    if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5) continue; // the chine, shared\n    t.push(bottomT);\n    pts.push(p);\n  }\n  return { pts, t };\n}\n\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O: P[], t: number[]): P[] {\n  const n = O.length, L: any[] = [];\n  for (let i = 0; i < n - 1; i++) {\n    const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n    const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n    L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n  }\n  const Q: P[] = [L[0].p];\n  for (let j = 1; j < n - 1; j++) {\n    const a = L[j - 1], b = L[j];\n    const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n    const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n    if (Math.abs(cr) < 0.25) { Q.push(mean); continue; }\n    const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n    const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n    Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n  }\n  const z = L[n - 2];\n  Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n  return Q;\n}\n\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q: P[], c: number): number | null {\n  for (let i = 0; i < Q.length - 1; i++) {\n    const a = Q[i], b = Q[i + 1];\n    if (a[0] >= c && b[0] < c) return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n  }\n  return null;\n}\n",
+          "compiledCode": "\"use strict\";\n/**\n * Keel hog profile: side view of the keel hog, a timber 2 x halfWidth wide and\n * `depth` deep lying on the bottom planking along the centreline, from the\n * transom to x = endX. Its lower edge is where the inside of the planking\n * passes y = halfWidth, so it bears on the planking at its edges; its aft end\n * follows the raked transom. Returns a sketch with X = boat x and Y = boat z\n * for Extrude, Rotate and Move atoms.\n */\nfunction run(hull, endX = 3300, halfWidth = 32, depth = 34, step = 50, rakeDeg = 12.017, xAtKeel = 0.622, sideThickness = 6, bottomThickness = 9) {\n    const side = hullLines(tagged(hull, \"side surface\"));\n    const bottom = hullLines(tagged(hull, \"bottom surface\"));\n    const tr = Math.tan((rakeDeg * Math.PI) / 180);\n    const xs = [];\n    for (let x = 5; x < endX; x += step)\n        xs.push(x);\n    xs.push(endX);\n    const lower = [];\n    for (const x of xs) {\n        const o = outsideAt(side, bottom, x, sideThickness, bottomThickness);\n        const z = o ? heightAtY(inset(o.pts, o.t), halfWidth) : null;\n        if (z !== null)\n            lower.push([x, z]);\n    }\n    if (lower.length < 2)\n        throw new Error(\"No hull sections along the keel\");\n    const z0 = lower[0][1];\n    let pen = replicad.draw([xAtKeel - z0 * tr, z0]); // aft end on the transom plane\n    for (const p of lower)\n        pen = pen.lineTo(p);\n    for (let i = lower.length - 1; i >= 0; i--)\n        pen = pen.lineTo([lower[i][0], lower[i][1] + depth]);\n    pen = pen.lineTo([xAtKeel - (z0 + depth) * tr, z0 + depth]);\n    return new Assembly({ geometry: pen.close(), tags: [\"keel hog\"] });\n}\n// Faces of the hull carrying `tag`, on the face itself or on a group above it.\nfunction tagged(hull, tag) {\n    const out = [];\n    const walk = (node, has) => {\n        const h = has || (node.tags || []).includes(tag);\n        if (Array.isArray(node.geometry))\n            node.geometry.forEach((c) => walk(c, h));\n        else if (h && node.geometry)\n            out.push(node.geometry);\n    };\n    walk(hull, false);\n    return out;\n}\n// The edges of strip faces that run along the boat: the hull lines.\nfunction hullLines(faces) {\n    const out = [];\n    for (const f of faces)\n        for (const e of f.edges) {\n            const a = e.pointAt(0), b = e.pointAt(1);\n            if (Math.abs(b.x - a.x) > 10)\n                out.push({ e, lo: Math.min(a.x, b.x), hi: Math.max(a.x, b.x) });\n        }\n    return out;\n}\n// Where a hull line crosses the plane x = s, as [y, z].\nfunction crossX(l, s) {\n    if (s <= l.lo || s >= l.hi)\n        return null;\n    let lo = 0, hi = 1, flo = l.e.pointAt(0).x - s;\n    if (flo * (l.e.pointAt(1).x - s) > 0)\n        return null;\n    for (let i = 0; i < 40; i++) {\n        const m = (lo + hi) / 2, fm = l.e.pointAt(m).x - s;\n        if ((fm < 0) === (flo < 0)) {\n            lo = m;\n            flo = fm;\n        }\n        else\n            hi = m;\n    }\n    const p = l.e.pointAt((lo + hi) / 2);\n    return [p.y, p.z];\n}\nfunction uniq(pts) {\n    const out = [];\n    for (const p of pts)\n        if (!out.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5))\n            out.push(p);\n    return out;\n}\n// Outside of the hull at x = s: points from the sheer down the side, then\n// across the bottom to the keel, with the planking thickness of each segment.\nfunction outsideAt(side, bottom, s, sideT, bottomT) {\n    const sp = uniq(side.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[1] - a[1]);\n    const bp = uniq(bottom.map((l) => crossX(l, s)).filter((p) => p)).sort((a, b) => b[0] - a[0]);\n    return joinOutside(sp, bp, sideT, bottomT);\n}\nfunction joinOutside(sp, bp, sideT, bottomT) {\n    if (sp.length < 2)\n        return null;\n    const pts = [...sp];\n    const t = sp.slice(1).map(() => sideT);\n    for (const p of bp) {\n        const last = pts[pts.length - 1];\n        if (Math.hypot(last[0] - p[0], last[1] - p[1]) < 0.5)\n            continue; // the chine, shared\n        t.push(bottomT);\n        pts.push(p);\n    }\n    return { pts, t };\n}\n// The same outline moved inward by each segment's thickness, corners mitred\n// (or averaged where the segments are nearly in line or the mitre is long).\nfunction inset(O, t) {\n    const n = O.length, L = [];\n    for (let i = 0; i < n - 1; i++) {\n        const dy = O[i + 1][0] - O[i][0], dz = O[i + 1][1] - O[i][1], len = Math.hypot(dy, dz) || 1;\n        const v = [dy / len, dz / len], N = [v[1], -v[0]]; // inboard of the side, above the bottom\n        L.push({ p: [O[i][0] + t[i] * N[0], O[i][1] + t[i] * N[1]], v, N, t: t[i] });\n    }\n    const Q = [L[0].p];\n    for (let j = 1; j < n - 1; j++) {\n        const a = L[j - 1], b = L[j];\n        const mean = [O[j][0] + 0.5 * (a.t * a.N[0] + b.t * b.N[0]), O[j][1] + 0.5 * (a.t * a.N[1] + b.t * b.N[1])];\n        const cr = a.v[0] * b.v[1] - a.v[1] * b.v[0];\n        if (Math.abs(cr) < 0.25) {\n            Q.push(mean);\n            continue;\n        }\n        const k = ((b.p[0] - a.p[0]) * b.v[1] - (b.p[1] - a.p[1]) * b.v[0]) / cr;\n        const q = [a.p[0] + a.v[0] * k, a.p[1] + a.v[1] * k];\n        Q.push(Math.hypot(q[0] - O[j][0], q[1] - O[j][1]) > 3 * Math.max(a.t, b.t) ? mean : q);\n    }\n    const z = L[n - 2];\n    Q.push([O[n - 1][0] + z.t * z.N[0], O[n - 1][1] + z.t * z.N[1]]);\n    return Q;\n}\n// Height of the inside of the planking where it passes y = c (going down).\nfunction heightAtY(Q, c) {\n    for (let i = 0; i < Q.length - 1; i++) {\n        const a = Q[i], b = Q[i + 1];\n        if (a[0] >= c && b[0] < c)\n            return a[1] + ((b[1] - a[1]) * (a[0] - c)) / (a[0] - b[0]);\n    }\n    return null;\n}\n"
+        },
+        {
+          "atomType": "Extrude",
+          "x": 0.5,
+          "y": 0.6,
+          "uniqueID": "id-6377",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "height",
+              "ioValue": 64
+            }
+          ]
+        },
+        {
+          "atomType": "Rotate",
+          "x": 0.55,
+          "y": 0.6,
+          "uniqueID": "id-6378",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "x-axis degrees",
+              "ioValue": 90
+            },
+            {
+              "name": "y-axis degrees",
+              "ioValue": 0
+            },
+            {
+              "name": "z-axis degrees",
+              "ioValue": 0
+            }
+          ]
+        },
+        {
+          "atomType": "Move",
+          "x": 0.6,
+          "y": 0.6,
+          "uniqueID": "id-6379",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            },
+            {
+              "name": "xDist",
+              "ioValue": 0
+            },
+            {
+              "name": "yDist",
+              "ioValue": 32
+            },
+            {
+              "name": "zDist",
+              "ioValue": 0
+            }
+          ]
+        },
+        {
+          "atomType": "Tag",
+          "x": 0.65,
+          "y": 0.6,
+          "uniqueID": "id-6380",
+          "name": "timber",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "tags": [
+            "timber"
+          ]
+        },
+        {
+          "atomType": "Color",
+          "x": 0.7,
+          "y": 0.6,
+          "uniqueID": "id-6381",
+          "ioValues": [
+            {
+              "name": "geometry",
+              "ioValue": "__GEOMETRY_INPUT__"
+            }
+          ],
+          "selectedColor": "Brown"
+        },
+        {
+          "atomType": "Input",
+          "x": 0.0254,
+          "y": 0.1538,
+          "uniqueID": "id-6415",
+          "name": "Hull",
+          "type": "geometry",
+          "options": []
         }
       ],
-      "selectedColor": "Brown"
+      "allConnectors": [
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-6376",
+          "ap2ID": "id-6377"
+        },
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-6377",
+          "ap2ID": "id-6378"
+        },
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-6378",
+          "ap2ID": "id-6379"
+        },
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-6379",
+          "ap2ID": "id-6380"
+        },
+        {
+          "ap2Name": "geometry",
+          "ap1ID": "id-6380",
+          "ap2ID": "id-6381"
+        },
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-6381",
+          "ap2ID": "id-6374"
+        },
+        {
+          "ap2Name": "hull",
+          "ap1ID": "id-6415",
+          "ap2ID": "id-6376"
+        }
+      ],
+      "fileTypeVersion": 1
     },
     {
       "atomType": "Molecule",
@@ -12181,14 +12551,9 @@
       "ap2ID": "id-2765"
     },
     {
-      "ap2Name": "stations",
+      "ap2Name": "Stations",
       "ap1ID": "id-3895",
-      "ap2ID": "id-5927"
-    },
-    {
-      "ap2Name": "offsets",
-      "ap1ID": "id-3895",
-      "ap2ID": "id-6008"
+      "ap2ID": "id-6218"
     },
     {
       "ap2Name": "Reference Hull",
@@ -12236,183 +12601,48 @@
       "ap2ID": "id-3239"
     },
     {
-      "ap2Name": "hull",
+      "ap2Name": "Hull",
       "ap1ID": "id-5921",
-      "ap2ID": "id-5927"
+      "ap2ID": "id-6218"
     },
     {
-      "ap2Name": "hull",
+      "ap2Name": "Hull",
       "ap1ID": "id-5921",
-      "ap2ID": "id-6029"
+      "ap2ID": "id-6279"
     },
     {
-      "ap2Name": "hull",
+      "ap2Name": "Hull",
       "ap1ID": "id-5921",
-      "ap2ID": "id-6073"
+      "ap2ID": "id-6320"
     },
     {
-      "ap2Name": "hull",
+      "ap2Name": "Hull",
       "ap1ID": "id-5921",
-      "ap2ID": "id-6128"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-5927",
-      "ap2ID": "id-5986"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-5986",
-      "ap2ID": "id-5990"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-5990",
-      "ap2ID": "id-5996"
-    },
-    {
-      "ap2Name": "toMove",
-      "ap1ID": "id-5996",
-      "ap2ID": "id-6008"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6008",
-      "ap2ID": "id-6023"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6023",
-      "ap2ID": "id-6026"
+      "ap2ID": "id-6372"
     },
     {
       "ap2Name": "Frames",
-      "ap1ID": "id-6026",
+      "ap1ID": "id-6218",
       "ap2ID": "id-2765"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6029",
-      "ap2ID": "id-6045"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6045",
-      "ap2ID": "id-6049"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6049",
-      "ap2ID": "id-6055"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6055",
-      "ap2ID": "id-6061"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6061",
-      "ap2ID": "id-6067"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6067",
-      "ap2ID": "id-6070"
     },
     {
       "ap2Name": "Transom",
-      "ap1ID": "id-6070",
+      "ap1ID": "id-6279",
       "ap2ID": "id-2765"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6073",
-      "ap2ID": "id-6090"
-    },
-    {
-      "ap2Name": "retain",
-      "ap1ID": "id-6073",
-      "ap2ID": "id-6096"
-    },
-    {
-      "ap2Name": "remove",
-      "ap1ID": "id-6090",
-      "ap2ID": "id-6096"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6096",
-      "ap2ID": "id-6100"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6100",
-      "ap2ID": "id-6104"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6104",
-      "ap2ID": "id-6110"
-    },
-    {
-      "ap2Name": "Shape 1",
-      "ap1ID": "id-6104",
-      "ap2ID": "id-6116"
-    },
-    {
-      "ap2Name": "Shape2",
-      "ap1ID": "id-6110",
-      "ap2ID": "id-6116"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6116",
-      "ap2ID": "id-6122"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6122",
-      "ap2ID": "id-6125"
     },
     {
       "ap2Name": "Stem",
-      "ap1ID": "id-6125",
+      "ap1ID": "id-6320",
       "ap2ID": "id-2765"
     },
     {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6128",
-      "ap2ID": "id-6145"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6145",
-      "ap2ID": "id-6149"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6149",
-      "ap2ID": "id-6155"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6155",
-      "ap2ID": "id-6161"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": "id-6161",
-      "ap2ID": "id-6164"
-    },
-    {
       "ap2Name": "Shape4",
-      "ap1ID": "id-6164",
+      "ap1ID": "id-6372",
       "ap2ID": "id-1892"
     },
     {
       "ap2Name": "Keel Hog",
-      "ap1ID": "id-6164",
+      "ap1ID": "id-6372",
       "ap2ID": "id-2765"
     },
     {

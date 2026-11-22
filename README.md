@@ -14,34 +14,40 @@
 
  # Zephyr runabout
 
-A 4.33 m (14 ft 2 in) barrel-back plywood runabout, modelled from the hull reference `Zephyr runabout.stl` and the build photos in **Refrences** (the STL is in metres; Refrences scales it x1000 to mm).
+A 4.33 m (14 ft 2 in) barrel-back plywood runabout built in Abundance, from a hull definition to parts you can cut. The project is meant to show how Abundance gets from hull lines to a boat and its cut files, so the boat is simplified where that keeps it quick to load (see **Simplifications**). The first load takes about 3 minutes (measured on an M1 Pro laptop); after that the browser has the results cached and it opens in about 20 seconds.
 
-## Hull lines: a camber hull definition
-- **Hull JSON** (project input) is a camber v1 hull in mm, fitted to the STL: 24 stations from 420 mm aft of the transom to the stem head, one template per station (one-hot blend weights) with 14 points each: deck edge, a point 5 mm above the sheer, sheer clamp edge, two side points, chine log edge, chine, chine log edge, outer and inner batten edges, keel hog edge, and a point past the centreline. The flat camber deck plane is 720 mm above the keel and `sheerTrim` brings it down to the real sheer.
-- **Keep Hull JSON under 10,000 characters.** Abundance does not save longer text inputs, so a longer hull would be lost on reload. The JSON here is a compact copy of the fit: running totals rounded to 0.1 mm (no point moves more than 0.05 mm), `k` left out where it is 0, and only the fields CamberToWires reads (`sheerPlan`, `sheerTrim`, `templates`).
-- **Hull Lines** runs tristan-huber/CamberToWires and moves the wires into the boat frame (x = 0 at the transom bottom, z = 0 at the keel). **Hull Cutters** trims at the centreline and the 12.0 deg raked transom. Strips come from crv.OpenWireLoft + util.FaceDifference, as in tristan-huber/CamberInterpreter.
-- Fit to the STL: mean 0.7 mm, 95 % within 2.2 mm, worst 5.2 mm (on the barrel-back curve at the transom corner).
-- CamberToWires scales its wires so their X extent equals `HullLengthInches`. It is set to the raw wire extent (Hull Lines 4713.955, Inner Hull Lines 4710.300) so the scale is exactly 1. **If you edit the JSON, copy the new value from the `Width` atom inside each CamberToWires into its `HullLengthInches`.**
+## How it is laid out
+The top level reads in order, one molecule per stage:
 
-## Parts
-- **Planking**: Side Panel 6 mm and Bottom Panel 9 mm per side (port copies mirrored). **Flat Patterns** unrolls them with tristan-huber/crv.MeshUnroll: side 4575 x 724 mm, bottom 4176 x 864 mm (scarf two 8 ft sheets for each).
-- **Frames**: 5 ring frames in 18 mm plywood at **FrameStations** (project input) = 700, 1400, 2100, 2800, 3500 mm from the transom bottom, 90 mm band, with the crowned deck beam on top (6 m crown radius, matching the 22 mm crown of the STL transom).
-- **Transom** 18 mm, **Stem** two 18 mm laminations from x = 3300 mm to the stem head, **Keel Hog** 64 mm wide and 34 mm deep to x = 3300 mm.
-- **Longitudinals**: sheer clamps, chine logs and two bottom battens per side. Each is a strip of the camber hull between two hull lines, given depth inward, so it follows the twist of the planking.
-- Frames, transom, stem and keel hog are cut from **Inner Hull Interior Starboard**, the volume inside the planking and a 9 mm deck (built from **Inner Hull Lines**, the camber sections offset inward by the planking).
-- **Deck**: **Deck Plan** is the sheer line seen from above. The 9 mm deck is a skin with a 6 m crown radius, cut to the deck plan, trimmed at the transom by Hull Cutters and split into two halves on the centreline. **Cockpit Opening** (x = 720 to 2780 mm, 200 mm side decks, 150 mm corner radius) is cut out of it and **Coaming** (12 mm, 80 mm above the deck) lines it. **Deck Flat Patterns** unrolls the two deck halves.
-- **Deck Framing**: a 90 mm king plank and three 40 x 20 mm deck battens per side under the deck. **Cockpit Beam Cut** removes the frame beams above z = 470 mm inside the cockpit in the assembled boat.
-- **CNC Parts**: frames and transom notched by the keel hog, longitudinals and deck framing. **Cut Layout 18mm** nests them, with the stem, on 3 sheets of 2440 x 1220 (the frames are laid out whole, before the cockpit beam cut).
+1. **1 Hull**: the shape. **Hull JSON** is a camber v1 hull in mm, fitted to `Zephyr runabout.stl` (mean error 0.7 mm). tristan-huber/CamberToWires turns it into hull lines, crv.OpenWireLoft lofts ruled strips between them and util.FaceDifference trims the strips at the centreline and the 12 deg raked transom (**Hull Cutters**). The output is the starboard planking surface: side strips tagged `side surface` and bottom strips tagged `bottom surface`. **Hull vs Reference Check** shows the strips with the STL; **Refrences** holds the STL and the build photos.
+2. **2 Deck Layout**: the deck outline (the sheer seen from above) and the **Cockpit Opening** (x = 720 to 2780 mm, 200 mm side decks, 150 mm corners), as 2D sketches tagged `deck outline` and `cockpit opening`.
+3. **3 Framing**: everything inside the planking. Five ring frames at **FrameStations**, the transom, two stem laminations and the keel hog are 2D outlines taken from cross-sections of the hull surface, moved inside the planking and, where they reach the deck, capped by its crowned underside, then extruded and placed. The frames stand 0.5 mm off the planking and deck as a glue line. The sheer clamps, chine logs and bottom battens are planking strips given depth inward; the king plank and deck battens sit under the deck. **CNC Parts** notches the frames and transom for the timber members, and **Cockpit Beam Cut** opens the frame beams inside the cockpit.
+4. **4 Skin**: 6 mm side planking, 9 mm bottom planking, the crowned 9 mm deck in two halves and the coaming.
+5. **5 Flat Patterns**: the side planking, bottom planking and starboard deck half unrolled flat with tristan-huber/crv.MeshUnroll. Each pattern is laid out twice: the port pieces are the same patterns turned over.
+6. **6 Cut Layout**: the 18 mm plywood parts (five frames, the transom and two stem laminations) nested on three 2440 x 1220 sheets.
 
-## Keeping the compute time down
-- Notches: **Notch Zones** (inside CNC Parts) clips the keel hog, longitudinals and deck framing to 60 mm boxes around each frame station and a 400 mm box at the transom, and the clipped pieces are fused into one cutter. Each frame and the transom then takes one boolean cut instead of 16 cuts against full-length members (this step went from about an hour to a few minutes).
-- There is one hull volume, the inner one. The deck is cut from the deck plan and Hull Cutters rather than from a second, outer hull volume.
-- The crowned lofts (Deck Crown Volume, deck skin, coaming, deck framing layer) use 24 sections along the sheer.
-- Each stem lamination subtracts a shifted copy of its own blank, not the whole hull volume.
-- The slowest steps left are building the inner hull volume and intersecting it with the frames, transom, stem, keel hog and longitudinals. A change to the Hull JSON or thicknesses recomputes all of these.
+The final Assembly shows **3 Framing** and **4 Skin** together.
+
+## Changing it
+- **Hull JSON**: keep it under 10,000 characters, because Abundance does not save longer text inputs. The current one is a compact copy of the fit (no point moves more than 0.05 mm). CamberToWires scales its wires so their X extent equals `HullLengthInches`, which is set to the raw extent (4713.955) for a scale of exactly 1: if you change the JSON, copy the new value from the `Width` atom inside CamberToWires into `HullLengthInches`.
+- **FrameStations**: frame positions in mm from the bottom of the transom. The frames and their notches follow.
+- Plywood thicknesses, member sizes, the cockpit, the coaming, the crown radius and the frames' glue gap are inputs on the molecules that use them.
+
+## Keeping it quick
+- Frames, transom, stem and keel hog are drawn as 2D outlines from sections through the hull surface, then extruded and placed, so no solid hull is ever built or cut.
+- Each frame gets all its notches from one boolean cut: the timber members are clipped to short zones around the stations (**Notch Zones**) and fused first.
+- Only one side of the planking and deck is unrolled; the other side uses the same patterns.
+
+## Simplifications
+- Frames, transom and stem have square edges: their outlines are sections through the part, so they are bevelled to the planking by hand, as with any 3-axis CNC cut (up to 2 mm on frames 1400 and 2100, 4 to 5 mm on frames 700 and 2800, 7 mm on frame 3500).
+- The keel hog is a rectangular timber that bears on the bottom planking at its edges; it does not follow the V of the bottom.
+- The chine log is two pieces, one on each side of the chine, and the sheer clamp is not trimmed to the underside of the deck.
+- The deck outline is a polyline through 48 points of the sheer (within a millimetre of it), and the deck's aft edge is square rather than raked with the transom.
+- The planking and deck patterns are single full-length pieces (about 4.4 m); plywood sheets are scarfed to that length before cutting.
 
 ## Assumed (not in the references)
-Plywood thicknesses (6 / 9 / 18 mm, 9 mm deck), frame stations, member sizes, the deck framing, the cockpit and coaming sizes and where the stem starts are estimates from the photos; all are inputs. Hardware is not modelled.
+Plywood thicknesses (6 / 9 / 18 mm, 9 mm deck), frame stations, member sizes, the deck framing, the cockpit and coaming sizes and where the stem starts are estimates from the build photos.
+
 
 __GEOMETRY_INPUT__
 

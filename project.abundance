@@ -12729,7 +12729,14 @@
               "name": "toUnroll",
               "type": "faceselect",
               "options": [],
-              "selectedFaceData": {}
+              "selectedFaceData": {
+                "0": [
+                  5
+                ],
+                "1": [
+                  5
+                ]
+              }
             },
             {
               "atomType": "Input",

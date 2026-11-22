@@ -10817,8 +10817,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.38,
-          "y": 0.66,
+          "x": 0.1382,
+          "y": 0.338,
           "uniqueID": "id-8332",
           "name": "Deck Plan",
           "ioValues": [
@@ -10886,8 +10886,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.45,
-          "y": 0.66,
+          "x": 0.3452,
+          "y": 0.293,
           "uniqueID": "id-8336",
           "name": "Cockpit Opening",
           "ioValues": [
@@ -11359,8 +11359,8 @@
         },
         {
           "atomType": "Tag",
-          "x": 0.3,
-          "y": 0.75,
+          "x": 0.213,
+          "y": 0.769,
           "uniqueID": "id-8361",
           "name": "deck outline",
           "ioValues": [
@@ -11391,8 +11391,8 @@
         },
         {
           "atomType": "Assembly",
-          "x": 0.36,
-          "y": 0.8,
+          "x": 0.6991,
+          "y": 0.4873,
           "uniqueID": "id-8363",
           "ioValues": [
             {
@@ -12316,8 +12316,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.2,
-          "y": 0.45,
+          "x": 0.1429,
+          "y": 0.5352,
           "uniqueID": "id-8489",
           "name": "Hull Cutters",
           "ioValues": [
@@ -12600,8 +12600,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.38,
-          "y": 0.12,
+          "x": 0.3829,
+          "y": 0.2789,
           "uniqueID": "id-8502",
           "name": "Side Surface",
           "ioValues": [
@@ -12892,8 +12892,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.38,
-          "y": 0.42,
+          "x": 0.3896,
+          "y": 0.6507,
           "uniqueID": "id-8517",
           "name": "Bottom Surface",
           "ioValues": [
@@ -13186,8 +13186,8 @@
         },
         {
           "atomType": "Tag",
-          "x": 0.3,
-          "y": 0.3,
+          "x": 0.5913,
+          "y": 0.293,
           "uniqueID": "id-8532",
           "name": "side surface",
           "ioValues": [
@@ -13202,8 +13202,8 @@
         },
         {
           "atomType": "Tag",
-          "x": 0.3,
-          "y": 0.4,
+          "x": 0.5417,
+          "y": 0.5549,
           "uniqueID": "id-8533",
           "name": "bottom surface",
           "ioValues": [
@@ -13218,8 +13218,8 @@
         },
         {
           "atomType": "Assembly",
-          "x": 0.36,
-          "y": 0.35,
+          "x": 0.8419,
+          "y": 0.4592,
           "uniqueID": "id-8534",
           "ioValues": [
             {
@@ -13242,8 +13242,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.55,
-          "y": 0.92,
+          "x": 0.5112,
+          "y": 0.9014,
           "uniqueID": "id-8535",
           "name": "Hull vs Reference Check",
           "ioValues": [

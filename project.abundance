@@ -5349,10 +5349,6 @@
           "ioValue": "__GEOMETRY_INPUT__"
         },
         {
-          "name": "Shape3",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
           "name": "Shape4",
           "ioValue": "__GEOMETRY_INPUT__"
         },
@@ -5362,10 +5358,6 @@
         },
         {
           "name": "Shape6",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "Shape7",
           "ioValue": "__GEOMETRY_INPUT__"
         }
       ]
@@ -7277,6 +7269,11 @@
         }
       ],
       "allConnectors": [
+        {
+          "ap2Name": "number or geometry",
+          "ap1ID": "id-2858",
+          "ap2ID": "id-2856"
+        },
         {
           "ap2Name": "Shape 1",
           "ap1ID": "id-2864",
@@ -12204,19 +12201,9 @@
   ],
   "allConnectors": [
     {
-      "ap2Name": "Shape 1",
-      "ap1ID": "id-1069",
-      "ap2ID": "id-1892"
-    },
-    {
       "ap2Name": "Frames",
       "ap1ID": "id-1069",
       "ap2ID": "id-2765"
-    },
-    {
-      "ap2Name": "Shape2",
-      "ap1ID": "id-1191",
-      "ap2ID": "id-1892"
     },
     {
       "ap2Name": "Transom",
@@ -12237,11 +12224,6 @@
       "ap2Name": "Hull JSON",
       "ap1ID": "id-122",
       "ap2ID": "id-346"
-    },
-    {
-      "ap2Name": "Shape3",
-      "ap1ID": "id-1240",
-      "ap2ID": "id-1892"
     },
     {
       "ap2Name": "Stem",
@@ -12357,6 +12339,11 @@
       "ap2Name": "InnerHullLines",
       "ap1ID": "id-2454",
       "ap2ID": "id-2162"
+    },
+    {
+      "ap2Name": "Shape 1",
+      "ap1ID": "id-2765",
+      "ap2ID": "id-1892"
     },
     {
       "ap2Name": "Parts",

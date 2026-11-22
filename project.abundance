@@ -81,8 +81,8 @@
         },
         {
           "atomType": "CutOrient",
-          "x": 0.35,
-          "y": 0.5,
+          "x": 0.4517,
+          "y": 0.5437,
           "uniqueID": "id-2816",
           "name": "Cut Orient",
           "ioValues": [
@@ -1020,8 +1020,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.4636,
-          "y": 0.6535,
+          "x": 0.379,
+          "y": 0.6761,
           "uniqueID": "id-6468",
           "name": "Stem",
           "ioValues": [
@@ -1320,8 +1320,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.457,
-          "y": 0.8197,
+          "x": 0.3757,
+          "y": 0.8648,
           "uniqueID": "id-6480",
           "name": "Keel Hog",
           "ioValues": [
@@ -6857,8 +6857,8 @@
     },
     {
       "atomType": "Molecule",
-      "x": 0.65,
-      "y": 0.5,
+      "x": 0.6515,
+      "y": 0.538,
       "uniqueID": "id-7579",
       "name": "4 Skin",
       "ioValues": [
@@ -6887,8 +6887,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.5648,
-          "y": 0.1042,
+          "x": 0.5668,
+          "y": 0.1352,
           "uniqueID": "id-7583",
           "name": "Planking",
           "ioValues": [
@@ -7248,8 +7248,8 @@
             },
             {
               "atomType": "Color",
-              "x": 0.55,
-              "y": 0.05,
+              "x": 0.5066,
+              "y": 0.4225,
               "uniqueID": "id-7599",
               "ioValues": [
                 {
@@ -7261,8 +7261,8 @@
             },
             {
               "atomType": "Color",
-              "x": 0.55,
-              "y": 0.95,
+              "x": 0.5397,
+              "y": 0.5746,
               "uniqueID": "id-7600",
               "ioValues": [
                 {
@@ -7335,8 +7335,8 @@
             },
             {
               "atomType": "Molecule",
-              "x": 0.3,
-              "y": 0.3,
+              "x": 0.2976,
+              "y": 0.2958,
               "uniqueID": "id-7607",
               "name": "Side Panel",
               "ioValues": [
@@ -7423,8 +7423,8 @@
             },
             {
               "atomType": "Molecule",
-              "x": 0.3,
-              "y": 0.7,
+              "x": 0.3009,
+              "y": 0.7155,
               "uniqueID": "id-7612",
               "name": "Bottom Panel",
               "ioValues": [
@@ -7881,8 +7881,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.6541,
-          "y": 0.2254,
+          "x": 0.5688,
+          "y": 0.4958,
           "uniqueID": "id-7630",
           "name": "Deck",
           "ioValues": [
@@ -7937,8 +7937,8 @@
             },
             {
               "atomType": "Molecule",
-              "x": 0.25,
-              "y": 0.45,
+              "x": 0.2487,
+              "y": 0.4507,
               "uniqueID": "id-7634",
               "name": "Deck Skin",
               "ioValues": [
@@ -7993,8 +7993,8 @@
                 },
                 {
                   "atomType": "Intersection",
-                  "x": 0.5,
-                  "y": 0.3,
+                  "x": 0.834,
+                  "y": 0.4338,
                   "uniqueID": "id-7638",
                   "ioValues": [
                     {
@@ -8063,8 +8063,8 @@
                 },
                 {
                   "atomType": "Extrude",
-                  "x": 0.25,
-                  "y": 0.75,
+                  "x": 0.5688,
+                  "y": 0.7268,
                   "uniqueID": "id-7645",
                   "ioValues": [
                     {
@@ -8079,8 +8079,8 @@
                 },
                 {
                   "atomType": "Move",
-                  "x": 0.4,
-                  "y": 0.75,
+                  "x": 0.7262,
+                  "y": 0.707,
                   "uniqueID": "id-7646",
                   "ioValues": [
                     {
@@ -8103,8 +8103,8 @@
                 },
                 {
                   "atomType": "Difference",
-                  "x": 0.25,
-                  "y": 0.6,
+                  "x": 0.248,
+                  "y": 0.4845,
                   "uniqueID": "id-8310",
                   "ioValues": [
                     {
@@ -8159,8 +8159,8 @@
                 },
                 {
                   "atomType": "Intersection",
-                  "x": 0.4,
-                  "y": 0.7,
+                  "x": 0.4325,
+                  "y": 0.6056,
                   "uniqueID": "id-8324",
                   "ioValues": [
                     {
@@ -8270,8 +8270,8 @@
                 },
                 {
                   "atomType": "Tag",
-                  "x": 0.72,
-                  "y": 0.45,
+                  "x": 0.2288,
+                  "y": 0.4704,
                   "uniqueID": "id-7655",
                   "name": "deck",
                   "ioValues": [
@@ -8286,8 +8286,8 @@
                 },
                 {
                   "atomType": "Color",
-                  "x": 0.85,
-                  "y": 0.45,
+                  "x": 0.6303,
+                  "y": 0.4789,
                   "uniqueID": "id-7656",
                   "ioValues": [
                     {
@@ -8761,8 +8761,8 @@
         },
         {
           "atomType": "Molecule",
-          "x": 0.668,
-          "y": 0.3972,
+          "x": 0.5761,
+          "y": 0.7408,
           "uniqueID": "id-7675",
           "name": "Coaming",
           "ioValues": [

@@ -202,71 +202,71 @@
           "placements": [
             [
               {
-                "id": 2,
+                "id": 3,
                 "rotate": 90,
                 "translate": {
-                  "x": 864.6299438476562,
-                  "y": 327.3500061035156
+                  "x": 825.3499145507812,
+                  "y": 338.6199951171875
                 }
               },
               {
                 "id": 0,
-                "rotate": 90,
+                "rotate": 270,
                 "translate": {
-                  "x": 715.3999633789062,
-                  "y": 914.300048828125
-                }
-              },
-              {
-                "id": 7,
-                "rotate": 0,
-                "translate": {
-                  "x": 1866.8800048828125,
-                  "y": 561.4000244140625
+                  "x": 714.260009765625,
+                  "y": 936.989990234375
                 }
               }
             ],
             [
               {
-                "id": 3,
+                "id": 2,
                 "rotate": 90,
                 "translate": {
-                  "x": 826.4699096679688,
-                  "y": 336.80999755859375
+                  "x": 864.570068359375,
+                  "y": 306.92999267578125
                 }
               },
-              {
-                "id": 5,
-                "rotate": 90,
-                "translate": {
-                  "x": 644.5199584960938,
-                  "y": 884.2899780273438
-                }
-              }
-            ],
-            [
               {
                 "id": 1,
                 "rotate": 90,
                 "translate": {
-                  "x": 822.6700439453125,
-                  "y": 299.9700012207031
+                  "x": 821.1299438476562,
+                  "y": 898.010009765625
                 }
-              },
-              {
-                "id": 6,
-                "rotate": 120,
-                "translate": {
-                  "x": 503.0753479003906,
-                  "y": 808.3628540039062
-                }
-              },
+              }
+            ],
+            [
               {
                 "id": 4,
                 "rotate": 90,
                 "translate": {
-                  "x": 1254.0999755859375,
-                  "y": 895.5700073242188
+                  "x": 641.7799682617188,
+                  "y": 306.3500061035156
+                }
+              },
+              {
+                "id": 5,
+                "rotate": 270,
+                "translate": {
+                  "x": 643.1500244140625,
+                  "y": 805.3899536132812
+                }
+              },
+              {
+                "id": 6,
+                "rotate": 270,
+                "translate": {
+                  "x": 1419.570068359375,
+                  "y": 465.3299865722656
+                }
+              },
+              {
+                "id": 7,
+                "rotate": 270,
+                "translate": {
+                  "x": 1543.679931640625,
+                  "y": 1070.97998046875
                 }
               }
             ]
@@ -8673,6 +8673,22 @@
               "name": "Deck Plan",
               "type": "geometry",
               "options": []
+            },
+            {
+              "atomType": "Tag",
+              "x": 0.7,
+              "y": 0.35,
+              "uniqueID": "id-8765",
+              "name": "starboard deck",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ],
+              "tags": [
+                "starboard deck"
+              ]
             }
           ],
           "allConnectors": [
@@ -8697,9 +8713,9 @@
               "ap2ID": "id-7657"
             },
             {
-              "ap2Name": "Shape 1",
+              "ap2Name": "geometry",
               "ap1ID": "id-7648",
-              "ap2ID": "id-7672"
+              "ap2ID": "id-8765"
             },
             {
               "ap2Name": "geometry",
@@ -8730,6 +8746,11 @@
               "ap2Name": "Deck Plan",
               "ap1ID": "id-7674",
               "ap2ID": "id-7634"
+            },
+            {
+              "ap2Name": "Shape 1",
+              "ap1ID": "id-8765",
+              "ap2ID": "id-7672"
             }
           ],
           "fileTypeVersion": 1
@@ -10361,9 +10382,6 @@
                   "selectedFaceData": {
                     "0": [
                       0
-                    ],
-                    "1": [
-                      0
                     ]
                   }
                 },
@@ -10495,6 +10513,78 @@
               "tags": [
                 "plywood 9mm deck"
               ]
+            },
+            {
+              "atomType": "Move",
+              "x": 0.75,
+              "y": 0.4,
+              "uniqueID": "id-8768",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "xDist",
+                  "ioValue": 0
+                },
+                {
+                  "name": "yDist",
+                  "ioValue": 4100
+                },
+                {
+                  "name": "zDist",
+                  "ioValue": 0
+                }
+              ]
+            },
+            {
+              "atomType": "Move",
+              "x": 0.75,
+              "y": 0.6,
+              "uniqueID": "id-8774",
+              "ioValues": [
+                {
+                  "name": "geometry",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "xDist",
+                  "ioValue": 0
+                },
+                {
+                  "name": "yDist",
+                  "ioValue": 5100
+                },
+                {
+                  "name": "zDist",
+                  "ioValue": 0
+                }
+              ]
+            },
+            {
+              "atomType": "Assembly",
+              "x": 0.85,
+              "y": 0.5,
+              "uniqueID": "id-8780",
+              "ioValues": [
+                {
+                  "name": "makeDisjoint",
+                  "ioValue": false
+                },
+                {
+                  "name": "Shape 1",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "Shape2",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                },
+                {
+                  "name": "Shape3",
+                  "ioValue": "__GEOMETRY_INPUT__"
+                }
+              ]
             }
           ],
           "allConnectors": [
@@ -10519,8 +10609,28 @@
               "ap2ID": "id-8106"
             },
             {
-              "ap2Name": "number or geometry",
+              "ap2Name": "geometry",
               "ap1ID": "id-8106",
+              "ap2ID": "id-8768"
+            },
+            {
+              "ap2Name": "geometry",
+              "ap1ID": "id-8106",
+              "ap2ID": "id-8774"
+            },
+            {
+              "ap2Name": "Shape 1",
+              "ap1ID": "id-8768",
+              "ap2ID": "id-8780"
+            },
+            {
+              "ap2Name": "Shape2",
+              "ap1ID": "id-8774",
+              "ap2ID": "id-8780"
+            },
+            {
+              "ap2Name": "number or geometry",
+              "ap1ID": "id-8780",
               "ap2ID": "id-8085"
             }
           ],
@@ -10611,7 +10721,7 @@
           "x": 0.15,
           "y": 0.7,
           "uniqueID": "id-8265",
-          "name": "Extract deck",
+          "name": "Extract starboard deck",
           "ioValues": [
             {
               "name": "geometry",
@@ -10620,7 +10730,7 @@
           ],
           "tagIndex": 0,
           "selectedTags": [
-            "deck"
+            "starboard deck"
           ],
           "includeUntagged": false,
           "notKeepOut": false
